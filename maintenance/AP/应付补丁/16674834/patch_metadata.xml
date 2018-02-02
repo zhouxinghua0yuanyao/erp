@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<patch_metadata>
+<patch_number>16674834</patch_number>
+<product>ap</product>
+<abstract><![CDATA[RCA PAY ADJ HAS INCORRECT ACCTG BECAUSE LAST DIST ROUNDING IS EXECUTED IN MIDDLE]]></abstract>
+<description><![CDATA[Description
+    Old Behavior
+         1. Payment Adjusted accounting having incorrect accounting
+         in following case,
+         - Single invoice have multiple adjustment.
+         - Adjusted distributions are like +x, -x, +x, -x etc. Mean
+         same amount added removed multiple times.
+         2. For 0.0 amount payment adjustment gain/loss line are not
+         getting calculated.
+    New Behavior
+        Payment adjusted event will get account with right entries.]]></description>
+<entity_abbreviation>ap</entity_abbreviation>
+<release>R12</release>
+<based_on><![CDATA[C]]></based_on>
+<aru_update_date>DEC-26-2014 17:25:01</aru_update_date>
+ <manual_steps>
+ </manual_steps>
+<introducing>
+</introducing>
+<requires>
+</requires>
+</patch_metadata>

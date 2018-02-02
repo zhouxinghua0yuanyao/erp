@@ -1,0 +1,61 @@
+# +======================================================================+ 
+# |    Copyright (c) 2005, 2015 Oracle and/or its affiliates.           | 
+# |                         All rights reserved.                         | 
+# |                           Version 12.0.0                             | 
+# +======================================================================+ 
+# $Header: gmebhrai.ldt 120.0.12020000.2 2015/04/30 05:09:39 qzeng noship $
+
+# dbdrv: exec fnd bin FNDLOAD bin &phase=dat+20 checkfile:~PROD:~PATH:~FILE &ui_apps 0 Y UPLOAD @EDR:patch/115/import/edramvar.lct @~PROD:~PATH/~FILE
+LANGUAGE = "US"
+LDRCONFIG = "edramvar.lct 120.2"
+
+#Source Database seed122
+
+#RELEASE_NAME 12.2.2
+
+# -- Begin Entity Definitions -- 
+
+DEFINE TRANSACTION_INPUT_VAR
+  KEY   AME_TRANS_ID                    VARCHAR2(80)
+  KEY   INPUT_NAME                      VARCHAR2(80)
+  CTX   OWNER                           VARCHAR2(38)
+  BASE  AME_TRANS_NAME                  VARCHAR2(240)
+  BASE  INPUT_DESC                      VARCHAR2(240)
+  BASE  INPUT_TYPE                      VARCHAR2(20)
+  BASE  DEFAULT_VALUE                   VARCHAR2(240)
+  BASE  LAST_UPDATE_DATE                VARCHAR2(75)
+END TRANSACTION_INPUT_VAR
+
+# -- End Entity Definitions -- 
+
+
+BEGIN TRANSACTION_INPUT_VAR "oracle.apps.gme.batch.holdrelease" "EREC_REQUIRED"
+  OWNER = "ORACLE"
+  AME_TRANS_NAME = "GME ERES Batch Hold Release"
+  DEFAULT_VALUE = "N"
+  LAST_UPDATE_DATE = "2015/04/20"
+END TRANSACTION_INPUT_VAR
+
+BEGIN TRANSACTION_INPUT_VAR "oracle.apps.gme.batch.holdrelease" "ESIG_REQUIRED"
+  OWNER = "ORACLE"
+  AME_TRANS_NAME = "GME ERES Batch Hold Release"
+  DEFAULT_VALUE = "N"
+  LAST_UPDATE_DATE = "2015/04/20"
+END TRANSACTION_INPUT_VAR
+
+BEGIN TRANSACTION_INPUT_VAR "oracle.apps.gme.batch.holdrelease"
+ "EREC_STYLE_SHEET"
+  OWNER = "ORACLE"
+  AME_TRANS_NAME = "GME ERES Batch Hold Release"
+  DEFAULT_VALUE = "GMEBHREL.rtf"
+  LAST_UPDATE_DATE = "2015/04/20"
+END TRANSACTION_INPUT_VAR
+
+BEGIN TRANSACTION_INPUT_VAR "oracle.apps.gme.batch.holdrelease"
+ "EREC_STYLE_SHEET_VER"
+  OWNER = "ORACLE"
+  AME_TRANS_NAME = "GME ERES Batch Hold Release"
+  DEFAULT_VALUE = "1"
+  LAST_UPDATE_DATE = "2015/04/20"
+END TRANSACTION_INPUT_VAR
+

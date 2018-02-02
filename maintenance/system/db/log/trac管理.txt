@@ -1,0 +1,2 @@
+adrci
+purge -age 10

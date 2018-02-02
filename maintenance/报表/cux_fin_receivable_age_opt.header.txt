@@ -1,0 +1,140 @@
+CREATE OR REPLACE PACKAGE cux_fin_receivable_age_opt IS
+  /*==================================================
+  Copyright (C) Yuanyao Shit Corp.
+             AllRights Reserved
+  ==================================================*/
+  /*==================================================
+  Program Name:
+      cux_fin_receivable_age_opt
+  Description:
+      This program provide private API to perform:
+       DIS-027_账龄表（管理-生物 优化）
+  History:
+      1.00  2017-11-03  xinghua.Chow  Creation
+  ==================================================*/
+
+  PROCEDURE main(errbuf                 OUT VARCHAR2,
+                 retcode                OUT VARCHAR2,
+                 p_org_id               IN NUMBER,
+                 p_cust_account_id      IN NUMBER,
+                 p_district             IN VARCHAR2,
+                 p_oe_header_id         IN NUMBER,
+                 p_contract_number      IN VARCHAR2,
+                 p_date_from            IN VARCHAR2, --签订时间
+                 p_date_to              IN VARCHAR2,
+                 p_cash_date_f          IN VARCHAR2,
+                 p_cash_date_t          IN VARCHAR2,
+                 p_ar_date_f            IN VARCHAR2,
+                 p_ar_date_t            IN VARCHAR2,
+                 p_display_zero_flag    IN VARCHAR2,
+                 p_include_invaild_flag IN VARCHAR2 DEFAULT 'Y');
+
+  g_print_header0 VARCHAR2(300) := '<html>' ||
+                                   '<meta http-equiv="Content-Language" content="zh-cn">' ||
+                                   '<meta http-equiv="Content-Type" content="text/html; charset=G_CHARSET">';
+  g_print_header1 CONSTANT VARCHAR2(5000) := '<title>账龄表（管理-生物）</title>' ||
+                                             '<style type="text/css">' ||
+                                             '<-- $header: porstyl2.css 115.9 2011/02/21 09:21:42 DFLEE ship ${  }' ||
+                                             '<!--' ||
+                                             '   body         {background-color: #ffffff;}' ||
+                                             '   .subheader1  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 13pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' ||
+                                             '   .subheader2  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' ||
+                                             '   .tableheader {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 background: #E0ECF8;' ||
+                                             '                 color: #336699;' ||
+                                             '                 text-align: center;}' ||
+                                             '   .tabledata   {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 mso-number-format: "\@"}' ||
+                                             '   .tabledata2  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 color: #000000;' ||
+                                             '                 mso-number-format: "\@"}' ||
+                                             '   .tablenumber {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 text-align: right}' ||
+                                             '   .tablenum002 {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 text-align: right;' ||
+                                             '                 mso-number-format: "0\.0000";}' ||
+                                             '    .footer  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' ||
+                                             '-->' || '</style>';
+
+  g_print_header2 VARCHAR2(500) := '<body>' ||
+                                   '<TABLE border=0 cellpadding=0 cellspacing=0 width=1200>' ||
+                                   '<TR><th colspan=24 class=subheader1 align=center style="margin-top: 0"><h2>账龄表（管理-生物）</h2> </th></TR>' ||
+                                   '</TABLE>';
+
+  g_print_header2_2 VARCHAR2(2000) := '<TABLE border=0 cellpadding=0 cellspacing=0 width=1400>' ||
+                                      '<TR><td class="tabledata2">业务实体：</td> <td align = left class="tabledata2">TEXT01</td> ' ||
+                                      '<td class="tabledata2">客户名称：</td><td align = "left" class="tabledata2">TEXT02</td>  ' ||
+                                      '<td class="tabledata2">合同签订日期从：</td><td align = "left" class="tabledata2">TEXT06</td>  ' ||
+                                      '<td class="tabledata2">合同签订日期至：</td><td align = "left" class="tabledata2">TEXT07</td>  ' ||
+                                      '</TR> ' ||
+                                      '<TR><td class="tabledata2">收款日期从：</td> <td align = left class="tabledata2">TEXT10</td> ' ||
+                                      '<td class="tabledata2">收款日期至：</td><td align = "left" class="tabledata2">TEXT11</td>  ' ||
+                                      '<td class="tabledata2">应收发票日期从：</td><td align = "left" class="tabledata2">TEXT12</td>  ' ||
+                                      '<td class="tabledata2">应收发票日期至：</td><td align = "left" class="tabledata2">TEXT13</td>  ' ||
+                                      '<td class="tabledata2">是否显示应收款项为零：</td><td align = "left" class="tabledata2">TEXT08</td>  ' ||
+                                      '<td class="tabledata2">制单日期：</td><td align = "left" class="tabledata2">TEXT09</td>  ' ||
+                                      '</TR> ' || '</TABLE>';
+
+  g_print_header3 CONSTANT VARCHAR2(5000) := '<TABLE width=800 border=1 cellpadding=3 cellspacing=1><tr>' ||
+                                             '<td class="tableheader" nowrap width="100">业务实体</td>' ||
+                                             '<td class="tableheader" nowrap width="100">客户编码</td>' ||
+                                             '<td class="tableheader" nowrap width="100">客户名称</td>' ||
+                                             '<td class="tableheader" nowrap width="100">档案标准账期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">档案标准额度</td>' ||
+                                             '<td class="tableheader" nowrap width="100">订单编号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">订单行</td>' ||
+                                             '<td class="tableheader" nowrap width="100">部门</td>' ||
+                                             '<td class="tableheader" nowrap width="100">业务员</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发货单号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发票编号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发票行号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">产品编码</td>' ||
+                                             '<td class="tableheader" nowrap width="100">产品名称</td>' ||
+                                            '<td class="tableheader" nowrap width="100">出库日期</td>' ||
+                                            '<td class="tableheader" nowrap width="100">回签日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">账龄起始日</td>' ||
+                                             '<td class="tableheader" nowrap width="100">起始日属性</td>' ||
+                                             '<td class="tableheader" nowrap width="100">币种</td>' ||
+                                             '<td class="tableheader" nowrap width="100">可核销</td>' ||
+                                             '<td class="tableheader" nowrap width="100">应收余额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">收款核销</td>' ||
+                                             '<td class="tableheader" nowrap width="100">账期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">1-7天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">8-15天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">16-20天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">21-30天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">31-45天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">46-60天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">61-180天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">181-360天</td>' ||
+                                             '<td class="tableheader" nowrap width="100">360天以上</td></tr>';
+
+  g_print_body1 VARCHAR2(100) := '<tr>';
+  g_print_body2 VARCHAR2(100) := '<td class="tabledata">TEXT01</td>';
+  g_print_body3 VARCHAR2(100) := '<td class="tablenumber">TEXT01</td>';
+  g_print_body4 VARCHAR2(100) := '</tr>';
+
+  g_print_footer CONSTANT VARCHAR2(30) := '</body></html>';
+
+END cux_fin_receivable_age_opt;

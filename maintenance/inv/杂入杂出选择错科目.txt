@@ -1,0 +1,54 @@
+1.) backup data 
+ create table mmt_0802bak as 
+ select * from mtl_material_transactions    ---------mtl_material_transactions 
+ where transaction_id = &transaction_id; 
+
+ create table gxeh_0802bak as 
+ select * from gmf_xla_extract_headers      ---------gmf_xla_extract_headers 
+ where transaction_id = &transaction_id; 
+
+ create table gxel_0802bak as 
+ select * from gmf_xla_extract_lines       ------------gmf_xla_extract_lines 
+ where header_id in (select header_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id); 
+
+ create table xe_0802back as 
+ select * from xla_events                  ----------xla_events 
+ where event_id in (select event_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id); 
+
+ create table xah_0802bak as 
+ select * from xla_ae_headers               --------xla_ae_headers
+ where event_id in (select event_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id); 
+
+ create table xal_0802back as                 -----------xla_ae_lines 
+ select * from xla_ae_lines 
+ where ae_header_id in (select ae_header_id from xla_ae_headers 
+ where event_id in (select event_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id)); 
+
+ 2.) Update & Delete data 
+ update mtl_material_transactions 
+ set DISTRIBUTION_ACCOUNT_ID = &correct_ccid 
+ where transaction_id = &transaction_id; 
+
+ delete from xla_ae_lines 
+ where ae_header_id in (select ae_header_id from xla_ae_headers 
+ where event_id in (select event_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id)); 
+
+ delete from xla_ae_headers 
+ where event_id in (select event_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id); 
+
+ delete from xla_events 
+ where event_id in (select event_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id); 
+
+ delete from gmf_xla_extract_lines 
+ where header_id in (select header_id from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id); 
+
+ delete from gmf_xla_extract_headers 
+ where transaction_id = &transaction_id; 

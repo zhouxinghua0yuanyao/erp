@@ -1,0 +1,1149 @@
+CREATE OR REPLACE PACKAGE BODY cux_dis_sales_deposit_rpt_pkg IS
+
+  /*==================================================
+  Copyright (C) Hand Enterprise Solutions Co.,Ltd.
+             AllRights Reserved
+  ==================================================*/
+  /*==================================================
+  Program Name:
+      cux_dis_sales_deposit_rpt_pkg
+  Description:
+      销售保证金报表
+  History: 
+      1.00  2016.03.03.  NINA.YE  Creation
+  ==================================================*/
+
+  -- Global variable
+  g_pkg_name CONSTANT VARCHAR2(30) := 'cux_dis_sales_deposit_rpt_pkg';
+  g_api_type CONSTANT VARCHAR2(4) := '_RPT';
+
+  /*=======================================================
+  *  FUNCTION / PROCEDURE
+  *       output
+  *   DESCRIPTION:
+  *      输出程序
+  *   HISTORY:
+      1.00  2016.03.03.  NINA.YE  Creation
+  =========================================================*/
+  PROCEDURE output(p_msg IN VARCHAR2) IS
+  BEGIN
+    fnd_file.put_line(fnd_file.output, p_msg);
+    --dbms_output.enable(99999999999999);
+    --dbms_output.put_line(p_msg);
+  END output;
+
+  /*=======================================================
+  *  FUNCTION / PROCEDURE
+  *       log
+  *   DESCRIPTION:
+  *      输出日志程序
+  *   ARGUMENT:
+  *   HISTORY:
+     1.00  2016.03.03.  NINA.YE  Creation
+  =========================================================*/
+  PROCEDURE log(p_msg IN VARCHAR2) IS
+  BEGIN
+    fnd_file.put_line(fnd_file.log, p_msg);
+  END log;
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_so_last_ship_status
+  *   DESCRIPTION:
+  *      获取销售订单最后一次发货的通知单状态
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.22  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_so_last_ship_status(p_so_header_id IN NUMBER) RETURN VARCHAR2 IS
+    l_last_ship_status VARCHAR2(50);
+  BEGIN
+  
+    SELECT h.req_status
+      INTO l_last_ship_status
+      FROM cux_dis_req_headers_all h, cux_dis_req_line_so_all l
+     WHERE h.header_id = l.header_id
+       AND h.req_status IN ('SUBMIT', 'APPROVED', 'FINAPPROVED')
+       AND l.so_header_id = p_so_header_id
+       AND h.last_ship_flag = 'Y'
+       AND rownum = 1;
+  
+    RETURN l_last_ship_status;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_so_last_ship_status;
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_cust_credit_class
+  *   DESCRIPTION:
+  *      获取客户的信用等级
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_cust_credit_class(p_org_id          IN NUMBER,
+                                 p_cust_account_id IN NUMBER) RETURN VARCHAR2 IS
+    l_credit_class VARCHAR2(200);
+  BEGIN
+    SELECT csh.credit_class
+      INTO l_credit_class
+      FROM CUX_DIS_CREDIT_SET_HEADERS csh
+     WHERE csh.party_type = 'C' --客户
+       AND csh.org_id = p_org_id
+       AND csh.vendor_or_cust_id = p_cust_account_id;
+    RETURN l_credit_class;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_cust_credit_class;
+
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_so_total_amount_o
+  *   DESCRIPTION:
+  *      获取销售订单原始总金额
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_so_total_amount_o(p_so_header_id IN NUMBER) RETURN NUMBER IS
+    l_total_amount_o NUMBER;
+  BEGIN
+    SELECT sum(ool.pricing_quantity * ool.unit_selling_price_per_pqty)
+      INTO l_total_amount_o
+      FROM oe_order_lines_all ool
+     WHERE ool.header_id = p_so_header_id;
+    RETURN l_total_amount_o;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_so_total_amount_o;
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_so_total_amount
+  *   DESCRIPTION:
+  *      获取销售订单当前总金额
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_so_total_amount(p_so_header_id IN NUMBER) RETURN NUMBER IS
+    l_total_amount NUMBER;
+  BEGIN
+    SELECT sum(ool.pricing_quantity * ool.unit_selling_price)
+      INTO l_total_amount
+      FROM oe_order_lines_all ool
+     WHERE ool.header_id = p_so_header_id;
+    RETURN l_total_amount;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_so_total_amount;
+
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_so_point_amount
+  *   DESCRIPTION:
+  *      获取销售订单大行号的点价金额
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_so_point_amount(p_so_header_id IN NUMBER,
+                               p_line_number  IN NUMBER) RETURN NUMBER IS
+    l_deposit_amount NUMBER;
+  BEGIN
+    SELECT sum(ctp.price_quantity * ctp.time_price)
+      INTO l_deposit_amount
+      FROM CUX_DIS_CONT_TIME_PRICE ctp
+     WHERE ctp.contract_source = 'OE' --点价类型为销售
+       AND ctp.contract_id = p_so_header_id
+       AND ctp.contract_line_number = p_line_number;
+    RETURN l_deposit_amount;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_so_point_amount;
+
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_so_point_quantity
+  *   DESCRIPTION:
+  *      获取销售订单大行号的点价数量
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_so_point_quantity(p_so_header_id IN NUMBER,
+                                 p_line_number  IN NUMBER) RETURN NUMBER IS
+    l_deposit_qty NUMBER;
+  BEGIN
+    SELECT sum(ctp.price_quantity)
+      INTO l_deposit_qty
+      FROM CUX_DIS_CONT_TIME_PRICE ctp
+     WHERE ctp.contract_source = 'OE' --点价类型为销售
+       AND ctp.contract_id = p_so_header_id
+       AND ctp.contract_line_number = p_line_number;
+    RETURN l_deposit_qty;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_so_point_quantity;
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_daily_price
+  *   DESCRIPTION:
+  *      获取大区的区域均价
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_daily_price(p_org_id            IN NUMBER,
+                           p_area_code         IN VARCHAR2,
+                           p_currency_code     IN VARCHAR2,
+                           p_inventory_item_id IN NUMBER,
+                           p_date              IN DATE) RETURN NUMBER IS
+    l_po_daily_price NUMBER;
+  BEGIN
+    SELECT cdpm.standard_price
+      INTO l_po_daily_price
+      FROM cux_dis_price_maintains_all cdpm
+     WHERE cdpm.price_type_code = 'QYJJ' --区域均价
+       AND cdpm.org_id = p_org_id
+       AND cdpm.currency_code = p_currency_code
+       AND cdpm.area_code = p_area_code
+       AND cdpm.inventory_item_id = p_inventory_item_id
+       AND p_date BETWEEN cdpm.effective_date_from AND
+           nvl(cdpm.effective_date_to, SYSDATE + 1)
+       AND rownum = 1;
+    RETURN l_po_daily_price;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_daily_price;
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_so_line_executed_qty
+  *   DESCRIPTION:
+  *      获取销售订单大行号的已执行数量
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  *     2.00  2016.03.22  NINA.YE  Modified
+  =======================================================*/
+  FUNCTION get_so_line_executed_qty(p_so_header_id IN NUMBER,
+                                    p_line_number  IN NUMBER) RETURN NUMBER IS
+    l_executed_qty NUMBER := 0;
+    l_line_id      NUMBER := 0;
+  
+  BEGIN
+    select ool.line_id
+      into l_line_id
+      from oe_order_lines_all ool
+     where ool.header_id = p_so_header_id
+       and ool.line_number = p_line_number
+       and ool.shipment_number = 1;
+  
+    l_executed_qty := cux_dis_credit_check_utl.get_order_executed_qty('SO',
+                                                                      p_so_header_id,
+                                                                      l_line_id);
+    RETURN l_executed_qty;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_so_line_executed_qty;
+
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_ar_receipt_deposit
+  *   DESCRIPTION:
+  *      获取销售订单收取的保证金
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_ar_receipt_deposit(p_so_header_id IN NUMBER) RETURN NUMBER IS
+    l_ar_receipt_deposit NUMBER;
+  BEGIN
+    /*    select nvl(sum(ara.amount_applied), 0)
+     into l_ar_receipt_deposit
+     from ar.ar_cash_receipts_all        acr,
+          ar_cash_receipt_history_all    acrh,
+          ar_receivable_applications_all ara
+    WHERE acrh.cash_receipt_id = acr.cash_receipt_id
+      AND acrh.org_id = acr.org_id
+      AND acrh.current_record_flag = 'Y'
+      AND nvl(acr.attribute1, '1') = 'Bail' --保证金
+      AND ara.cash_receipt_id = acr.cash_receipt_id
+      AND ara.display = 'Y'
+      AND ara.applied_payment_schedule_id = -1 --核销到记账
+      AND to_number(ara.attribute1) = p_so_header_id;*/
+  
+    --modified by nina.ye@20160323 排除已最后一次发货且已逻辑释放的 
+    select nvl(sum(arav.amount_applied), 0)
+      into l_ar_receipt_deposit
+      from ar.ar_cash_receipts_all      acr,
+           ar_payment_schedules_all     aps,
+           ar_receivable_applications_v arav
+     WHERE acr.cash_receipt_id = aps.cash_receipt_id
+       AND acr.cash_receipt_id = arav.cash_receipt_id
+       AND acr.attribute1 = 'Bail' --保证金
+       AND arav.trx_number = '记帐'
+       AND arav.attribute1 = to_char(p_so_header_id)
+       AND NOT EXISTS
+     (SELECT 1
+              FROM ar_cash_receipt_history_all acrh
+             WHERE acrh.cash_receipt_id = acr.cash_receipt_id --排除已冲销
+               AND acrh.org_id = acr.org_id
+               AND acrh.current_record_flag = 'Y'
+               AND acrh.status = 'REVERSED')
+       AND (arav.attribute2 = 'N' OR NOT EXISTS
+            (SELECT 1
+               FROM cux_dis_req_headers_all h, cux_dis_req_line_so_all l
+              WHERE 1 = 1
+                AND h.header_id = l.header_id
+                AND nvl(arav.attribute2, 'Y') = 'Y'
+                AND h.req_status = 'APPROVED'
+                AND l.so_header_id = p_so_header_id
+                AND h.last_ship_flag = 'Y'));
+  
+    RETURN l_ar_receipt_deposit;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN 0;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_ar_receipt_deposit;
+
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_deposit_req_amount
+  *   DESCRIPTION:
+  *      获取销售订单大行号的应收保证金(后续调整)
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_deposit_req_amount(p_so_header_id IN NUMBER,
+                                  p_line_number  IN NUMBER) RETURN NUMBER IS
+    l_deposit_req_amount NUMBER := 0;
+  BEGIN
+    NULL;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_deposit_req_amount;
+
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_deposit_point_add
+  *   DESCRIPTION:
+  *      获取点价/协议价类型的销售订单大行号的价格*未执行量计算
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_deposit_point_add(p_so_header_id   IN NUMBER,
+                                 p_line_number    IN NUMBER,
+                                 p_unexecuted_qty IN NUMBER,
+                                 p_price          IN NUMBER) RETURN NUMBER IS
+    l_add_amount     NUMBER := 0;
+    l_so_line_amount NUMBER;
+    l_point_qty      NUMBER := 0;
+  
+    CURSOR c_point IS
+      select ctp.price_quantity, ctp.time_price, ctp.time_price_id
+        FROM CUX_DIS_CONT_TIME_PRICE ctp
+       WHERE ctp.contract_source = 'OE' --点价类型为销售
+         AND ctp.contract_id = p_so_header_id
+         AND ctp.contract_line_number = p_line_number;
+  
+  BEGIN
+    select sum(ool.pricing_quantity * ool.unit_selling_price_per_pqty)
+      into l_so_line_amount
+      from oe_order_lines_all ool
+     where ool.header_id = p_so_header_id
+       and ool.line_number = p_line_number;
+  
+    FOR c1 IN c_point LOOP
+      l_point_qty  := l_point_qty + c1.price_quantity;
+      l_add_amount := l_add_amount + c1.price_quantity / l_so_line_amount *
+                      p_unexecuted_qty * c1.time_price;
+    END LOOP;
+    IF l_point_qty < l_so_line_amount THEN
+      l_add_amount := l_add_amount +
+                      (l_so_line_amount - l_point_qty) / l_so_line_amount *
+                      p_unexecuted_qty * p_price;
+    END IF;
+    RETURN l_add_amount;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_deposit_point_add;
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       get_price_con_act
+  *   DESCRIPTION:
+  *      根据订单大行号获取单价构成的实际值
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.05.09  NINA.YE  Creation
+  =======================================================*/
+  FUNCTION get_price_con_act(p_header_id   IN NUMBER,
+                             p_line_number IN NUMBER,
+                             p_type        IN VARCHAR2) RETURN NUMBER IS
+    l_price_con_act NUMBER;
+  BEGIN
+    select ps.actual_price
+      into l_price_con_act
+      from CUX_DIS_PRICE_STRUCTURES_all ps
+     where ps.source_header_id = p_header_id
+       and ps.source_code = 'OE'
+       and ps.price_type_code = p_type
+       and exists (select 1
+              from oe_order_lines_all oel
+             where oel.line_id = ps.source_line_id
+               and oel.line_number = p_line_number)
+       and rownum = 1;
+    RETURN l_price_con_act;
+  EXCEPTION
+    WHEN no_data_found THEN
+      RETURN NULL;
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_price_con_act;
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       process_request
+  *   DESCRIPTION:
+  *      主程序
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE   Creation
+  =======================================================*/
+  PROCEDURE process_request(p_init_msg_list     IN VARCHAR2 DEFAULT fnd_api.g_false,
+                            p_commit            IN VARCHAR2 DEFAULT fnd_api.g_false,
+                            x_return_status     OUT NOCOPY VARCHAR2,
+                            x_msg_count         OUT NOCOPY NUMBER,
+                            x_msg_data          OUT NOCOPY VARCHAR2,
+                            p_org_id            IN NUMBER,
+                            p_cust_account_id   IN NUMBER,
+                            p_so_hedaer_id      IN NUMBER,
+                            p_contract_num      IN VARCHAR2,
+                            p_inventory_item_id IN NUMBER,
+                            p_order_type_id     IN NUMBER,
+                            p_pricing_type_code IN VARCHAR2,
+                            p_om_price_area     IN VARCHAR2,
+                            p_start_date        IN DATE,
+                            p_end_date          IN DATE) IS
+    --declare 
+    l_cell_null CONSTANT VARCHAR2(10) := chr(38) || 'nbsp;';
+    l_print_string VARCHAR2(32767);
+    l_api_name CONSTANT VARCHAR2(30) := 'process_request';
+    l_char_encoding           VARCHAR(20);
+    l_deposit_add_amount      NUMBER := 0; --现行价应收保证金额 
+    l_deposit_add_rece_amount NUMBER := 0; --应追加保证金额
+    l_deposit_add_cust_amount NUMBER := 0; --按保证金客户分类应收追加额
+    l_change_rate             NUMBER := 0; --涨跌幅
+    l_est_freight             NUMBER := 0; --预估运费
+    l_est_zhangqi             NUMBER := 0; --账期
+    l_order_number NUMBER:=-1;  --add by zhou
+    l_rpt_title CONSTANT VARCHAR2(50) := '销售保证金报表';
+  
+    CURSOR cur_data IS
+    --排出已取消\已关闭,订单总额是0,订单行原单价是0(因为除数不能为0)的
+      select oeh.org_id,
+             oeh.header_id oe_header_id,
+             ou.name org_name, --业务实体
+             ot.name so_type, --订单类型
+             ct.pricing_type_code,
+             cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_PRICING_TYPES',
+                                               p_lookup_code => ct.pricing_type_code) pricing_type, --定价类型
+             cux_common_utl.get_flex_value_desc(p_value_set_name => 'CUX_OM_BUSINESS_TYPE',
+                                                p_flex_value     => oeh.attribute1) business_type, --业务类型
+             cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_DELIVERY_TYPES',
+                                               p_lookup_code => ct.delivery_type_code) delivery_type, --交割类型
+             trunc(nvl(ct.SIGN_DATE, oeh.ordered_date)) order_date, --销售日期
+             hp.party_name customer_name, --客户
+             cux_dis_sales_deposit_rpt_pkg.get_cust_credit_class(oeh.org_id,
+                                                                 hca.cust_account_id) class_type, --客户信用等级
+             oeh.order_number, --订单编号
+             ct.CONTRACT_NUMBER, --合同号
+             cux_common_utl.get_lookup_meaning(p_lookup_type => 'FLOW_STATUS',
+                                               p_lookup_code => oeh.flow_status_code) flow_status_code, --订单状态
+             cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_CONTRACT_STATUS',
+                                               p_lookup_code => oeh.attribute15) CONTRACT_STATUS, --审批状态
+             cux_common_utl.get_flex_value_desc(p_value_set_name => 'YUANYAO_COA_COSTCENTRE',
+                                                p_flex_value     => oeh.attribute3) bumen, --部门
+             rre.resource_name salesrep_name, --业务员
+             cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_CARGO_FINISH_TYPES',
+                                               p_lookup_code => ct.cargo_finish_type_code) cargo_finish_type, --货权了结方式
+             pv.vendor_name, --预计交货供应商
+             cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_AREA',
+                                               p_lookup_code => oolp.ATTRIBUTE8) area, --市场价计价大区
+             cux_dis_sales_deposit_rpt_pkg.get_daily_price(oeh.org_id,
+                                                           oolp.ATTRIBUTE8,
+                                                           oeh.transactional_curr_code,
+                                                           oolt.INVENTORY_ITEM_ID,
+                                                           trunc(nvl(ct.SIGN_DATE,
+                                                                     oeh.ordered_date))) daily_price, --预计供应商市场平均价
+             msi.segment1 item, --物料编码
+             msi.description item_desc, --物料名称
+             oolt.line_number,
+             oolt.order_quantity_uom, --单位
+             '' as known_as,
+             oolt.qty, --数量
+             cux_dis_sales_deposit_rpt_pkg.get_so_point_quantity(oeh.header_id,
+                                                                 oolt.line_number) be_deposit_quantity, --已点价数量
+             oeh.transactional_curr_code currency, --币种
+             oolt.unit_selling_price_per_pqty, --订单原单价
+             oolp.ATTRIBUTE4 OM_PRICE_BR, --返利前单价(非饲料)
+             oolt.qty *
+             (to_number(oolp.ATTRIBUTE4) - oolt.unit_selling_price_per_pqty) br_amount, --返利金额(非饲料)
+             oolp.ATTRIBUTE5 OM_REBATE_AMOUNT, --使用返利金额(饲料)
+             oolp.ATTRIBUTE9 OM_PRICE_BASIS, --基差合同单价
+             oolt.qty * oolt.unit_selling_price_per_pqty order_line_amount, --订单金额,
+             cux_dis_sales_deposit_rpt_pkg.get_so_point_amount(oeh.header_id,
+                                                               oolt.line_number) be_deposit_amount, --已点价金额
+             ct.deposit_rate / 100 deposit_rate, --定金/保证金比例(%)
+             ct.deposit_amount, --定金/保证金金额
+             ctd.deposit_num / 100 deposit_num, --点价后定金/保证金比例(%)
+             trunc(oolp.PROMISE_DATE) PROMISE_DATE, --最晚交提货日期（承诺日期）
+             oolp.SHIP_TOLERANCE_ABOVE / 100 SHIP_TOLERANCE_ABOVE, --溢短装（超发允差）(%)
+             decode(cux_dis_sales_deposit_rpt_pkg.get_so_last_ship_status(oeh.header_id),
+                    null,
+                    '否',
+                    '是') so_last_ship_flag, --订单是否最后一次发货
+             cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_APPLICATION_STATUS',
+                                               p_lookup_code => cux_dis_sales_deposit_rpt_pkg.get_so_last_ship_status(oeh.header_id)) so_last_ship_status, --最后一次发货的通知单状态
+             cux_dis_sales_deposit_rpt_pkg.get_so_line_executed_qty(oeh.header_id,
+                                                                    oolt.line_number) executed_qty, --累计通知发货量
+             oolt.qty -
+             cux_dis_sales_deposit_rpt_pkg.get_so_line_executed_qty(oeh.header_id,
+                                                                    oolt.line_number) unexecuted_qty, ----合同未执行量
+             decode(nvl(ctd.deposit_num, ct.deposit_rate),
+                    null,
+                    ct.deposit_amount * oolt.amount_o /
+                    cux_dis_sales_deposit_rpt_pkg.get_so_total_amount_o(oeh.header_id),
+                    nvl(ctd.deposit_num, ct.deposit_rate) / 100 *
+                    nvl(cux_dis_sales_deposit_rpt_pkg.get_so_point_amount(oeh.header_id,
+                                                                          oolt.line_number),
+                        0) +
+                    (oolt.qty - nvl(cux_dis_sales_deposit_rpt_pkg.get_so_point_quantity(oeh.header_id,
+                                                                                        oolt.line_number),
+                                    0)) * oolt.unit_selling_price_per_pqty *
+                    nvl(ct.deposit_rate, 0) / 100) deposit_req_amount, --合同价应收保证金额(初版的) 
+             oolt.amount_o /
+             cux_dis_sales_deposit_rpt_pkg.get_so_total_amount_o(oeh.header_id) *
+             cux_dis_sales_deposit_rpt_pkg.get_ar_receipt_deposit(oeh.header_id) ar_receipt_deposit, --累计保证金收款额
+             (decode(nvl(ctd.deposit_num, ct.deposit_rate),
+                     null,
+                     ct.deposit_amount * oolt.amount_o /
+                     cux_dis_sales_deposit_rpt_pkg.get_so_total_amount_o(oeh.header_id),
+                     nvl(ctd.deposit_num, ct.deposit_rate) / 100 *
+                     nvl(cux_dis_sales_deposit_rpt_pkg.get_so_point_amount(oeh.header_id,
+                                                                           oolt.line_number),
+                         0) +
+                     (oolt.qty - nvl(cux_dis_sales_deposit_rpt_pkg.get_so_point_quantity(oeh.header_id,
+                                                                                         oolt.line_number),
+                                     0)) * oolt.unit_selling_price_per_pqty *
+                     nvl(ct.deposit_rate, 0) / 100)) -
+             (oolt.amount_o /
+             cux_dis_sales_deposit_rpt_pkg.get_so_total_amount_o(oeh.header_id) *
+             cux_dis_sales_deposit_rpt_pkg.get_ar_receipt_deposit(oeh.header_id)) un_receipt_deposit, --合同未收保证金额
+             cux_dis_sales_deposit_rpt_pkg.get_daily_price(oeh.org_id,
+                                                           oolp.ATTRIBUTE8,
+                                                           oeh.transactional_curr_code,
+                                                           oolt.INVENTORY_ITEM_ID,
+                                                           trunc(sysdate)) sysdate_price --制表日期现行市场价
+      /*             round(cux_dis_sales_deposit_rpt_pkg.get_daily_price(oeh.org_id,
+                                                                       oolp.ATTRIBUTE8,
+                                                                       oeh.transactional_curr_code,
+                                                                       oolt.INVENTORY_ITEM_ID,
+                                                                       trunc(sysdate)) /
+                         oolt.unit_selling_price_per_pqty - 1,
+                         4) change_rate --涨跌幅*/
+      
+        from oe_order_headers_all oeh, --销售订单头
+             CUX_DIS_CONTRACT_TERMS_ALL ct, --合同条款
+             hr_operating_units ou, --业务实体
+             oe_transaction_types_tl ot, --事务处理类型
+             jtf_rs_salesreps salesrep, --销售人员分配
+             jtf_rs_resource_extns_vl rre, --销售人员信息
+             hz_parties hp, --party
+             hz_cust_accounts hca, --客户帐户
+             CUX_DIS_CONT_TIME_DEPOSIT ctd, --点价头表
+             mtl_system_items_b msi, --物料
+             po_vendors pv, --供应商
+             oe_order_lines_all oolp, --订单行,匹配大行号下的小行号是1的 --add by nina.ye@20160422
+             (select ool.header_id, --订单头id
+                     ool.line_number, --大行号
+                     ool.INVENTORY_ITEM_ID, --物料id
+                     ool.order_quantity_uom, --订购单位
+                     ool.unit_selling_price_per_pqty, --订单单价（原）
+                     /*                     ool.PROMISE_DATE, --最晚交提货日期（承诺日期）
+                                          ool.SHIP_TOLERANCE_ABOVE, --溢短装（超发允差）*/
+                     /*                     ool.ATTRIBUTE4 OM_PRICE_BR, --返利前单价(非饲料)
+                                          ool.ATTRIBUTE5 OM_REBATE_AMOUNT, --使用返利金额(饲料)
+                                          ool.ATTRIBUTE7 OM_EX_SUPPLIER, --预计供应商
+                                          ool.ATTRIBUTE8 OM_PRICE_AREA, --市场价计价大区
+                                          ool.ATTRIBUTE9 OM_PRICE_BASIS, --基差合同价格*/
+                     sum(ool.pricing_quantity) qty,
+                     sum(ool.pricing_quantity *
+                         ool.unit_selling_price_per_pqty) amount_o,
+                     sum(ool.pricing_quantity * ool.unit_selling_price) amount
+                from oe_order_lines_all ool
+               where ool.pricing_quantity <> 0
+               group by ool.header_id,
+                        ool.line_number,
+                        ool.INVENTORY_ITEM_ID,
+                        ool.order_quantity_uom,
+                        ool.unit_selling_price_per_pqty
+              /*                        ool.PROMISE_DATE,
+                                      ool.SHIP_TOLERANCE_ABOVE,*/
+              /*                        ool.ATTRIBUTE4,
+                                      ool.ATTRIBUTE5,
+                                      ool.ATTRIBUTE7,
+                                      ool.ATTRIBUTE8,
+                                      ool.ATTRIBUTE9*/
+              ) oolt --按订单行大行号汇总
+       where oeh.flow_status_code not in ('CANCELLED', 'CLOSED') --销售订单状态非已取消\已关闭
+            --and oeh.attribute15 = 'APPROVED' --销售订单审批状态是已审批
+         and oeh.header_id = ct.source_header_id --销售订单与合同条款
+         and ct.source_type_code = 'OE' --合同条款类型是销售
+         and oeh.org_id = ou.organization_id --销售订单与ou表
+         and oeh.order_type_id = ot.transaction_type_id --销售订单与订单类型
+         and ot.language = userenv('LANG') --订单类型的语言
+         and oeh.salesrep_id = salesrep.salesrep_id(+) --销售订单与销售人员分配
+         and oeh.org_id = salesrep.org_id(+) --销售订单与销售人员分配[业务实体]
+         and salesrep.resource_id = rre.resource_id(+) --销售人员分配与销售人员
+         and oeh.sold_to_org_id = hca.cust_account_id --销售订单与客户帐户
+         and hca.party_id = hp.party_id --客户帐户与party
+         and oeh.header_id = ctd.contract_id(+) --销售订单与点价头
+         and ctd.contract_source(+) = 'OE' --点价类型为销售
+         and oeh.header_id = oolt.header_id --销售订单头与销售订单行[大行号]
+         and oolt.inventory_item_id = msi.inventory_item_id --销售订单行[大行号]与物料
+         and oeh.ship_from_org_id = msi.organization_id --销售订单与物料[库存组织]
+            --and oolt.OM_EX_SUPPLIER = pv.vendor_id(+) --销售订单行[大行号]与供应商
+         and oolp.ATTRIBUTE7 = pv.vendor_id(+) --销售订单行[匹配小行]与供应商
+            ----add by nina.ye@20160422 匹配大行号下的小行号是1的 
+         and oolt.header_id = oolp.header_id
+         and oolt.line_number = oolp.line_number
+         and oolp.SHIPMENT_NUMBER = 1
+            ---add by nina.ye@20160422 匹配大行号下的小行号是1的 
+            /*    and NOT EXISTS
+                                                                                                       (select 1
+                                                                                                                from cux_dis_req_headers_all h, cux_dis_req_line_so_all ls
+                                                                                                               where h.last_ship_flag = 'Y'
+                                                                                                                 and h.header_id = ls.header_id
+                                                                                                                 and ls.so_header_id = oeh.header_id) --非最后一次发货的合同*/
+         and cux_dis_sales_deposit_rpt_pkg.get_so_total_amount_o(oeh.header_id) <> 0 --金额非0 
+         and oolt.unit_selling_price_per_pqty <> 0 --单价非0 
+         and (p_org_id IS NULL OR oeh.org_id = p_org_id)
+         and (p_cust_account_id IS NULL OR
+             oeh.sold_to_org_id = p_cust_account_id)
+         and (p_so_hedaer_id IS NULL OR oeh.header_id = p_so_hedaer_id)
+         and (p_contract_num IS NULL OR
+             ct.CONTRACT_NUMBER like p_contract_num)
+         and (p_inventory_item_id IS NULL OR
+             oolt.inventory_item_id = p_inventory_item_id)
+         and (p_order_type_id IS NULL OR
+             oeh.order_type_id = p_order_type_id)
+         and (p_pricing_type_code IS NULL OR
+             ct.pricing_type_code = p_pricing_type_code)
+         and (p_om_price_area IS NULL OR oolp.ATTRIBUTE8 = p_om_price_area)
+         and (p_start_date IS NULL OR
+             trunc(nvl(ct.SIGN_DATE, oeh.ordered_date)) >= p_start_date)
+         and (p_end_date IS NULL OR
+             trunc(nvl(ct.SIGN_DATE, oeh.ordered_date)) <= p_end_date)
+       -----add by tyler 
+        --  order by  oeh.order_number    
+             ;
+       
+  BEGIN
+    -- start activity to create savepoint, check compatibility
+    -- and initialize message list, include debug message hint to enter api
+    x_return_status := cux_api.start_activity(p_pkg_name      => g_pkg_name,
+                                              p_api_name      => l_api_name,
+                                              p_api_type      => g_api_type,
+                                              p_init_msg_list => p_init_msg_list);
+    IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+      RAISE fnd_api.g_exc_error;
+    END IF;
+  
+    --get Character set
+    BEGIN
+      SELECT v.tag
+        INTO l_char_encoding
+        FROM fnd_lookup_values_vl v
+       WHERE v.lookup_type = 'FND_ISO_CHARACTER_SET_MAP'
+         AND v.lookup_code =
+             fnd_profile.value('FND_NATIVE_CLIENT_ENCODING')
+         AND v.enabled_flag = 'Y'
+         AND trunc(SYSDATE) BETWEEN
+             nvl(v.start_date_active, trunc(SYSDATE - 1)) AND
+             nvl(v.end_date_active, trunc(SYSDATE + 1));
+    EXCEPTION
+      WHEN no_data_found THEN
+        l_char_encoding := 'UTF-8';
+    END;
+  
+    --print report header
+    output(REPLACE(g_print_header0, 'G_CHARSET', l_char_encoding));
+    output(g_print_header0);
+    l_print_string := REPLACE(g_print_header1, 'HTML_TITLE', l_rpt_title);
+    output(l_print_string);
+    l_print_string := REPLACE(g_print_header2, 'HTML_TITLE', l_rpt_title);
+    output(l_print_string);
+    l_print_string := REPLACE(g_print_header2_2,
+                              'TEXT01',
+                              to_char(SYSDATE, 'YYYY-MM-DD'));
+    output(l_print_string);
+    output(g_print_header3);
+  
+    FOR cur_record IN cur_data LOOP
+    
+      l_print_string := g_print_body;
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT01',
+                                nvl(cur_record.org_name, l_cell_null)); --业务实体
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT02',
+                                nvl(cur_record.so_type, l_cell_null)); --订单类型
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT03',
+                                nvl(cur_record.pricing_type, l_cell_null)); --定价类型
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT04',
+                                nvl(cur_record.business_type, l_cell_null)); --业务类型
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT05',
+                                nvl(cur_record.delivery_type, l_cell_null)); --交割类型
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT06',
+                                nvl(to_char(cur_record.order_date,
+                                            'YYYY-MM-DD'),
+                                    l_cell_null)); --销售日期
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT07',
+                                nvl(cur_record.customer_name, l_cell_null)); --客户
+      cur_record.known_as :=cux_dis_party_info_rpt_pkg.get_customer_shortname(cur_record.customer_name); --客户                             
+         l_print_string := REPLACE(l_print_string,
+                                'TEXT77',
+                                nvl(cur_record.known_as, l_cell_null)); --客户                        
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT08',
+                                nvl(cur_record.class_type, l_cell_null)); --客户信用等级
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT09',
+                                nvl(to_char(cur_record.order_number),
+                                    l_cell_null)); --订单编号
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT10',
+                                nvl(cur_record.CONTRACT_NUMBER, l_cell_null)); --合同号
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTEE',
+                                nvl(cur_record.flow_status_code, l_cell_null)); --订单状态
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTFF',
+                                nvl(cur_record.CONTRACT_STATUS, l_cell_null)); --审批状态                              
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT11',
+                                nvl(cur_record.bumen, l_cell_null)); --部门
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT12',
+                                nvl(cur_record.salesrep_name, l_cell_null)); --业务员
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT13',
+                                nvl(cur_record.cargo_finish_type,
+                                    l_cell_null)); --货权了结方式
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT14',
+                                nvl(cur_record.vendor_name, l_cell_null)); --预计交货供应商
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT15',
+                                nvl(cur_record.area, l_cell_null)); --市场价计价大区
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT16',
+                                nvl(to_char(cur_record.daily_price),
+                                    l_cell_null)); --预计供应商市场平均价
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTDD',
+                                nvl(to_char(cur_record.line_number),
+                                    l_cell_null)); --行号
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT17',
+                                nvl(cur_record.item, l_cell_null)); --物料编码
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT18',
+                                nvl(cur_record.item_desc, l_cell_null)); --物料名称
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTAA',
+                                nvl(cur_record.order_quantity_uom,
+                                    l_cell_null)); --单位
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT19',
+                                nvl(to_char(cur_record.qty), l_cell_null)); --数量
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT20',
+                                nvl(to_char(cur_record.be_deposit_quantity),
+                                    l_cell_null)); --已点价数量
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT21',
+                                nvl(cur_record.currency, l_cell_null)); --币种
+      ---add by nina.ye@20160509 增加单价构成的预估运费,账期
+      l_est_freight  := get_price_con_act(cur_record.oe_header_id,
+                                          cur_record.line_number,
+                                          'BZYJ');
+      l_est_zhangqi  := get_price_con_act(cur_record.oe_header_id,
+                                          cur_record.line_number,
+                                          'BZZQ');
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTGG',
+                                nvl(to_char(l_est_freight), l_cell_null)); --预估运费 
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTHH',
+                                nvl(to_char(l_est_zhangqi), l_cell_null)); --账期 
+      ----------------------------------------------------------                                                                 
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT22',
+                                nvl(to_char(cur_record.unit_selling_price_per_pqty),
+                                    l_cell_null)); --订单原单价
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT23',
+                                nvl(to_char(cur_record.OM_PRICE_BR),
+                                    l_cell_null)); --返利前单价(非饲料)
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT24',
+                                nvl(to_char(cur_record.br_amount),
+                                    l_cell_null)); --返利金额(非饲料)  
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT25',
+                                nvl(to_char(cur_record.OM_REBATE_AMOUNT),
+                                    l_cell_null)); ---使用返利金额(饲料)     
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT26',
+                                nvl(cur_record.OM_PRICE_BASIS, l_cell_null)); --基差合同单价
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT27',
+                                nvl(to_char(cur_record.order_line_amount),
+                                    l_cell_null)); --订单金额
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT28',
+                                nvl(to_char(cur_record.be_deposit_amount),
+                                    l_cell_null)); --已点价金额
+      IF cur_record.deposit_rate IS NULL THEN
+        l_print_string := REPLACE(l_print_string,
+                                  'TEXT29',
+                                  nvl(to_char(NULL), l_cell_null)); --定金/保证金比例(%)     
+      ELSE
+        l_print_string := REPLACE(l_print_string,
+                                  'TEXT29',
+                                  nvl(to_char(cur_record.deposit_rate * 100) || '%',
+                                      l_cell_null)); --定金/保证金比例(%)
+      END IF;
+     
+    
+    ---------相同订单保证金重复
+     IF (cur_record.order_number <> l_order_number) THEN
+    
+     l_print_string := REPLACE(l_print_string,
+                                'TEXT30',
+                                nvl(to_char(cur_record.deposit_amount),
+                                    l_cell_null)); --定金/保证金金额
+    else
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT30',
+                                nvl(to_char(''),
+                                    l_cell_null)); --定金/保证金金额
+     end if;
+    
+    
+    
+      IF cur_record.deposit_num IS NULL THEN
+        l_print_string := REPLACE(l_print_string,
+                                  'TEXT31',
+                                  nvl(to_char(NULL), l_cell_null)); --点价后定金/保证金比例 (%)     
+      ELSE
+        l_print_string := REPLACE(l_print_string,
+                                  'TEXT31',
+                                  nvl(to_char(cur_record.deposit_num * 100) || '%',
+                                      l_cell_null)); --点价后定金/保证金比例 (%)
+      END IF;
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT32',
+                                nvl(to_char(cur_record.PROMISE_DATE,
+                                            'YYYY-MM-DD'),
+                                    l_cell_null)); --最晚交提货日期（承诺日期）
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT33',
+                                nvl(to_char(cur_record.SHIP_TOLERANCE_ABOVE * 100) || '%',
+                                    l_cell_null)); ----溢短装（超发允差）(%)
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTBB',
+                                nvl(cur_record.so_last_ship_flag,
+                                    l_cell_null)); --最后一次发货
+      l_print_string := REPLACE(l_print_string,
+                                'TEXTCC',
+                                nvl(cur_record.so_last_ship_status,
+                                    l_cell_null)); --最后一次发货申请状态
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT34',
+                                nvl(to_char(cur_record.executed_qty),
+                                    l_cell_null)); --累计通知发货量
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT35',
+                                nvl(to_char(cur_record.unexecuted_qty),
+                                    l_cell_null)); --合同未执行量
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT36',
+                                nvl(to_char(round(cur_record.deposit_req_amount,
+                                                  2)),
+                                    l_cell_null)); --合同价应收保证金额
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT37',
+                                nvl(to_char(round(cur_record.ar_receipt_deposit,
+                                                  2)),
+                                    l_cell_null)); --累计保证金收款额
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT38',
+                                nvl(to_char(round(cur_record.un_receipt_deposit,
+                                                  2)),
+                                    l_cell_null)); --合同未收保证金额
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT39',
+                                nvl(to_char(cur_record.sysdate_price),
+                                    l_cell_null)); --制表日期现行市场价
+      /*      l_print_string := REPLACE(l_print_string,
+      'TEXT40',
+      nvl(to_char(nvl(cur_record.change_rate, 0) * 100) || '%',
+          l_cell_null)); --涨跌幅*/
+      --modified by nina.ye@20160509 涨跌幅逻辑变更 :制表日期现行市场价/(订单原单价-预估运费-账期)-1    
+      l_change_rate  := round(cur_record.sysdate_price /
+                              (cur_record.unit_selling_price_per_pqty -
+                              nvl(l_est_freight,0) - nvl(l_est_zhangqi,0)) - 1,
+                              4);
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT40',
+                                nvl(to_char(nvl(l_change_rate, 0) * 100) || '%',
+                                    l_cell_null)); --涨跌幅
+    
+      --计算按现行价应追加收取保证金额
+      IF cur_record.pricing_type_code = 'FIX' THEN
+        l_deposit_add_amount := (cur_record.unit_selling_price_per_pqty -
+                                cur_record.sysdate_price) *
+                                cur_record.unexecuted_qty -
+                                cur_record.deposit_req_amount;
+      ELSE
+        l_deposit_add_amount := get_deposit_point_add(cur_record.oe_header_id,
+                                                      cur_record.line_number,
+                                                      cur_record.unexecuted_qty,
+                                                      cur_record.unit_selling_price_per_pqty) -
+                                cur_record.sysdate_price *
+                                cur_record.unexecuted_qty -
+                                cur_record.deposit_req_amount;
+      END IF;
+      IF l_deposit_add_amount < 0 THEN
+        l_deposit_add_amount := 0;
+      END IF;
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT41',
+                                nvl(to_char(round(l_deposit_add_amount, 2)),
+                                    l_cell_null)); --现行价应收保证金额
+      --计算应追加保证金额
+      IF l_change_rate <
+         nvl(cur_record.deposit_num, cur_record.deposit_rate) * -1 / 2 THEN
+        l_deposit_add_rece_amount := l_deposit_add_amount;
+      ELSE
+        l_deposit_add_rece_amount := 0;
+      END IF;
+    
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT42',
+                                nvl(to_char(round(l_deposit_add_rece_amount,
+                                                  2)),
+                                    l_cell_null)); --应追加保证金额  
+      --按保证金客户分类应收追加额
+      IF cur_record.class_type = 'A' THEN
+        l_deposit_add_cust_amount := 0;
+      ELSE
+        l_deposit_add_cust_amount := l_deposit_add_rece_amount;
+      END IF;
+    
+      l_print_string := REPLACE(l_print_string,
+                                'TEXT43',
+                                nvl(to_char(round(l_deposit_add_cust_amount,
+                                                  2)),
+                                    l_cell_null)); --按保证金客户分类应收追加额       
+  l_order_number := cur_record.order_number;--add by zhou
+      output(l_print_string);
+    END LOOP;
+  
+    output(g_print_footer);
+  
+    -- API end body
+    -- end activity, include debug message hint to exit api
+  
+    cux_api.end_activity(p_pkg_name  => g_pkg_name,
+                         p_api_name  => l_api_name,
+                         p_commit    => p_commit,
+                         x_msg_count => x_msg_count,
+                         x_msg_data  => x_msg_data);
+  
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => g_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_error,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => g_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_unexp,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN OTHERS THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => g_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_others,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+  END process_request;
+
+  /*====================================================
+  *  FUNCTION / PROCEDURE
+  *       main
+  *   DESCRIPTION:
+  *      程序入口
+  *   ARGUMENT:
+  *
+  *   RETURN:  
+  *       N/A
+  *   HISTORY:
+  *     1.00  2016.03.03  NINA.YE Creation
+  =======================================================*/
+  PROCEDURE main(errbuf              OUT VARCHAR2,
+                 retcode             OUT VARCHAR2,
+                 p_org_id            IN NUMBER,
+                 p_cust_account_id   IN NUMBER,
+                 p_so_hedaer_id      IN NUMBER,
+                 p_contract_num      IN VARCHAR2,
+                 p_inventory_item_id IN NUMBER,
+                 p_order_type_id     IN NUMBER,
+                 p_pricing_type_code IN VARCHAR2,
+                 p_om_price_area     IN VARCHAR2,
+                 p_start_date        IN VARCHAR2 DEFAULT NULL,
+                 p_end_date          IN VARCHAR2 DEFAULT NULL) IS
+    l_return_status   VARCHAR2(30);
+    l_msg_count       NUMBER;
+    l_msg_data        VARCHAR2(2000);
+    l_settlement_date VARCHAR2(30);
+    l_start_date      DATE;
+    l_end_date        DATE;
+  BEGIN
+    retcode := '0';
+    -- concurrent header log
+    cux_conc_utl.log_header;
+    -- conc body  
+  
+    -- convert parameter data type, such as varchar2 to date
+    l_start_date := apps.fnd_conc_date.string_to_date(p_start_date);
+    l_end_date   := apps.fnd_conc_date.string_to_date(p_end_date);
+  
+    process_request(p_init_msg_list     => fnd_api.g_false,
+                    p_commit            => fnd_api.g_false,
+                    x_return_status     => l_return_status,
+                    x_msg_count         => l_msg_count,
+                    x_msg_data          => l_msg_data,
+                    p_org_id            => p_org_id,
+                    p_cust_account_id   => p_cust_account_id,
+                    p_so_hedaer_id      => p_so_hedaer_id,
+                    p_contract_num      => p_contract_num,
+                    p_inventory_item_id => p_inventory_item_id,
+                    p_order_type_id     => p_order_type_id,
+                    p_pricing_type_code => p_pricing_type_code,
+                    p_om_price_area     => p_om_price_area,
+                    p_start_date        => l_start_date, --add by nina.ye@20160329 增加参数销售日期
+                    p_end_date          => l_end_date); --add by nina.ye@20160329 增加参数销售日期
+  
+    IF l_return_status = fnd_api.g_ret_sts_error THEN
+      RAISE fnd_api.g_exc_error;
+    ELSIF l_return_status = fnd_api.g_ret_sts_unexp_error THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    END IF;
+    -- conc end body
+    -- concurrent footer log
+    cux_conc_utl.log_footer;
+  
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      cux_conc_utl.log_message_list;
+      retcode := '1';
+      fnd_msg_pub.count_and_get(p_encoded => fnd_api.g_false,
+                                p_count   => l_msg_count,
+                                p_data    => l_msg_data);
+      IF l_msg_count > 1 THEN
+        l_msg_data := fnd_msg_pub.get_detail(p_msg_index => fnd_msg_pub.g_first,
+                                             p_encoded   => fnd_api.g_false);
+      END IF;
+      errbuf := l_msg_data;
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      cux_conc_utl.log_message_list;
+      retcode := '2';
+      fnd_msg_pub.count_and_get(p_encoded => fnd_api.g_false,
+                                p_count   => l_msg_count,
+                                p_data    => l_msg_data);
+      IF l_msg_count > 1 THEN
+        l_msg_data := fnd_msg_pub.get_detail(p_msg_index => fnd_msg_pub.g_first,
+                                             p_encoded   => fnd_api.g_false);
+      END IF;
+      errbuf := l_msg_data;
+    WHEN OTHERS THEN
+      fnd_msg_pub.add_exc_msg(p_pkg_name       => g_pkg_name,
+                              p_procedure_name => 'MAIN',
+                              p_error_text     => substrb(SQLERRM, 1, 240));
+      cux_conc_utl.log_message_list;
+      retcode := '2';
+      errbuf  := SQLERRM;
+  END main;
+
+END cux_dis_sales_deposit_rpt_pkg;

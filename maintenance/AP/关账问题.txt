@@ -1,0 +1,24 @@
+SELECT DISTINCT xe.*
+  FROM ap_invoice_payments_all      aip,
+       xla_events                   xe,
+       xla_transaction_entities_upg xte
+ WHERE xte.application_id = 200
+   AND xe.application_id = 200
+   AND aip.invoice_id = '42421'
+   AND xte.entity_code = 'AP_PAYMENTS'
+   AND NVL(xte.source_id_int_1, -99) = aip.check_id
+   AND xte.ledger_id = aip.set_of_books_id
+   AND xte.entity_id = xe.entity_id
+ ORDER BY xe.entity_id, xe.event_number
+ 
+ select * from xla_transaction_entities
+
+select *
+  from xla_transaction_entities_upg xte
+ where xte.entity_code = 'AP_PAYMENTS'
+   AND NVL(xte.source_id_int_1, -99) not in
+       (select check_id from ap_checks_all) --check_id:15099,34203,39199
+entity_id 106273 487167 541171
+
+create table xla_events_bck select * from xla_events xe where xe.ENTITY_ID in (106273, 487167, 541171)
+select * from XLA_AE_HEADERS xh where xh.ENTITY_ID in (106273, 487167, 541171)

@@ -1,0 +1,17 @@
+create table ap_checks_all_bad as select * from AP_CHECKS_ALL 
+ where check_id=83391; 
+
+delete from AP_CHECKS_ALL 
+ where check_id=83391; 
+
+create table AP_PAYMENT_HISTORY_ALL_bad as select * from AP_PAYMENT_HISTORY_ALL 
+ where check_id=83391; 
+
+ delete from AP_PAYMENT_HISTORY_ALL 
+ where check_id=83391; 
+
+create table AP_PAYMENT_HIST_DISTS_bad as select * from AP_PAYMENT_HIST_DISTS
+ where check_id=75105;
+
+ delete from AP_PAYMENT_HIST_DISTS 
+ where PAYMENT_HISTORY_ID in (75105); 

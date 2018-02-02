@@ -1,0 +1,2858 @@
+begin aru bug_26397424 
+
+  compatible release 12.0.0 
+
+  compatible platform GENERIC 
+
+  compatible requires_translation yes 
+
+  characterset us7ascii 
+
+  extension recordpatch 26397424 US 
+
+  extension patch_type software base 
+
+  extension fixes 25595164 gme C 
+  extension fixes 22859297 gme C 
+  extension fixes 23716981 gme C 
+  extension fixes 23105420 gme C 
+  extension fixes 22955827 gme C 
+  extension fixes 19297761 gme C 
+  extension fixes 20615823 gme C 
+  extension fixes 22295728 gme C 
+  extension fixes 17452692 gme C 
+  extension fixes 23487870 gme C 
+  extension fixes 19675039 gme C 
+  extension fixes 22673485 gme C 
+  extension fixes 22085252 gme C 
+  extension fixes 24617918 gme C 
+  extension fixes 22514452 gme C 
+  extension fixes 25718309 gme C 
+  extension fixes 22308915 gme C 
+  extension fixes 20985387 gme C 
+  extension fixes 22451459 gme C 
+  extension fixes 20112352 gme C 
+  extension fixes 24815775 gme C 
+  extension fixes 24397635 gme C 
+  extension fixes 22081481 gme C 
+  extension fixes 23149583 gme C 
+  extension fixes 21954329 gme C 
+  extension fixes 20286421 gme C 
+  extension fixes 17867859 gme C 
+  extension fixes 26073710 gme C 
+  extension fixes 22240879 gme C 
+  extension fixes 26094274 gme C 
+  extension fixes 21786445 gme C 
+  extension fixes 19811389 gme C 
+  extension fixes 24457891 gme C 
+  extension fixes 23216605 gme C 
+  extension fixes 25519032 gme C 
+  extension fixes 25183093 gme C 
+  extension fixes 19306456 gme C 
+  extension fixes 21312775 gme C 
+  extension fixes 25808846 gme C 
+  extension fixes 26256886 gme C 
+  extension fixes 20052174 gme C 
+  extension fixes 26051008 gme C 
+  extension fixes 18529193 gme C 
+  extension fixes 17707892 gme C 
+  extension fixes 17722332 gme C 
+  extension fixes 23176130 gme C 
+  extension fixes 20228841 gme C 
+  extension fixes 17675571 gme C 
+  extension fixes 18044719 gme C 
+  extension fixes 23155176 gme C 
+  extension fixes 21123798 gme C 
+  extension fixes 22200452 gme C 
+  extension fixes 23198865 gme C 
+  extension fixes 16534256 gme C 
+  extension fixes 20054655 gme C 
+  extension fixes 23128093 gme C 
+  extension fixes 22857165 gme C 
+  extension fixes 20716976 gme C 
+  extension fixes 26306441 gme C 
+  extension fixes 23033331 gme C 
+  extension fixes 25949491 gme C 
+  extension fixes 23516667 gme C 
+  extension fixes 20448067 gme C 
+  extension fixes 21135856 gme C 
+  extension fixes 21764324 gme C 
+  extension fixes 21567126 gme C 
+  extension fixes 24977868 gme C 
+  extension fixes 20567897 gme C 
+  extension fixes 23195628 gme C 
+  extension fixes 17277470 gme C 
+  extension fixes 24681900 gme C 
+  extension fixes 15988551 gme C 
+  extension fixes 17960020 gme C 
+  extension fixes 20078417 gme C 
+  extension fixes 24560898 gme C 
+  extension fixes 19854401 gme C 
+  extension fixes 18538005 gme C 
+  extension fixes 20064698 gme C 
+  extension fixes 16297308 gme C 
+  extension fixes 20265129 gme C 
+  extension fixes 20332236 gme C 
+  extension fixes 25378304 gme C 
+  extension fixes 17870719 gme C 
+  extension fixes 22358770 gme C 
+  extension fixes 25202346 gme C 
+  extension fixes 18765933 gme C 
+  extension fixes 23103411 gme C 
+  extension fixes 22838710 gme C 
+  extension fixes 20435478 gme C 
+  extension fixes 20700972 gme C 
+  extension fixes 19226606 gme C 
+  extension fixes 23715423 gme C 
+  extension fixes 20696004 gme C 
+  extension fixes 20581830 gme C 
+  extension fixes 18230984 gme C 
+  extension fixes 20544380 gme C 
+  extension fixes 19788419 gme C 
+  extension fixes 23003334 gme C 
+  extension fixes 20385776 gme C 
+  extension fixes 19720611 gme C 
+  extension fixes 23237559 gme C 
+  extension fixes 22086884 gme C 
+  extension fixes 21082706 gme C 
+  extension fixes 17326823 gme C 
+  extension fixes 24738886 gme C 
+  extension fixes 17495349 gme C 
+  extension fixes 20747158 gme C 
+  extension fixes 17410850 gme C 
+  extension fixes 22217179 gme C 
+  extension fixes 22857387 gme C 
+  extension fixes 20287720 gme C 
+  extension fixes 21126478 gme C 
+  extension fixes 20190417 gme C 
+  extension fixes 16518556 gme C 
+  extension fixes 24949569 gme C 
+  extension fixes 23705844 gme C 
+  extension fixes 20986335 gme C 
+  extension fixes 20416843 gme C 
+  extension fixes 21140866 gme C 
+  extension fixes 23228636 gme C 
+  extension fixes 19347201 gme C 
+  extension fixes 18898256 gme C 
+  extension fixes 24323104 gme C 
+  extension fixes 23020692 gme C 
+  extension fixes 25056182 gme C 
+  extension fixes 19364328 gme C 
+  extension fixes 19999369 gme C 
+  extension fixes 24905205 gme C 
+  extension fixes 20914959 gme C 
+  extension fixes 18513515 gme C 
+  extension fixes 21102937 gme C 
+  extension fixes 21102335 gme C 
+  extension fixes 19624259 gme C 
+  extension fixes 22813874 gme C 
+  extension fixes 17508173 gme C 
+  extension fixes 19619931 gme C 
+  extension fixes 21078209 gme C 
+  extension fixes 20959349 gme C 
+  extension fixes 25246717 gme C 
+  extension fixes 22183983 gme C 
+  extension fixes 21321858 gme C 
+  extension fixes 22890167 gme C 
+  extension fixes 19185162 gme C 
+  extension fixes 17230115 gme C 
+  extension fixes 22026914 gme C 
+  extension fixes 22317010 gme C 
+  extension fixes 23026619 gme C 
+  extension fixes 24604095 gme C 
+  extension fixes 17457045 gme C 
+  extension fixes 22160524 gme C 
+  extension fixes 21185625 gme C 
+  extension fixes 23640627 gme C 
+  extension fixes 18013991 gme C 
+  extension fixes 25301412 gme C 
+  extension fixes 23060798 gmo C 
+  extension fixes 20320185 gme C 
+  extension fixes 21101876 gme C 
+  extension fixes 21480679 gme C 
+  extension fixes 21467413 gme C 
+  extension fixes 25609180 gme C 
+  extension fixes 20777114 gme C 
+  extension fixes 19595998 gme C 
+  extension fixes 26397424 gme C 
+  extension fixes 25999337 gme C 
+  extension fixes 25202190 gme C 
+  extension fixes 24642212 gme C 
+  extension fixes 18314515 gme C 
+  extension fixes 17328622 gme C 
+  extension fixes 19571616 gme C 
+  extension fixes 21456143 gme C 
+  extension fixes 25784916 gme C 
+  extension fixes 21653652 gme C 
+  extension fixes 20938455 gme C 
+  extension fixes 20215072 gme C 
+  extension fixes 25251721 gme C 
+  extension fixes 24355267 gme C 
+  extension fixes 24410338 gme C 
+  extension fixes 24587420 gme C 
+  extension fixes 21239549 gme C 
+  extension fixes 21114362 gme C 
+  extension fixes 18329535 gme C 
+  extension fixes 17433833 gme C 
+  extension fixes 20411084 gme C 
+  extension fixes 24351209 gme C 
+  extension fixes 19487393 gma C 
+  extension fixes 25504743 gme C 
+  extension fixes 18647656 gme C 
+  extension fixes 23013067 gme C 
+  extension fixes 25353805 gme C 
+  extension fixes 24350177 gme C 
+  extension fixes 21075334 gme C 
+  extension fixes 21759414 gme C 
+  extension fixes 20310272 gme C 
+  extension fixes 19911453 gme C 
+  extension fixes 18346409 gme C 
+  extension fixes 25596394 gme C 
+  extension fixes 22980052 gme C 
+  extension fixes 22681641 gme C 
+  extension fixes 22900323 gme C 
+  extension fixes 24958580 gme C 
+  extension fixes 22839055 gme C 
+  extension fixes 18925101 gme C 
+  extension fixes 21328236 gme C 
+  extension fixes 17223043 gme C 
+  extension fixes 21628134 gme C 
+  extension fixes 25548444 gme C 
+  extension fixes 18960929 gme C 
+  extension fixes 23268130 gme C 
+  extension fixes 25379395 gme C 
+  extension fixes 19888172 gme C 
+  extension fixes 19781489 gme C 
+  extension fixes 22962971 gme C 
+  extension fixes 21070199 gme C 
+  extension fixes 25883843 gme C 
+  extension fixes 25597552 gme C 
+  extension fixes 22140698 gme C 
+  extension fixes 22753342 gme C 
+  extension fixes 19942924 gme C 
+  extension fixes 24307150 gme C 
+  extension fixes 17905627 gme C 
+  extension fixes 22991566 gme C 
+  extension fixes 26027932 gme C 
+  extension fixes 21103495 gme C 
+  extension fixes 21547203 gme C 
+  extension fixes 21187113 gme C 
+  extension fixes 22128352 gme C 
+  extension fixes 20250948 gme C 
+  extension fixes 20571333 gme C 
+  extension fixes 25516739 gme C 
+  extension fixes 26248999 gme C 
+  extension fixes 19247157 gme C 
+  extension fixes 19296360 gme C 
+  extension fixes 23053534 gme C 
+  extension fixes 21364641 gme C 
+  extension fixes 24826002 gme C 
+  extension fixes 22893491 gme C 
+  extension fixes 21962707 gme C 
+  extension fixes 22089783 gme C 
+  extension fixes 25412645 gme C 
+  extension fixes 18762054 gme C 
+  extension fixes 20635929 gme C 
+  extension fixes 23736558 gme C 
+  extension fixes 22567974 gme C 
+  extension fixes 17775550 gme C 
+  extension fixes 24317514 gme C 
+  extension fixes 20206070 gme C 
+  extension fixes 20742452 gme C 
+  extension fixes 24514315 gme C 
+  extension fixes 23595831 gme C 
+  extension fixes 18482168 gme C 
+  extension fixes 20948163 gme C 
+  extension fixes 21040294 gme C 
+  extension fixes 21197462 gme C 
+  extension fixes 23067178 gme C 
+  extension fixes 16403018 gme C 
+  extension fixes 23066637 gme C 
+  extension fixes 22681568 gmd C 
+  extension fixes 21984755 gme C 
+  extension fixes 19868921 gme C 
+  extension fixes 21890861 gme C 
+  extension fixes 20371815 gme C 
+  extension fixes 21513183 gme C 
+  extension fixes 21114692 gme C 
+  extension fixes 18409532 gme C 
+  extension fixes 23720963 gme C 
+  extension fixes 25077133 gme C 
+  extension fixes 20906347 gme C 
+  extension fixes 21145359 gme C 
+  extension fixes 22546888 gme C 
+  extension fixes 18516569 gme C 
+  extension fixes 25771893 gme C 
+  extension fixes 25261523 gme C 
+  extension fixes 20506322 gme C 
+  extension fixes 22874366 gme C 
+  extension fixes 21237665 gme C 
+  extension fixes 20046960 gme C 
+  extension fixes 22576949 gme C 
+  extension fixes 19987978 gme C 
+  extension fixes 20691997 gme C 
+  extension fixes 25576167 gme C 
+  extension fixes 17436612 gme C 
+  extension fixes 23748607 gme C 
+  extension fixes 23044855 gme C 
+  extension fixes 22804243 gme C 
+  extension fixes 16974953 gme C 
+  extension fixes 26023863 gme C 
+  extension fixes 25117447 gme C 
+  extension fixes 24509515 gme C 
+
+  extension includes 26397424 gme C 
+  extension includes 15988551 gme C 
+  extension includes 16297308 gme C 
+  extension includes 16403018 gme C 
+  extension includes 16518556 gme C 
+  extension includes 16534256 gme C 
+  extension includes 16974953 gme C 
+  extension includes 17223043 gme C 
+  extension includes 17230115 gme C 
+  extension includes 17277470 gme C 
+  extension includes 17326823 gme C 
+  extension includes 17328622 gme C 
+  extension includes 17410850 gme C 
+  extension includes 17433833 gme C 
+  extension includes 17436612 gme C 
+  extension includes 17452692 gme C 
+  extension includes 17457045 gme C 
+  extension includes 17495349 gme C 
+  extension includes 17508173 gme C 
+  extension includes 17675571 gme C 
+  extension includes 17707892 gme C 
+  extension includes 17722332 gme C 
+  extension includes 17775550 gme C 
+  extension includes 17867859 gme C 
+  extension includes 17870719 gme C 
+  extension includes 17905627 gme C 
+  extension includes 17960020 gme C 
+  extension includes 18013991 gme C 
+  extension includes 18044719 gme C 
+  extension includes 18230984 gme C 
+  extension includes 18314515 gme C 
+  extension includes 18329535 gme C 
+  extension includes 18346409 gme C 
+  extension includes 18409532 gme C 
+  extension includes 18482168 gme C 
+  extension includes 18513515 gme C 
+  extension includes 18516569 gme C 
+  extension includes 18529193 gme C 
+  extension includes 18538005 gme C 
+  extension includes 18647656 gme C 
+  extension includes 18762054 gme C 
+  extension includes 18765933 gme C 
+  extension includes 18898256 gme C 
+  extension includes 18925101 gme C 
+  extension includes 18960929 gme C 
+  extension includes 19185162 gme C 
+  extension includes 19226606 gme C 
+  extension includes 19247157 gme C 
+  extension includes 19296360 gme C 
+  extension includes 19297761 gme C 
+  extension includes 19306456 gme C 
+  extension includes 19347201 gme C 
+  extension includes 19364328 gme C 
+  extension includes 19487393 gma C 
+  extension includes 19571616 gme C 
+  extension includes 19595998 gme C 
+  extension includes 19619931 gme C 
+  extension includes 19624259 gme C 
+  extension includes 19675039 gme C 
+  extension includes 19720611 gme C 
+  extension includes 19781489 gme C 
+  extension includes 19788419 gme C 
+  extension includes 19811389 gme C 
+  extension includes 19854401 gme C 
+  extension includes 19868921 gme C 
+  extension includes 19888172 gme C 
+  extension includes 19911453 gme C 
+  extension includes 19942924 gme C 
+  extension includes 19987978 gme C 
+  extension includes 19999369 gme C 
+  extension includes 20046960 gme C 
+  extension includes 20052174 gme C 
+  extension includes 20054655 gme C 
+  extension includes 20064698 gme C 
+  extension includes 20078417 gme C 
+  extension includes 20112352 gme C 
+  extension includes 20190417 gme C 
+  extension includes 20206070 gme C 
+  extension includes 20215072 gme C 
+  extension includes 20228841 gme C 
+  extension includes 20250948 gme C 
+  extension includes 20265129 gme C 
+  extension includes 20286421 gme C 
+  extension includes 20287720 gme C 
+  extension includes 20310272 gme C 
+  extension includes 20320185 gme C 
+  extension includes 20332236 gme C 
+  extension includes 20371815 gme C 
+  extension includes 20385776 gme C 
+  extension includes 20411084 gme C 
+  extension includes 20416843 gme C 
+  extension includes 20435478 gme C 
+  extension includes 20448067 gme C 
+  extension includes 20506322 gme C 
+  extension includes 20544380 gme C 
+  extension includes 20567897 gme C 
+  extension includes 20571333 gme C 
+  extension includes 20581830 gme C 
+  extension includes 20615823 gme C 
+  extension includes 20635929 gme C 
+  extension includes 20691997 gme C 
+  extension includes 20696004 gme C 
+  extension includes 20700972 gme C 
+  extension includes 20716976 gme C 
+  extension includes 20742452 gme C 
+  extension includes 20747158 gme C 
+  extension includes 20777114 gme C 
+  extension includes 20906347 gme C 
+  extension includes 20914959 gme C 
+  extension includes 20948163 gme C 
+  extension includes 20959349 gme C 
+  extension includes 20986335 gme C 
+  extension includes 21070199 gme C 
+  extension includes 21075334 gme C 
+  extension includes 21078209 gme C 
+  extension includes 21082706 gme C 
+  extension includes 21123798 gme C 
+  extension includes 21126478 gme C 
+  extension includes 21145359 gme C 
+  extension includes 21185625 gme C 
+  extension includes 21187113 gme C 
+  extension includes 21197462 gme C 
+  extension includes 21237665 gme C 
+  extension includes 21239549 gme C 
+  extension includes 21312775 gme C 
+  extension includes 21321858 gme C 
+  extension includes 21328236 gme C 
+  extension includes 21364641 gme C 
+  extension includes 21380580 gme C 
+  extension includes 21456143 gme C 
+  extension includes 21467413 gme C 
+  extension includes 21480679 gme C 
+  extension includes 21513183 gme C 
+  extension includes 21547203 gme C 
+  extension includes 21567126 gme C 
+  extension includes 21628134 gme C 
+  extension includes 21653652 gme C 
+  extension includes 21759414 gme C 
+  extension includes 21764324 gme C 
+  extension includes 21786445 gme C 
+  extension includes 21799236 gme C 
+  extension includes 21890861 gme C 
+  extension includes 21954329 gme C 
+  extension includes 21962707 gme C 
+  extension includes 21984755 gme C 
+  extension includes 22026914 gme C 
+  extension includes 22081481 gme C 
+  extension includes 22085252 gme C 
+  extension includes 22086884 gme C 
+  extension includes 22089783 gme C 
+  extension includes 22128352 gme C 
+  extension includes 22140698 gme C 
+  extension includes 22160524 gme C 
+  extension includes 22183983 gme C 
+  extension includes 22200452 gme C 
+  extension includes 22217179 gme C 
+  extension includes 22240879 gme C 
+  extension includes 22295728 gme C 
+  extension includes 22308915 gme C 
+  extension includes 22317010 gme C 
+  extension includes 22358770 gme C 
+  extension includes 22451459 gme C 
+  extension includes 22514452 gme C 
+  extension includes 22546888 gme C 
+  extension includes 22567974 gme C 
+  extension includes 22576949 gme C 
+  extension includes 22673485 gme C 
+  extension includes 22681568 gmd C 
+  extension includes 22753342 gme C 
+  extension includes 22804243 gme C 
+  extension includes 22813874 gme C 
+  extension includes 22838710 gme C 
+  extension includes 22839055 gme C 
+  extension includes 22857165 gme C 
+  extension includes 22857387 gme C 
+  extension includes 22859297 gme C 
+  extension includes 22874366 gme C 
+  extension includes 22890167 gme C 
+  extension includes 22893491 gme C 
+  extension includes 22900323 gme C 
+  extension includes 22955827 gme C 
+  extension includes 22962971 gme C 
+  extension includes 22980052 gme C 
+  extension includes 22991566 gme C 
+  extension includes 23003334 gme C 
+  extension includes 23013067 gme C 
+  extension includes 23020692 gme C 
+  extension includes 23026619 gme C 
+  extension includes 23033331 gme C 
+  extension includes 23044855 gme C 
+  extension includes 23053534 gme C 
+  extension includes 23060798 gmo C 
+  extension includes 23066637 gme C 
+  extension includes 23067178 gme C 
+  extension includes 23103411 gme C 
+  extension includes 23105420 gme C 
+  extension includes 23128093 gme C 
+  extension includes 23149583 gme C 
+  extension includes 23155176 gme C 
+  extension includes 23176130 gme C 
+  extension includes 23195628 gme C 
+  extension includes 23198865 gme C 
+  extension includes 23216605 gme C 
+  extension includes 23228636 gme C 
+  extension includes 23237559 gme C 
+  extension includes 23268130 gme C 
+  extension includes 23487870 gme C 
+  extension includes 23516667 gme C 
+  extension includes 23595831 gme C 
+  extension includes 23640627 gme C 
+  extension includes 23705844 gme C 
+  extension includes 23715423 gme C 
+  extension includes 23716981 gme C 
+  extension includes 23720963 gme C 
+  extension includes 23736558 gme C 
+  extension includes 23748607 gme C 
+  extension includes 24307150 gme C 
+  extension includes 24317514 gme C 
+  extension includes 24323104 gme C 
+  extension includes 24350177 gme C 
+  extension includes 24351209 gme C 
+  extension includes 24355267 gme C 
+  extension includes 24397635 gme C 
+  extension includes 24410338 gme C 
+  extension includes 24457891 gme C 
+  extension includes 24509515 gme C 
+  extension includes 24514315 gme C 
+  extension includes 24560898 gme C 
+  extension includes 24587420 gme C 
+  extension includes 24604095 gme C 
+  extension includes 24617918 gme C 
+  extension includes 24642212 gme C 
+  extension includes 24681900 gme C 
+  extension includes 24738886 gme C 
+  extension includes 24815775 gme C 
+  extension includes 24826002 gme C 
+  extension includes 24905205 gme C 
+  extension includes 24949569 gme C 
+  extension includes 24958580 gme C 
+  extension includes 24977868 gme C 
+  extension includes 25056182 gme C 
+  extension includes 25077133 gme C 
+  extension includes 25117447 gme C 
+  extension includes 25183093 gme C 
+  extension includes 25202190 gme C 
+  extension includes 25202346 gme C 
+  extension includes 25246717 gme C 
+  extension includes 25251721 gme C 
+  extension includes 25261523 gme C 
+  extension includes 25301412 gme C 
+  extension includes 25353805 gme C 
+  extension includes 25378304 gme C 
+  extension includes 25379395 gme C 
+  extension includes 25412645 gme C 
+  extension includes 25504743 gme C 
+  extension includes 25516739 gme C 
+  extension includes 25519032 gme C 
+  extension includes 25548444 gme C 
+  extension includes 25576167 gme C 
+  extension includes 25595164 gme C 
+  extension includes 25596394 gme C 
+  extension includes 25597552 gme C 
+  extension includes 25609180 gme C 
+  extension includes 25718309 gme C 
+  extension includes 25771893 gme C 
+  extension includes 25784916 gme C 
+  extension includes 25808846 gme C 
+  extension includes 25883843 gme C 
+  extension includes 25949491 gme C 
+  extension includes 25999337 gme C 
+  extension includes 26023863 gme C 
+  extension includes 26027932 gme C 
+  extension includes 26051008 gme C 
+  extension includes 26073710 gme C 
+  extension includes 26094274 gme C 
+  extension includes 26248999 gme C 
+  extension includes 26256886 gme C 
+  extension includes 26306441 gme C 
+
+  compatible feature checkfile 
+
+  extension trackable_entity gmo product Oracle MES for Process Manufacturing 
+  extension trackable_entity gmd product Oracle Process Manufacturing Product Development 
+  extension trackable_entity gme product Oracle Process Manufacturing Process Execution 
+  extension trackable_entity gma product Oracle Process Manufacturing Systems 
+  extension based on gmo C
+  extension based on gma C
+  extension based on gme C
+  extension based on gmd C
+
+  begin bug gme 15988551
+    begin actions
+    end actions
+  end bug gme 15988551
+
+  begin bug gme 16297308
+    begin actions
+    end actions
+  end bug gme 16297308
+
+  begin bug gme 16403018
+    begin actions
+    end actions
+  end bug gme 16403018
+
+  begin bug gme 16518556
+    begin actions
+    end actions
+  end bug gme 16518556
+
+  begin bug gme 16534256
+    begin actions
+    end actions
+  end bug gme 16534256
+
+  begin bug gme 16974953
+    begin actions
+    end actions
+  end bug gme 16974953
+
+  begin bug gme 17223043
+    begin actions
+    end actions
+  end bug gme 17223043
+
+  begin bug gme 17230115
+    begin actions
+    end actions
+  end bug gme 17230115
+
+  begin bug gme 17277470
+    begin actions
+    end actions
+  end bug gme 17277470
+
+  begin bug gme 17326823
+    begin actions
+    end actions
+  end bug gme 17326823
+
+  begin bug gme 17328622
+    begin actions
+    end actions
+  end bug gme 17328622
+
+  begin bug gme 17410850
+    begin actions
+    end actions
+  end bug gme 17410850
+
+  begin bug gme 17433833
+    begin actions
+    end actions
+  end bug gme 17433833
+
+  begin bug gme 17436612
+    begin actions
+    end actions
+  end bug gme 17436612
+
+  begin bug gme 17452692
+    begin actions
+    end actions
+  end bug gme 17452692
+
+  begin bug gme 17457045
+    begin actions
+    end actions
+  end bug gme 17457045
+
+  begin bug gme 17495349
+    begin actions
+    end actions
+  end bug gme 17495349
+
+  begin bug gme 17508173
+    begin actions
+    end actions
+  end bug gme 17508173
+
+  begin bug gme 17675571
+    begin actions
+    end actions
+  end bug gme 17675571
+
+  begin bug gme 17707892
+    begin actions
+    end actions
+  end bug gme 17707892
+
+  begin bug gme 17722332
+    begin actions
+    end actions
+  end bug gme 17722332
+
+  begin bug gme 17775550
+    begin actions
+    end actions
+  end bug gme 17775550
+
+  begin bug gme 17867859
+    begin actions
+    end actions
+  end bug gme 17867859
+
+  begin bug gme 17870719
+    begin actions
+    end actions
+  end bug gme 17870719
+
+  begin bug gme 17905627
+    begin actions
+    end actions
+  end bug gme 17905627
+
+  begin bug gme 17960020
+    begin actions
+    end actions
+  end bug gme 17960020
+
+  begin bug gme 18013991
+    begin actions
+    end actions
+  end bug gme 18013991
+
+  begin bug gme 18044719
+    begin actions
+    end actions
+  end bug gme 18044719
+
+  begin bug gme 18230984
+    begin actions
+    end actions
+  end bug gme 18230984
+
+  begin bug gme 18314515
+    begin actions
+    end actions
+  end bug gme 18314515
+
+  begin bug gme 18329535
+    begin actions
+    end actions
+  end bug gme 18329535
+
+  begin bug gme 18346409
+    begin actions
+    end actions
+  end bug gme 18346409
+
+  begin bug gme 18409532
+    begin actions
+    end actions
+  end bug gme 18409532
+
+  begin bug gme 18482168
+    begin actions
+    end actions
+  end bug gme 18482168
+
+  begin bug gme 18513515
+    begin actions
+    end actions
+  end bug gme 18513515
+
+  begin bug gme 18516569
+    begin actions
+    end actions
+  end bug gme 18516569
+
+  begin bug gme 18529193
+    begin actions
+    end actions
+  end bug gme 18529193
+
+  begin bug gme 18538005
+    begin actions
+    end actions
+  end bug gme 18538005
+
+  begin bug gme 18647656
+    begin actions
+    end actions
+  end bug gme 18647656
+
+  begin bug gme 18762054
+    begin actions
+    end actions
+  end bug gme 18762054
+
+  begin bug gme 18765933
+    begin actions
+    end actions
+  end bug gme 18765933
+
+  begin bug gme 18898256
+    begin actions
+    end actions
+  end bug gme 18898256
+
+  begin bug gme 18925101
+    begin actions
+    end actions
+  end bug gme 18925101
+
+  begin bug gme 18960929
+    begin actions
+    end actions
+  end bug gme 18960929
+
+  begin bug gme 19185162
+    begin actions
+    end actions
+  end bug gme 19185162
+
+  begin bug gme 19226606
+    begin actions
+    end actions
+  end bug gme 19226606
+
+  begin bug gme 19247157
+    begin actions
+    end actions
+  end bug gme 19247157
+
+  begin bug gme 19296360
+    begin actions
+    end actions
+  end bug gme 19296360
+
+  begin bug gme 19297761
+    begin actions
+    end actions
+  end bug gme 19297761
+
+  begin bug gme 19306456
+    begin actions
+    end actions
+  end bug gme 19306456
+
+  begin bug gme 19347201
+    begin actions
+    end actions
+  end bug gme 19347201
+
+  begin bug gme 19364328
+    begin actions
+    end actions
+  end bug gme 19364328
+
+  begin bug gma 19487393
+    begin actions
+    end actions
+  end bug gma 19487393
+
+  begin bug gme 19571616
+    begin actions
+    end actions
+  end bug gme 19571616
+
+  begin bug gme 19595998
+    begin actions
+    end actions
+  end bug gme 19595998
+
+  begin bug gme 19619931
+    begin actions
+    end actions
+  end bug gme 19619931
+
+  begin bug gme 19624259
+    begin actions
+    end actions
+  end bug gme 19624259
+
+  begin bug gme 19675039
+    begin actions
+    end actions
+  end bug gme 19675039
+
+  begin bug gme 19720611
+    begin actions
+    end actions
+  end bug gme 19720611
+
+  begin bug gme 19781489
+    begin actions
+    end actions
+  end bug gme 19781489
+
+  begin bug gme 19788419
+    begin actions
+    end actions
+  end bug gme 19788419
+
+  begin bug gme 19811389
+    begin actions
+    end actions
+  end bug gme 19811389
+
+  begin bug gme 19854401
+    begin actions
+    end actions
+  end bug gme 19854401
+
+  begin bug gme 19868921
+    begin actions
+    end actions
+  end bug gme 19868921
+
+  begin bug gme 19888172
+    begin actions
+    end actions
+  end bug gme 19888172
+
+  begin bug gme 19911453
+    begin actions
+    end actions
+  end bug gme 19911453
+
+  begin bug gme 19942924
+    begin actions
+    end actions
+  end bug gme 19942924
+
+  begin bug gme 19987978
+    begin actions
+    end actions
+  end bug gme 19987978
+
+  begin bug gme 19999369
+    begin actions
+    end actions
+  end bug gme 19999369
+
+  begin bug gme 20046960
+    begin actions
+    end actions
+  end bug gme 20046960
+
+  begin bug gme 20052174
+    begin actions
+    end actions
+  end bug gme 20052174
+
+  begin bug gme 20054655
+    begin actions
+    end actions
+  end bug gme 20054655
+
+  begin bug gme 20064698
+    begin actions
+    end actions
+  end bug gme 20064698
+
+  begin bug gme 20078417
+    begin actions
+    end actions
+  end bug gme 20078417
+
+  begin bug gme 20112352
+    begin actions
+    end actions
+  end bug gme 20112352
+
+  begin bug gme 20190417
+    begin actions
+    end actions
+  end bug gme 20190417
+
+  begin bug gme 20206070
+    begin actions
+    end actions
+  end bug gme 20206070
+
+  begin bug gme 20215072
+    begin actions
+    end actions
+  end bug gme 20215072
+
+  begin bug gme 20228841
+    begin actions
+    end actions
+  end bug gme 20228841
+
+  begin bug gme 20250948
+    begin actions
+    end actions
+  end bug gme 20250948
+
+  begin bug gme 20265129
+    begin actions
+    end actions
+  end bug gme 20265129
+
+  begin bug gme 20286421
+    begin actions
+    end actions
+  end bug gme 20286421
+
+  begin bug gme 20287720
+    begin actions
+    end actions
+  end bug gme 20287720
+
+  begin bug gme 20310272
+    begin actions
+    end actions
+  end bug gme 20310272
+
+  begin bug gme 20320185
+    begin actions
+    end actions
+  end bug gme 20320185
+
+  begin bug gme 20332236
+    begin actions
+    end actions
+  end bug gme 20332236
+
+  begin bug gme 20371815
+    begin actions
+    end actions
+  end bug gme 20371815
+
+  begin bug gme 20385776
+    begin actions
+    end actions
+  end bug gme 20385776
+
+  begin bug gme 20411084
+    begin actions
+    end actions
+  end bug gme 20411084
+
+  begin bug gme 20416843
+    begin actions
+    end actions
+  end bug gme 20416843
+
+  begin bug gme 20435478
+    begin actions
+    end actions
+  end bug gme 20435478
+
+  begin bug gme 20448067
+    begin actions
+    end actions
+  end bug gme 20448067
+
+  begin bug gme 20506322
+    begin actions
+    end actions
+  end bug gme 20506322
+
+  begin bug gme 20544380
+    begin actions
+    end actions
+  end bug gme 20544380
+
+  begin bug gme 20567897
+    begin actions
+    end actions
+  end bug gme 20567897
+
+  begin bug gme 20571333
+    begin actions
+    end actions
+  end bug gme 20571333
+
+  begin bug gme 20581830
+    begin actions
+    end actions
+  end bug gme 20581830
+
+  begin bug gme 20615823
+    begin actions
+    end actions
+  end bug gme 20615823
+
+  begin bug gme 20635929
+    begin actions
+    end actions
+  end bug gme 20635929
+
+  begin bug gme 20691997
+    begin actions
+    end actions
+  end bug gme 20691997
+
+  begin bug gme 20696004
+    begin actions
+    end actions
+  end bug gme 20696004
+
+  begin bug gme 20700972
+    begin actions
+    end actions
+  end bug gme 20700972
+
+  begin bug gme 20716976
+    begin actions
+    end actions
+  end bug gme 20716976
+
+  begin bug gme 20742452
+    begin actions
+    end actions
+  end bug gme 20742452
+
+  begin bug gme 20747158
+    begin actions
+    end actions
+  end bug gme 20747158
+
+  begin bug gme 20777114
+    begin actions
+    end actions
+  end bug gme 20777114
+
+  begin bug gme 20906347
+    begin actions
+    end actions
+  end bug gme 20906347
+
+  begin bug gme 20914959
+    begin actions
+    end actions
+  end bug gme 20914959
+
+  begin bug gme 20948163
+    begin actions
+    end actions
+  end bug gme 20948163
+
+  begin bug gme 20959349
+    begin actions
+    end actions
+  end bug gme 20959349
+
+  begin bug gme 20986335
+    begin actions
+    end actions
+  end bug gme 20986335
+
+  begin bug gme 21070199
+    begin actions
+    end actions
+  end bug gme 21070199
+
+  begin bug gme 21075334
+    begin actions
+    end actions
+  end bug gme 21075334
+
+  begin bug gme 21078209
+    begin actions
+    end actions
+  end bug gme 21078209
+
+  begin bug gme 21082706
+    begin actions
+    end actions
+  end bug gme 21082706
+
+  begin bug gme 21123798
+    begin actions
+    end actions
+  end bug gme 21123798
+
+  begin bug gme 21126478
+    begin actions
+    end actions
+  end bug gme 21126478
+
+  begin bug gme 21145359
+    begin actions
+    end actions
+  end bug gme 21145359
+
+  begin bug gme 21185625
+    begin actions
+    end actions
+  end bug gme 21185625
+
+  begin bug gme 21187113
+    begin actions
+    end actions
+  end bug gme 21187113
+
+  begin bug gme 21197462
+    begin actions
+    end actions
+  end bug gme 21197462
+
+  begin bug gme 21237665
+    begin actions
+    end actions
+  end bug gme 21237665
+
+  begin bug gme 21239549
+    begin actions
+    end actions
+  end bug gme 21239549
+
+  begin bug gme 21312775
+    begin actions
+    end actions
+  end bug gme 21312775
+
+  begin bug gme 21321858
+    begin actions
+    end actions
+  end bug gme 21321858
+
+  begin bug gme 21328236
+    begin actions
+    end actions
+  end bug gme 21328236
+
+  begin bug gme 21364641
+    begin actions
+    end actions
+  end bug gme 21364641
+
+  begin bug gme 21380580
+    begin actions
+    end actions
+  end bug gme 21380580
+
+  begin bug gme 21456143
+    begin actions
+    end actions
+  end bug gme 21456143
+
+  begin bug gme 21467413
+    begin actions
+    end actions
+  end bug gme 21467413
+
+  begin bug gme 21480679
+    begin actions
+    end actions
+  end bug gme 21480679
+
+  begin bug gme 21513183
+    begin actions
+    end actions
+  end bug gme 21513183
+
+  begin bug gme 21547203
+    begin actions
+    end actions
+  end bug gme 21547203
+
+  begin bug gme 21567126
+    begin actions
+    end actions
+  end bug gme 21567126
+
+  begin bug gme 21628134
+    begin actions
+    end actions
+  end bug gme 21628134
+
+  begin bug gme 21653652
+    begin actions
+    end actions
+  end bug gme 21653652
+
+  begin bug gme 21759414
+    begin actions
+    end actions
+  end bug gme 21759414
+
+  begin bug gme 21764324
+    begin actions
+    end actions
+  end bug gme 21764324
+
+  begin bug gme 21786445
+    begin actions
+    end actions
+  end bug gme 21786445
+
+  begin bug gme 21799236
+    begin actions
+    end actions
+  end bug gme 21799236
+
+  begin bug gme 21890861
+    begin actions
+    end actions
+  end bug gme 21890861
+
+  begin bug gme 21954329
+    begin actions
+    end actions
+  end bug gme 21954329
+
+  begin bug gme 21962707
+    begin actions
+    end actions
+  end bug gme 21962707
+
+  begin bug gme 21984755
+    begin actions
+    end actions
+  end bug gme 21984755
+
+  begin bug gme 22026914
+    begin actions
+    end actions
+  end bug gme 22026914
+
+  begin bug gme 22081481
+    begin actions
+    end actions
+  end bug gme 22081481
+
+  begin bug gme 22085252
+    begin actions
+    end actions
+  end bug gme 22085252
+
+  begin bug gme 22086884
+    begin actions
+    end actions
+  end bug gme 22086884
+
+  begin bug gme 22089783
+    begin actions
+    end actions
+  end bug gme 22089783
+
+  begin bug gme 22128352
+    begin actions
+    end actions
+  end bug gme 22128352
+
+  begin bug gme 22140698
+    begin actions
+    end actions
+  end bug gme 22140698
+
+  begin bug gme 22160524
+    begin actions
+    end actions
+  end bug gme 22160524
+
+  begin bug gme 22183983
+    begin actions
+    end actions
+  end bug gme 22183983
+
+  begin bug gme 22200452
+    begin actions
+    end actions
+  end bug gme 22200452
+
+  begin bug gme 22217179
+    begin actions
+    end actions
+  end bug gme 22217179
+
+  begin bug gme 22240879
+    begin actions
+    end actions
+  end bug gme 22240879
+
+  begin bug gme 22295728
+    begin actions
+    end actions
+  end bug gme 22295728
+
+  begin bug gme 22308915
+    begin actions
+    end actions
+  end bug gme 22308915
+
+  begin bug gme 22317010
+    begin actions
+    end actions
+  end bug gme 22317010
+
+  begin bug gme 22358770
+    begin actions
+    end actions
+  end bug gme 22358770
+
+  begin bug gme 22451459
+    begin actions
+    end actions
+  end bug gme 22451459
+
+  begin bug gme 22514452
+    begin actions
+    end actions
+  end bug gme 22514452
+
+  begin bug gme 22546888
+    begin actions
+    end actions
+  end bug gme 22546888
+
+  begin bug gme 22567974
+    begin actions
+    end actions
+  end bug gme 22567974
+
+  begin bug gme 22576949
+    begin actions
+    end actions
+  end bug gme 22576949
+
+  begin bug gme 22673485
+    begin actions
+    end actions
+  end bug gme 22673485
+
+  begin bug gmd 22681568
+    begin actions
+    end actions
+  end bug gmd 22681568
+
+  begin bug gme 22681641
+    begin actions
+    end actions
+  end bug gme 22681641
+
+  begin bug gme 22753342
+    begin actions
+    end actions
+  end bug gme 22753342
+
+  begin bug gme 22804243
+    begin actions
+    end actions
+  end bug gme 22804243
+
+  begin bug gme 22813874
+    begin actions
+    end actions
+  end bug gme 22813874
+
+  begin bug gme 22838710
+    begin actions
+    end actions
+  end bug gme 22838710
+
+  begin bug gme 22839055
+    begin actions
+    end actions
+  end bug gme 22839055
+
+  begin bug gme 22857165
+    begin actions
+    end actions
+  end bug gme 22857165
+
+  begin bug gme 22857387
+    begin actions
+    end actions
+  end bug gme 22857387
+
+  begin bug gme 22859297
+    begin actions
+    end actions
+  end bug gme 22859297
+
+  begin bug gme 22874366
+    begin actions
+    end actions
+  end bug gme 22874366
+
+  begin bug gme 22890167
+    begin actions
+    end actions
+  end bug gme 22890167
+
+  begin bug gme 22893491
+    begin actions
+    end actions
+  end bug gme 22893491
+
+  begin bug gme 22900323
+    begin actions
+    end actions
+  end bug gme 22900323
+
+  begin bug gme 22955827
+    begin actions
+    end actions
+  end bug gme 22955827
+
+  begin bug gme 22962971
+    begin actions
+    end actions
+  end bug gme 22962971
+
+  begin bug gme 22980052
+    begin actions
+    end actions
+  end bug gme 22980052
+
+  begin bug gme 22991566
+    begin actions
+    end actions
+  end bug gme 22991566
+
+  begin bug gme 23003334
+    begin actions
+    end actions
+  end bug gme 23003334
+
+  begin bug gme 23013067
+    begin actions
+    end actions
+  end bug gme 23013067
+
+  begin bug gme 23020692
+    begin actions
+    end actions
+  end bug gme 23020692
+
+  begin bug gme 23026619
+    begin actions
+    end actions
+  end bug gme 23026619
+
+  begin bug gme 23033331
+    begin actions
+    end actions
+  end bug gme 23033331
+
+  begin bug gme 23044855
+    begin actions
+    end actions
+  end bug gme 23044855
+
+  begin bug gme 23053534
+    begin actions
+    end actions
+  end bug gme 23053534
+
+  begin bug gmo 23060798
+    begin actions
+    end actions
+  end bug gmo 23060798
+
+  begin bug gme 23066637
+    begin actions
+    end actions
+  end bug gme 23066637
+
+  begin bug gme 23067178
+    begin actions
+    end actions
+  end bug gme 23067178
+
+  begin bug gme 23103411
+    begin actions
+    end actions
+  end bug gme 23103411
+
+  begin bug gme 23105420
+    begin actions
+    end actions
+  end bug gme 23105420
+
+  begin bug gme 23128093
+    begin actions
+    end actions
+  end bug gme 23128093
+
+  begin bug gme 23149583
+    begin actions
+    end actions
+  end bug gme 23149583
+
+  begin bug gme 23155176
+    begin actions
+    end actions
+  end bug gme 23155176
+
+  begin bug gme 23176130
+    begin actions
+    end actions
+  end bug gme 23176130
+
+  begin bug gme 23195628
+    begin actions
+    end actions
+  end bug gme 23195628
+
+  begin bug gme 23198865
+    begin actions
+    end actions
+  end bug gme 23198865
+
+  begin bug gme 23216605
+    begin actions
+    end actions
+  end bug gme 23216605
+
+  begin bug gme 23228636
+    begin actions
+    end actions
+  end bug gme 23228636
+
+  begin bug gme 23237559
+    begin actions
+    end actions
+  end bug gme 23237559
+
+  begin bug gme 23268130
+    begin actions
+    end actions
+  end bug gme 23268130
+
+  begin bug gme 23487870
+    begin actions
+    end actions
+  end bug gme 23487870
+
+  begin bug gme 23516667
+    begin actions
+    end actions
+  end bug gme 23516667
+
+  begin bug gme 23595831
+    begin actions
+    end actions
+  end bug gme 23595831
+
+  begin bug gme 23640627
+    begin actions
+    end actions
+  end bug gme 23640627
+
+  begin bug gme 23705844
+    begin actions
+    end actions
+  end bug gme 23705844
+
+  begin bug gme 23715423
+    begin actions
+    end actions
+  end bug gme 23715423
+
+  begin bug gme 23716981
+    begin actions
+    end actions
+  end bug gme 23716981
+
+  begin bug gme 23720963
+    begin actions
+    end actions
+  end bug gme 23720963
+
+  begin bug gme 23736558
+    begin actions
+    end actions
+  end bug gme 23736558
+
+  begin bug gme 23748607
+    begin actions
+    end actions
+  end bug gme 23748607
+
+  begin bug gme 24307150
+    begin actions
+    end actions
+  end bug gme 24307150
+
+  begin bug gme 24317514
+    begin actions
+    end actions
+  end bug gme 24317514
+
+  begin bug gme 24323104
+    begin actions
+    end actions
+  end bug gme 24323104
+
+  begin bug gme 24350177
+    begin actions
+    end actions
+  end bug gme 24350177
+
+  begin bug gme 24351209
+    begin actions
+    end actions
+  end bug gme 24351209
+
+  begin bug gme 24355267
+    begin actions
+    end actions
+  end bug gme 24355267
+
+  begin bug gme 24397635
+    begin actions
+    end actions
+  end bug gme 24397635
+
+  begin bug gme 24410338
+    begin actions
+    end actions
+  end bug gme 24410338
+
+  begin bug gme 24457891
+    begin actions
+    end actions
+  end bug gme 24457891
+
+  begin bug gme 24509515
+    begin actions
+    end actions
+  end bug gme 24509515
+
+  begin bug gme 24514315
+    begin actions
+    end actions
+  end bug gme 24514315
+
+  begin bug gme 24560898
+    begin actions
+    end actions
+  end bug gme 24560898
+
+  begin bug gme 24587420
+    begin actions
+    end actions
+  end bug gme 24587420
+
+  begin bug gme 24604095
+    begin actions
+    end actions
+  end bug gme 24604095
+
+  begin bug gme 24617918
+    begin actions
+    end actions
+  end bug gme 24617918
+
+  begin bug gme 24642212
+    begin actions
+    end actions
+  end bug gme 24642212
+
+  begin bug gme 24681900
+    begin actions
+    end actions
+  end bug gme 24681900
+
+  begin bug gme 24738886
+    begin actions
+    end actions
+  end bug gme 24738886
+
+  begin bug gme 24815775
+    begin actions
+    end actions
+  end bug gme 24815775
+
+  begin bug gme 24826002
+    begin actions
+    end actions
+  end bug gme 24826002
+
+  begin bug gme 24905205
+    begin actions
+    end actions
+  end bug gme 24905205
+
+  begin bug gme 24949569
+    begin actions
+    end actions
+  end bug gme 24949569
+
+  begin bug gme 24958580
+    begin actions
+    end actions
+  end bug gme 24958580
+
+  begin bug gme 24977868
+    begin actions
+    end actions
+  end bug gme 24977868
+
+  begin bug gme 25056182
+    begin actions
+    end actions
+  end bug gme 25056182
+
+  begin bug gme 25077133
+    begin actions
+    end actions
+  end bug gme 25077133
+
+  begin bug gme 25117447
+    begin actions
+    end actions
+  end bug gme 25117447
+
+  begin bug gme 25183093
+    begin actions
+    end actions
+  end bug gme 25183093
+
+  begin bug gme 25202190
+    begin actions
+    end actions
+  end bug gme 25202190
+
+  begin bug gme 25202346
+    begin actions
+    end actions
+  end bug gme 25202346
+
+  begin bug gme 25246717
+    begin actions
+    end actions
+  end bug gme 25246717
+
+  begin bug gme 25251721
+    begin actions
+    end actions
+  end bug gme 25251721
+
+  begin bug gme 25261523
+    begin actions
+    end actions
+  end bug gme 25261523
+
+  begin bug gme 25301412
+    begin actions
+    end actions
+  end bug gme 25301412
+
+  begin bug gme 25353805
+    begin actions
+    end actions
+  end bug gme 25353805
+
+  begin bug gme 25378304
+    begin actions
+    end actions
+  end bug gme 25378304
+
+  begin bug gme 25379395
+    begin actions
+    end actions
+  end bug gme 25379395
+
+  begin bug gme 25412645
+    begin actions
+    end actions
+  end bug gme 25412645
+
+  begin bug gme 25504743
+    begin actions
+    end actions
+  end bug gme 25504743
+
+  begin bug gme 25516739
+    begin actions
+    end actions
+  end bug gme 25516739
+
+  begin bug gme 25519032
+    begin actions
+    end actions
+  end bug gme 25519032
+
+  begin bug gme 25548444
+    begin actions
+    end actions
+  end bug gme 25548444
+
+  begin bug gme 25576167
+    begin actions
+    end actions
+  end bug gme 25576167
+
+  begin bug gme 25595164
+    begin actions
+    end actions
+  end bug gme 25595164
+
+  begin bug gme 25596394
+    begin actions
+    end actions
+  end bug gme 25596394
+
+  begin bug gme 25597552
+    begin actions
+    end actions
+  end bug gme 25597552
+
+  begin bug gme 25609180
+    begin actions
+    end actions
+  end bug gme 25609180
+
+  begin bug gme 25718309
+    begin actions
+    end actions
+  end bug gme 25718309
+
+  begin bug gme 25771893
+    begin actions
+    end actions
+  end bug gme 25771893
+
+  begin bug gme 25784916
+    begin actions
+    end actions
+  end bug gme 25784916
+
+  begin bug gme 25808846
+    begin actions
+    end actions
+  end bug gme 25808846
+
+  begin bug gme 25883843
+    begin actions
+    end actions
+  end bug gme 25883843
+
+  begin bug gme 25949491
+    begin actions
+    end actions
+  end bug gme 25949491
+
+  begin bug gme 25999337
+    begin actions
+    end actions
+  end bug gme 25999337
+
+  begin bug gme 26023863
+    begin actions
+    end actions
+  end bug gme 26023863
+
+  begin bug gme 26027932
+    begin actions
+    end actions
+  end bug gme 26027932
+
+  begin bug gme 26051008
+    begin actions
+    end actions
+  end bug gme 26051008
+
+  begin bug gme 26073710
+    begin actions
+    end actions
+  end bug gme 26073710
+
+  begin bug gme 26094274
+    begin actions
+    end actions
+  end bug gme 26094274
+
+  begin bug gme 26248999
+    begin actions
+    end actions
+  end bug gme 26248999
+
+  begin bug gme 26256886
+    begin actions
+    end actions
+  end bug gme 26256886
+
+  begin bug gme 26306441
+    begin actions
+    end actions
+  end bug gme 26306441
+
+  begin bug gme 26397424
+    begin actions
+
+      #=================================#
+      # Actions for Copying Patch Files #
+      #=================================#
+
+      copy      gmd      forms/US                  GMDOPRED.fmb 120.38.12020000.7
+      copy      gmd      forms/US                  GMDROTED.fmb 120.47.12020000.9
+      copy      gmd      forms/US                  GMDRVRED.fmb 120.38.12020000.6
+      copy      gmd      patch/115/import/US       gmdmsg.ldt   120.73.12020000.7
+      copy      gmd      patch/115/odf             GMDDMLS.odf  120.6.12020000.4
+      copy      gmd      patch/115/odf             GMDFMGT.odf  120.6.12020000.3
+      copy      gmd      patch/115/odf             GMDRCP.odf   120.12.12020000.7
+      copy      gme      admin/driver              gme16974953.drv 120.0.12020000.2
+      copy      gme      admin/driver              gme20986335.drv 120.0.12020000.5
+      copy      gme      admin/driver              gmefile.drv  120.11.12020000.3
+      copy      gme      forms/US                  GMEBDOHD.fmb 120.0.12020000.14
+      copy      gme      forms/US                  GMEBDTED.fmb 120.232.12020000.85
+      copy      gme      forms/US                  GMECBTCH.fmb 120.49.12020000.20
+      copy      gme      forms/US                  GMEIBFED.fmb 120.27.12020000.5
+      copy      gme      forms/US                  GMEINPSM.fmb 120.11.12020000.6
+      copy      gme      forms/US                  GMEMATED.fmb 120.11.12020000.5
+      copy      gme      forms/US                  GMEMSBCH.fmb 120.21.12020000.11
+      copy      gme      forms/US                  GMEMTORL.fmb 120.10.12020000.6
+      copy      gme      forms/US                  GMEPRMED.fmb 120.21.12020000.10
+      copy      gme      forms/US                  GMEPSCSM.fmb 120.15.12020000.4
+      copy      gme      forms/US                  GMEPWBSC.fmb 120.11.12020000.8
+      copy      gme      forms/US                  GMESMAED.fmb 120.16.12020000.4
+      copy      gme      forms/US                  GMESTPED.fmb 120.130.12020000.89
+      copy      gme      forms/US                  GMETTMTX.fmb 120.131.12020000.104
+      copy      gme      forms/US                  GMEWIPSM.fmb 120.15.12020000.4
+      copy      gme      forms/US                  GMEWKBCH.fmb 120.21.12020000.10
+      copy      gme      mds/invtxn/server         IssueIngredientPage.xml 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmeattr.jlt  120.9.12020000.2
+      copy      gme      patch/115/import/US       gmebhdai.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmebhdar.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmebhdat.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmebhdau.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmebhrai.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmebhrar.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmebhrat.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmebhrau.ldt 120.0.12020000.2
+      copy      gme      patch/115/import/US       gmelkup.ldt  120.11.12020000.7
+      copy      gme      patch/115/import/US       gmemenu.ldt  120.22.12020000.7
+      copy      gme      patch/115/import/US       gmemsg.ldt   120.55.12020000.36
+      copy      gme      patch/115/import/US       gmeprg.ldt   120.17.12020000.11
+      copy      gme      patch/115/irep/patch/115/import/US gmeprg_ldt.ildt 120.17.12020000.11
+      copy      gme      patch/115/import/US       gmergup.ldt  120.6.12020000.5
+      copy      gme      patch/115/import/US       gmetable.ldt 120.6.12020000.5
+      copy      gme      patch/115/import/US       gmetmpl.ldt  120.3.12020000.2
+      copy      gme      patch/115/import/US       gmexdodefn.ldt 120.2.12020000.6
+      copy      gme      patch/115/odf             GMEACT.odf   120.3.12020000.3
+      copy      gme      patch/115/odf             GMEBCH.odf   120.9.12020000.5
+      copy      gme      patch/115/odf             GMEMTO.odf   120.4.12020000.2
+      copy      gme      patch/115/odf             GMEPEPC.odf  120.8.12020000.4
+      copy      gme      patch/115/odf             GMEPRM.odf   120.10.12020000.8
+      copy      gme      patch/115/odf             GMERSC.odf   120.3.12020000.4
+      copy      gme      patch/115/odf             GMERTXN.odf  120.2.12020000.5
+      copy      gme      patch/115/odf             GMESTP.odf   120.5.12020000.5
+      copy      gme      patch/115/publisher/defs  GMEOSP.xml   120.0.12020000.2
+      copy      gme      patch/115/publisher/templates/US GMEBEVRT.rtf 120.9.12020000.8
+      copy      gme      patch/115/publisher/templates/US GMEBHOLD.rtf 120.0.12020000.5
+      copy      gme      patch/115/publisher/templates/US GMEBHREL.rtf 120.0.12020000.5
+      copy      gme      patch/115/publisher/templates/US GMEOSP.rtf   120.0.12020000.5
+      copy      gme      patch/115/publisher/templates/US GMESTPRT.rtf 120.9.12020000.4
+      copy      gme      patch/115/sql             GMEBAOIB.pls 120.2.12020000.20
+      copy      gme      patch/115/sql             GMEBAOIS.pls 120.1.12020000.3
+      copy      gme      patch/115/sql             GMEBCHTKB.pls 120.0.12020000.2
+      copy      gme      patch/115/sql             GMEBCHTKS.pls 120.1.12020000.2
+      copy      gme      patch/115/sql             GMEBCHYVB.pls 120.0.12020000.2
+      copy      gme      patch/115/sql             GMEBOHPB.pls 120.0.12020000.9
+      copy      gme      patch/115/sql             GMEBOHPS.pls 120.0.12020000.5
+      copy      gme      patch/115/sql             GMEBTOIB.pls 120.9.12020000.15
+      copy      gme      patch/115/sql             GMEBTOIS.pls 120.0.12020000.5
+      copy      gme      patch/115/sql             GMECRBTB.pls 120.9.12020000.8
+      copy      gme      patch/115/sql             GMECRSVB.pls 120.2.12020000.6
+      copy      gme      patch/115/sql             GMEDRPTG.sql 120.1.12020000.1
+      copy      gme      patch/115/sql             GMEERESB.pls 120.2.12020000.2
+      copy      gme      patch/115/sql             GMEERESS.pls 120.2.12020000.2
+      copy      gme      patch/115/sql             GMEGAPIB.pls 120.41.12020000.4
+      copy      gme      patch/115/sql             GMEGNTB.pls  120.11.12020000.9
+      copy      gme      patch/115/sql             GMEGNTLB.pls 120.4.12020000.2
+      copy      gme      patch/115/sql             GMEGNTRB.pls 120.5.12020000.4
+      copy      gme      patch/115/sql             GMEMAPIB.pls 120.40.12020000.22
+      copy      gme      patch/115/sql             GMEMAPIS.pls 120.13.12020000.6
+      copy      gme      patch/115/sql             GMEMIRSB.pls 120.0.12020000.2
+      copy      gme      patch/115/sql             GMEMLOVB.pls 120.41.12020000.11
+      copy      gme      patch/115/sql             GMEMLOVS.pls 120.19.12020000.4
+      copy      gme      patch/115/sql             GMEMORSB.pls 120.12.12020000.2
+      copy      gme      patch/115/sql             GMEMOTXB.pls 120.36.12020000.9
+      copy      gme      patch/115/sql             GMEMOTXS.pls 120.17.12020000.5
+      copy      gme      patch/115/sql             GMEMUSBVB.pls 120.1.12020000.3
+      copy      gme      patch/115/sql             GMENIRST.sql 120.0.12020000.2
+      copy      gme      patch/115/sql             GMEORESB.pls 120.9.12020000.4
+      copy      gme      patch/115/sql             GMEOSPB.pls  120.0.12020000.23
+      copy      gme      patch/115/sql             GMEOSPS.pls  120.0.12020000.6
+      copy      gme      patch/115/sql             GMEPAPIB.pls 120.82.12020000.39
+      copy      gme      patch/115/irep/patch/115/sql GMEPAPIS_pls.ildt 120.39.12020000.15
+      copy      gme      patch/115/sql             GMEPAPIS.pls 120.39.12020000.15
+      copy      gme      patch/115/sql             GMERTOIB.pls 120.2.12020000.23
+      copy      gme      patch/115/sql             GMERTOIS.pls 120.0.12020000.2
+      copy      gme      patch/115/sql             GMERTXSD.sql 120.2.12020000.2
+      copy      gme      patch/115/sql             GMERTXSI.sql 120.2.12020000.2
+      copy      gme      patch/115/sql             GMERTXSU.sql 120.2.12020000.2
+      copy      gme      patch/115/sql             GMEVACTB.pls 120.2.12020000.5
+      copy      gme      patch/115/sql             GMEVCCBB.pls 120.10.12020000.8
+      copy      gme      patch/115/sql             GMEVCCSB.pls 120.1.12020000.2
+      copy      gme      patch/115/sql             GMEVCHGB.pls 120.2.12020000.2
+      copy      gme      patch/115/sql             GMEVCLBB.pls 120.14.12020000.5
+      copy      gme      patch/115/sql             GMEVCMBB.pls 120.31.12020000.7
+      copy      gme      patch/115/sql             GMEVCMBS.pls 120.4.12020000.2
+      copy      gme      patch/115/sql             GMEVCMNB.pls 120.61.12020000.23
+      copy      gme      patch/115/sql             GMEVCMNS.pls 120.23.12020000.12
+      copy      gme      patch/115/sql             GMEVCMSB.pls 120.21.12020000.11
+      copy      gme      patch/115/sql             GMEVCMSS.pls 120.4.12020000.2
+      copy      gme      patch/115/sql             GMEVCRBB.pls 120.54.12020000.9
+      copy      gme      patch/115/sql             GMEVCRSB.pls 120.25.12020000.12
+      copy      gme      patch/115/sql             GMEVDBSB.pls 120.3.12020000.6
+      copy      gme      patch/115/sql             GMEVFPLB.pls 120.2.12020000.5
+      copy      gme      patch/115/sql             GMEVGRTB.pls 120.2.12020000.2
+      copy      gme      patch/115/sql             GMEVIBFB.pls 120.28.12020000.19
+      copy      gme      patch/115/sql             GMEVIBFS.pls 120.3.12020000.2
+      copy      gme      patch/115/sql             GMEVMOVB.pls 120.19.12020000.8
+      copy      gme      patch/115/sql             GMEVMTLB.pls 120.36.12020000.12
+      copy      gme      patch/115/sql             GMEVPCKB.pls 120.16.12020000.5
+      copy      gme      patch/115/sql             GMEVPHBB.pls 120.7.12020000.5
+      copy      gme      patch/115/sql             GMEVPPRB.pls 120.3.12020000.5
+      copy      gme      patch/115/sql             GMEVPTXB.pls 120.69.12020000.41
+      copy      gme      patch/115/sql             GMEVRLBB.pls 120.39.12020000.20
+      copy      gme      patch/115/sql             GMEVRLBS.pls 120.11.12020000.3
+      copy      gme      patch/115/sql             GMEVRLSB.pls 120.15.12020000.11
+      copy      gme      patch/115/sql             GMEVROBB.pls 120.5.12020000.3
+      copy      gme      patch/115/sql             GMEVRRBB.pls 120.10.12020000.5
+      copy      gme      patch/115/sql             GMEVRSBB.pls 120.12.12020000.11
+      copy      gme      patch/115/sql             GMEVRSBS.pls 120.1.12020000.2
+      copy      gme      patch/115/sql             GMEVRSSB.pls 120.13.12020000.6
+      copy      gme      patch/115/sql             GMEVRSVB.pls 120.43.12020000.13
+      copy      gme      patch/115/sql             GMEVRSVS.pls 120.7.12020000.4
+      copy      gme      patch/115/sql             GMEVRWBB.pls 120.10.12020000.4
+      copy      gme      patch/115/sql             GMEVRWBS.pls 120.0.12020000.2
+      copy      gme      patch/115/sql             GMEVRWSB.pls 120.4.12020000.2
+      copy      gme      patch/115/sql             GMEVRWSS.pls 120.0.12020000.2
+      copy      gme      patch/115/sql             GMEVRXNB.pls 120.20.12020000.13
+      copy      gme      patch/115/sql             GMEVSCBB.pls 120.12.12020000.14
+      copy      gme      patch/115/sql             GMEVTRBB.pls 120.6.12020000.2
+      copy      gme      patch/115/sql             GMEVURBB.pls 120.23.12020000.6
+      copy      gme      patch/115/sql             GMEVURSB.pls 120.7.12020000.3
+      copy      gme      patch/115/sql             GMEVUSQB.pls 120.15.12020000.8
+      copy      gme      patch/115/sql             GMEYCSTB.pls 120.0.12020000.4
+      copy      gme      patch/115/sql             GMEYCSTS.pls 120.0.12020000.4
+      copy      gme      patch/115/sql             GMEYMMPB.pls 120.0.12020000.2
+      copy      gme      patch/115/irep/patch/115/sql GMEYMMPS_pls.ildt 120.0.12020000.4
+      copy      gme      patch/115/sql             GMEYMMPS.pls 120.0.12020000.4
+      copy      gme      patch/115/sql             GME_BATCH_HISTORY_X1.sql 120.0.12020000.1
+      copy      gme      patch/115/sql             GME_BATCH_STEP_ACTIVITIES_X1.sql 120.0.12020000.1
+      copy      gme      patch/115/sql             GME_BATCH_STEP_RESOURCES_X2.sql 120.0.12020000.2
+      copy      gme      patch/115/sql             GME_RESOURCE_TXNS_X1.sql 120.0.12020000.1
+      copy      gme      patch/115/sql             GME_YIELD_CALCULATION_PVT_B.pls 120.0.12020000.47
+      copy      gme      patch/115/sql             GME_YIELD_CALCULATION_PVT_S.pls 120.0.12020000.14
+      copy      gme      patch/115/sql             gmeeresgt1.sql 120.0.12020000.4
+      copy      gme      patch/115/xdf             GME_BATCH_GENEALOGY.xdf 120.0.12020000.3
+      copy      gme      patch/115/xdf             GME_BATCH_ONHOLD_DTLS.xdf 120.0.12020000.1
+      copy      gme      patch/115/xdf             GME_BATCH_STEPS_QUANTITY.xdf 120.0.12020000.2
+      copy      gme      patch/115/xdf             GME_BATCH_STEPS_QUANTITY_V.xdf 120.0.12020000.2
+      copy      gme      patch/115/xdf             GME_ERES_GTMP2.xdf 120.0.12020000.1
+      copy      gme      patch/115/xdf             GME_OSP_ACTIVITIES_VAL_V.xdf 120.0.12020000.1
+      copy      gme      patch/115/xdf             GME_RESOURCE_TXNS_GTMP.xdf 120.1.12020000.2
+      copy      gme      patch/115/irep/patch/115/xdf GME_RESOURCE_TXNS_INTERFACE_xdf.ildt 120.0.12020000.5
+      copy      gme      patch/115/xdf             GME_RESOURCE_TXNS_INTERFACE.xdf 120.0.12020000.5
+      copy      gme      patch/115/xml/US          gme_cbr_batch_actns.xgm 120.10.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_bact.xgm 120.3.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_bact_updt.xgm 120.2.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_bpparam.xgm 120.3.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_brsrc.xgm 120.3.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_brsrc_updt.xgm 120.2.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_clse_ropn.xgm 120.2.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_hold.xgm 120.0.12020000.5
+      copy      gme      patch/115/xml/US          gme_cbr_batch_matl.xgm 120.7.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_matl_trx.xgm 120.7.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_new.xgm 120.2.12020000.3
+      copy      gme      patch/115/xml/US          gme_cbr_batch_release.xgm 120.6.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_rsrs_txns.xgm 120.1.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_step.xgm 120.3.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_step_actns.xgm 120.7.12020000.3
+      copy      gme      patch/115/xml/US          gme_cbr_batch_terminate.xgm 120.2.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batch_updt.xgm 120.2.12020000.2
+      copy      gme      patch/115/xml/US          gme_cbr_batchstp_clse_ropn.xgm 120.3.12020000.2
+      copy      gme      patch/115/irep/patch/115/xml/US gmebhdre_wfx.ildt 120.0.12020000.2
+      copy      gme      patch/115/xml/US          gmebhdre.wfx 120.0.12020000.2
+      copy      gme      patch/115/xml/US          gmebhdrs.wfx 120.0.12020000.1
+      copy      gme      patch/115/irep/patch/115/xml/US gmebhlde_wfx.ildt 120.0.12020000.2
+      copy      gme      patch/115/xml/US          gmebhlde.wfx 120.0.12020000.2
+      copy      gme      patch/115/xml/US          gmebhlds.wfx 120.0.12020000.1
+      copy      gme      reports/US                GMEBCHTK.rdf 120.9.12020000.3
+      copy      gme      reports/US                GMEBCHYV.rdf 120.10.12020000.4
+      copy      gme      resource                  GMECOM.pll   120.40.12020000.5
+      copy      gme      xml/orc115                gme_cbr_batchhold.dtd 120.0.12020000.2
+      copy      gmo      patch/115/publisher/templates/US GMOCBRCOMN.rtf 120.27.12020000.7
+      copy      gmo      patch/115/sql             GMOGCONS.pls 120.6.12020000.2
+      copy      gmo      patch/115/sql             GMOVVBTB.pls 120.27.12020000.3
+      copy      gmo      patch/115/sql             GMOVVBTS.pls 120.10.12020000.3
+      copy      gmp      forms/US                  GMPGRSRC.fmb 120.1.12020000.5
+      copy      gmp      forms/US                  GMPPLRSC.fmb 120.23.12020000.8
+      copy      gmp      patch/115/odf             GMPDTL.odf   120.6.12020000.3
+      copy      gmp      patch/115/odf             GMPPMLS.odf  120.3.12020000.5
+      copy      gmp      patch/115/sql             GMPRSMSB.pls 120.4.12020000.2
+      copy      gmp      patch/115/sql             GMPRSMSS.pls 120.4.12020000.2
+      jcopy                                        j26397424_gme.zip
+
+      #=======================================#
+      # Actions for Applying Database Objects #
+      #=======================================#
+
+      #
+      # Phase CON - Disable constraints, foreign keys
+      #
+
+      # file-version-parsed gme patch/115/sql GMEDRPTG.sql 120.1.12020000.1
+      sql gme patch/115/sql GMEDRPTG.sql none none none sql &phase=con checkfile:nocheck
+
+      #
+      # Phase SEQ - Create Sequences
+      #
+
+      # file-version-parsed gmd patch/115/odf GMDFMGT.odf 120.6.12020000.3
+      exec gmd patch/115/odf GMDFMGT.odf odf &phase=seq checkfile:gmd:patch/115/odf:GMDFMGT.odf:seq_sequences mode=sequences
+
+      # file-version-parsed gmd patch/115/odf GMDRCP.odf 120.12.12020000.7
+      exec gmd patch/115/odf GMDRCP.odf odf &phase=seq checkfile:gmd:patch/115/odf:GMDRCP.odf:seq_sequences mode=sequences
+
+      # file-version-parsed gme patch/115/odf GMEMTO.odf 120.4.12020000.2
+      exec gme patch/115/odf GMEMTO.odf odf &phase=seq checkfile(120.0.12010000.2=120.4):gme:patch/115/odf:GMEMTO.odf:seq_sequences mode=sequences
+
+      # file-version-parsed gme patch/115/odf GMEPEPC.odf 120.8.12020000.4
+      exec gme patch/115/odf GMEPEPC.odf odf &phase=seq checkfile:gme:patch/115/odf:GMEPEPC.odf:seq_sequences mode=sequences
+
+      # file-version-parsed gme patch/115/xdf GME_BATCH_ONHOLD_DTLS.xdf 120.0.12020000.1
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=seq checkfile:gme:patch/115/xdf:GME_BATCH_ONHOLD_DTLS.xdf:seq_sequence &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr sequence &fullpath_gme_patch/115/xdf_GME_BATCH_ONHOLD_DTLS.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_BATCH_STEPS_QUANTITY.xdf 120.0.12020000.2
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=seq checkfile:gme:patch/115/xdf:GME_BATCH_STEPS_QUANTITY.xdf:seq_sequence &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr sequence &fullpath_gme_patch/115/xdf_GME_BATCH_STEPS_QUANTITY.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_RESOURCE_TXNS_INTERFACE.xdf 120.0.12020000.5
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=seq checkfile:gme:patch/115/xdf:GME_RESOURCE_TXNS_INTERFACE.xdf:seq_sequence &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr sequence &fullpath_gme_patch/115/xdf_GME_RESOURCE_TXNS_INTERFACE.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      #
+      # Phase TAB - Create Tables and Indexes
+      #
+
+      # file-version-parsed gmd patch/115/odf GMDDMLS.odf 120.6.12020000.4
+      exec gmd patch/115/odf GMDDMLS.odf odf &phase=tab checkfile:gmd:patch/115/odf:GMDDMLS.odf:tab_tables mode=tables
+
+      # file-version-parsed gmd patch/115/odf GMDFMGT.odf 120.6.12020000.3
+      exec gmd patch/115/odf GMDFMGT.odf odf &phase=tab checkfile:gmd:patch/115/odf:GMDFMGT.odf:tab_tables mode=tables
+
+      # file-version-parsed gmd patch/115/odf GMDRCP.odf 120.12.12020000.7
+      exec gmd patch/115/odf GMDRCP.odf odf &phase=tab checkfile:gmd:patch/115/odf:GMDRCP.odf:tab_tables mode=tables
+
+      # file-version-parsed gme patch/115/odf GMEACT.odf 120.3.12020000.3
+      exec gme patch/115/odf GMEACT.odf odf &phase=tab checkfile:gme:patch/115/odf:GMEACT.odf:tab_tables mode=tables defer=GME_BATCH_STEP_ACTIVITIES_PK
+
+      # file-version-parsed gme patch/115/odf GMEBCH.odf 120.9.12020000.5
+      exec gme patch/115/odf GMEBCH.odf odf &phase=tab checkfile:gme:patch/115/odf:GMEBCH.odf:tab_tables mode=tables
+
+      # file-version-parsed gme patch/115/odf GMEMTO.odf 120.4.12020000.2
+      exec gme patch/115/odf GMEMTO.odf odf &phase=tab checkfile(120.0.12010000.2=120.4):gme:patch/115/odf:GMEMTO.odf:tab_tables mode=tables
+
+      # file-version-parsed gme patch/115/odf GMEPEPC.odf 120.8.12020000.4
+      exec gme patch/115/odf GMEPEPC.odf odf &phase=tab checkfile:gme:patch/115/odf:GMEPEPC.odf:tab_tables mode=tables defer=GME_BATCH_HISTORY_PK
+
+      # file-version-parsed gme patch/115/odf GMEPRM.odf 120.10.12020000.8
+      exec gme patch/115/odf GMEPRM.odf odf &phase=tab checkfile:gme:patch/115/odf:GMEPRM.odf:tab_tables mode=tables
+
+      # file-version-parsed gme patch/115/odf GMERSC.odf 120.3.12020000.4
+      exec gme patch/115/odf GMERSC.odf odf &phase=tab checkfile:gme:patch/115/odf:GMERSC.odf:tab_tables mode=tables
+
+      # file-version-parsed gme patch/115/odf GMERTXN.odf 120.2.12020000.5
+      exec gme patch/115/odf GMERTXN.odf odf &phase=tab checkfile:gme:patch/115/odf:GMERTXN.odf:tab_tables mode=tables defer=GME_RESOURCE_TXNS_PK
+
+      # file-version-parsed gme patch/115/odf GMESTP.odf 120.5.12020000.5
+      exec gme patch/115/odf GMESTP.odf odf &phase=tab checkfile:gme:patch/115/odf:GMESTP.odf:tab_tables mode=tables
+
+      # file-version-parsed gme patch/115/xdf GME_BATCH_GENEALOGY.xdf 120.0.12020000.3
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=tab checkfile:gme:patch/115/xdf:GME_BATCH_GENEALOGY.xdf:tab_table &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr table &fullpath_gme_patch/115/xdf_GME_BATCH_GENEALOGY.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_BATCH_ONHOLD_DTLS.xdf 120.0.12020000.1
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=tab checkfile:gme:patch/115/xdf:GME_BATCH_ONHOLD_DTLS.xdf:tab_table &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr table &fullpath_gme_patch/115/xdf_GME_BATCH_ONHOLD_DTLS.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_BATCH_STEPS_QUANTITY.xdf 120.0.12020000.2
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=tab checkfile:gme:patch/115/xdf:GME_BATCH_STEPS_QUANTITY.xdf:tab_table &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr table &fullpath_gme_patch/115/xdf_GME_BATCH_STEPS_QUANTITY.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_ERES_GTMP2.xdf 120.0.12020000.1
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=tab checkfile:gme:patch/115/xdf:GME_ERES_GTMP2.xdf:tab_table &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr table &fullpath_gme_patch/115/xdf_GME_ERES_GTMP2.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_RESOURCE_TXNS_GTMP.xdf 120.1.12020000.2
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=tab checkfile:gme:patch/115/xdf:GME_RESOURCE_TXNS_GTMP.xdf:tab_table &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr table &fullpath_gme_patch/115/xdf_GME_RESOURCE_TXNS_GTMP.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_RESOURCE_TXNS_INTERFACE.xdf 120.0.12020000.5
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=tab checkfile:gme:patch/115/xdf:GME_RESOURCE_TXNS_INTERFACE.xdf:tab_table &un_gme &pw_gme &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr table &fullpath_gme_patch/115/xdf_GME_RESOURCE_TXNS_INTERFACE.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gmp patch/115/odf GMPDTL.odf 120.6.12020000.3
+      exec gmp patch/115/odf GMPDTL.odf odf &phase=tab checkfile:gmp:patch/115/odf:GMPDTL.odf:tab_tables mode=tables
+
+      # file-version-parsed gmp patch/115/odf GMPPMLS.odf 120.3.12020000.5
+      exec gmp patch/115/odf GMPPMLS.odf odf &phase=tab checkfile:gmp:patch/115/odf:GMPPMLS.odf:tab_tables mode=tables
+
+      #
+      # Phase OS - Odd Synonyms
+      #
+
+      # file-version-parsed gme patch/115/sql gmeeresgt1.sql 120.0.12020000.4
+      sql gme patch/115/sql gmeeresgt1.sql none none none sql &phase=os checkfile:gme:patch/115/sql:gmeeresgt1.sql &un_gme &pw_gme &un_apps &pw_apps
+
+      #
+      # Phase PLS - Create Package Specifications
+      #
+
+      # file-version-parsed gme patch/115/sql GMEBAOIS.pls 120.1.12020000.3
+      sql gme patch/115/sql GMEBAOIS.pls none none none package &phase=pls checkfile(120.0.12010000.4=120.1.12020000.3)(115.2=120.1):gme:patch/115/sql:GMEBAOIS.pls
+
+      # file-version-parsed gme patch/115/sql GMEBCHTKS.pls 120.1.12020000.2
+      sql gme patch/115/sql GMEBCHTKS.pls none none none package &phase=pls checkfile(120.0.12010000.3=120.1.12020000.2):gme:patch/115/sql:GMEBCHTKS.pls
+
+      # file-version-parsed gme patch/115/sql GMEBOHPS.pls 120.0.12020000.5
+      sql gme patch/115/sql GMEBOHPS.pls none none none package &phase=pls checkfile(120.0.12010000.5=120.0.12020000.5)(120.0.12000000.1=120.0.12010000.1):gme:patch/115/sql:GMEBOHPS.pls
+
+      # file-version-parsed gme patch/115/sql GMEBTOIS.pls 120.0.12020000.5
+      sql gme patch/115/sql GMEBTOIS.pls none none none package &phase=pls checkfile(120.0.12010000.5=120.0.12020000.5)(115.2=120.1):gme:patch/115/sql:GMEBTOIS.pls
+
+      # file-version-parsed gme patch/115/sql GMEERESS.pls 120.2.12020000.2
+      sql gme patch/115/sql GMEERESS.pls none none none package &phase=pls checkfile(120.2.12010000.2=120.2.12020000.2)(115.4=120.1):gme:patch/115/sql:GMEERESS.pls
+
+      # file-version-parsed gme patch/115/sql GMEMAPIS.pls 120.13.12020000.6
+      sql gme patch/115/sql GMEMAPIS.pls none none none package &phase=pls checkfile(120.11.12010000.8=120.13.12020000.6)(120.10.12000000.5=120.11.12010000.3)(120.10.12000000.4=120.11.12010000.2)(115.15=120.4):gme:patch/115/sql:GMEMAPIS.pls
+
+      # file-version-parsed gme patch/115/sql GMEMLOVS.pls 120.19.12020000.4
+      sql gme patch/115/sql GMEMLOVS.pls none none none package &phase=pls checkfile(120.17.12010000.6=120.19.12020000.4)(120.15.12000000.5=120.17.12010000.3)(120.15.12000000.5=120.19):gme:patch/115/sql:GMEMLOVS.pls
+
+      # file-version-parsed gme patch/115/sql GMEMOTXS.pls 120.17.12020000.5
+      sql gme patch/115/sql GMEMOTXS.pls none none none package &phase=pls checkfile(120.13.12010000.10=120.17.12020000.5)(120.9.12000000.10=120.13.12010000.7)(120.9.12000000.8=120.13.12010000.5)(120.9.12000000.8=120.17):gme:patch/115/sql:GMEMOTXS.pls
+
+      # file-version-parsed gme patch/115/sql GMEOSPS.pls 120.0.12020000.6
+      sql gme patch/115/sql GMEOSPS.pls none none none package &phase=pls checkfile(120.0.12010000.6=120.0.12020000.6)(115.2=120.1):gme:patch/115/sql:GMEOSPS.pls
+
+      # file-version-parsed gme patch/115/sql GMEPAPIS.pls 120.39.12020000.15
+      sql gme patch/115/sql GMEPAPIS.pls none none none package &phase=pls checkfile(120.32.12010000.23=120.39.12020000.15)(115.84=120.7):gme:patch/115/sql:GMEPAPIS.pls
+
+      # file-version-parsed gme patch/115/sql GMERTOIS.pls 120.0.12020000.2
+      sql gme patch/115/sql GMERTOIS.pls none none none package &phase=pls checkfile(120.0.12010000.2=120.0.12020000.2)(115.2=120.1):gme:patch/115/sql:GMERTOIS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCMBS.pls 120.4.12020000.2
+      sql gme patch/115/sql GMEVCMBS.pls none none none package &phase=pls checkfile(120.4.12010000.2=120.4.12020000.2):gme:patch/115/sql:GMEVCMBS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCMNS.pls 120.23.12020000.12
+      sql gme patch/115/sql GMEVCMNS.pls none none none package &phase=pls checkfile(120.17.12010000.18=120.23.12020000.12)(120.13.12000000.16=120.17.12010000.12)(120.13.12000000.13=120.17.12010000.9)(120.13.12000000.9=120.17.12010000.5)(120.13.12000000.11=120.23):gme:patch/115/sql:GMEVCMNS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCMSS.pls 120.4.12020000.2
+      sql gme patch/115/sql GMEVCMSS.pls none none none package &phase=pls checkfile(120.4.12010000.2=120.4.12020000.2)(120.3.12000000.2=120.4):gme:patch/115/sql:GMEVCMSS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVIBFS.pls 120.3.12020000.2
+      sql gme patch/115/sql GMEVIBFS.pls none none none package &phase=pls checkfile(120.3.12010000.2=120.3.12020000.2):gme:patch/115/sql:GMEVIBFS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRLBS.pls 120.11.12020000.3
+      sql gme patch/115/sql GMEVRLBS.pls none none none package &phase=pls checkfile(120.9.12010000.4=120.11.12020000.3)(120.9.12000000.3=120.9.12010000.2)(115.12=120.2):gme:patch/115/sql:GMEVRLBS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRSBS.pls 120.1.12020000.2
+      sql gme patch/115/sql GMEVRSBS.pls none none none package &phase=pls checkfile(120.1.12010000.2=120.1.12020000.2)(115.11=120.1):gme:patch/115/sql:GMEVRSBS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRSVS.pls 120.7.12020000.4
+      sql gme patch/115/sql GMEVRSVS.pls none none none package &phase=pls checkfile(120.2.12010000.10=120.7.12020000.4)(120.2.12000000.10=120.2.12010000.9)(120.2.12000000.7=120.7):gme:patch/115/sql:GMEVRSVS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRWBS.pls 120.0.12020000.2
+      sql gme patch/115/sql GMEVRWBS.pls none none none package &phase=pls checkfile(120.0.12010000.2=120.0.12020000.2):gme:patch/115/sql:GMEVRWBS.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRWSS.pls 120.0.12020000.2
+      sql gme patch/115/sql GMEVRWSS.pls none none none package &phase=pls checkfile(120.0.12010000.2=120.0.12020000.2):gme:patch/115/sql:GMEVRWSS.pls
+
+      # file-version-parsed gme patch/115/sql GMEYCSTS.pls 120.0.12020000.4
+      sql gme patch/115/sql GMEYCSTS.pls none none none package &phase=pls checkfile(120.0.12010000.4=120.0.12020000.4)(115.2=120.1):gme:patch/115/sql:GMEYCSTS.pls
+
+      # file-version-parsed gme patch/115/sql GMEYMMPS.pls 120.0.12020000.4
+      sql gme patch/115/sql GMEYMMPS.pls none none none package &phase=pls checkfile(120.0.12010000.5=120.0.12020000.4):gme:patch/115/sql:GMEYMMPS.pls
+
+      # file-version-parsed gme patch/115/sql GME_YIELD_CALCULATION_PVT_S.pls 120.0.12020000.14
+      sql gme patch/115/sql GME_YIELD_CALCULATION_PVT_S.pls none none none package &phase=pls checkfile(120.0.12010000.24=120.0.12020000.14):gme:patch/115/sql:GME_YIELD_CALCULATION_PVT_S.pls
+
+      # file-version-parsed gmo patch/115/sql GMOGCONS.pls 120.6.12020000.2
+      sql gmo patch/115/sql GMOGCONS.pls none none none package &phase=pls checkfile(120.6.12010000.2=120.6.12020000.2):gmo:patch/115/sql:GMOGCONS.pls
+
+      # file-version-parsed gmo patch/115/sql GMOVVBTS.pls 120.10.12020000.3
+      sql gmo patch/115/sql GMOVVBTS.pls none none none package &phase=pls checkfile(120.8.12010000.5=120.10.12020000.3)(120.5.12000000.5=120.10):gmo:patch/115/sql:GMOVVBTS.pls
+
+      # file-version-parsed gmp patch/115/sql GMPRSMSS.pls 120.4.12020000.2
+      sql gmp patch/115/sql GMPRSMSS.pls none none none package &phase=pls checkfile(120.0.12010000.3=120.4)(115.6=120.0):gmp:patch/115/sql:GMPRSMSS.pls
+
+      #
+      # Phase VW - Create Views
+      #
+
+      # file-version-parsed gmd patch/115/odf GMDDMLS.odf 120.6.12020000.4
+      exec gmd patch/115/odf GMDDMLS.odf odf &phase=vw checkfile:gmd:patch/115/odf:GMDDMLS.odf:vw_views mode=views
+
+      # file-version-parsed gmd patch/115/odf GMDFMGT.odf 120.6.12020000.3
+      exec gmd patch/115/odf GMDFMGT.odf odf &phase=vw checkfile:gmd:patch/115/odf:GMDFMGT.odf:vw_views mode=views
+
+      # file-version-parsed gmd patch/115/odf GMDRCP.odf 120.12.12020000.7
+      exec gmd patch/115/odf GMDRCP.odf odf &phase=vw checkfile:gmd:patch/115/odf:GMDRCP.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/odf GMEACT.odf 120.3.12020000.3
+      exec gme patch/115/odf GMEACT.odf odf &phase=vw checkfile:gme:patch/115/odf:GMEACT.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/odf GMEBCH.odf 120.9.12020000.5
+      exec gme patch/115/odf GMEBCH.odf odf &phase=vw checkfile:gme:patch/115/odf:GMEBCH.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/odf GMEMTO.odf 120.4.12020000.2
+      exec gme patch/115/odf GMEMTO.odf odf &phase=vw checkfile(120.0.12010000.2=120.4):gme:patch/115/odf:GMEMTO.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/odf GMEPEPC.odf 120.8.12020000.4
+      exec gme patch/115/odf GMEPEPC.odf odf &phase=vw checkfile:gme:patch/115/odf:GMEPEPC.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/odf GMERSC.odf 120.3.12020000.4
+      exec gme patch/115/odf GMERSC.odf odf &phase=vw checkfile:gme:patch/115/odf:GMERSC.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/odf GMERTXN.odf 120.2.12020000.5
+      exec gme patch/115/odf GMERTXN.odf odf &phase=vw checkfile:gme:patch/115/odf:GMERTXN.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/odf GMESTP.odf 120.5.12020000.5
+      exec gme patch/115/odf GMESTP.odf odf &phase=vw checkfile:gme:patch/115/odf:GMESTP.odf:vw_views mode=views
+
+      # file-version-parsed gme patch/115/xdf GME_BATCH_STEPS_QUANTITY_V.xdf 120.0.12020000.2
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=vw checkfile:gme:patch/115/xdf:GME_BATCH_STEPS_QUANTITY_V.xdf:vw_view &un_apps &pw_apps &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr view &fullpath_gme_patch/115/xdf_GME_BATCH_STEPS_QUANTITY_V.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gme patch/115/xdf GME_OSP_ACTIVITIES_VAL_V.xdf 120.0.12020000.1
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=vw checkfile:gme:patch/115/xdf:GME_OSP_ACTIVITIES_VAL_V.xdf:vw_view &un_apps &pw_apps &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr view &fullpath_gme_patch/115/xdf_GME_OSP_ACTIVITIES_VAL_V.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed gmp patch/115/odf GMPPMLS.odf 120.3.12020000.5
+      exec gmp patch/115/odf GMPPMLS.odf odf &phase=vw checkfile:gmp:patch/115/odf:GMPPMLS.odf:vw_views mode=views
+
+      #
+      # Phase PLB - Create Package Bodies
+      #
+
+      # file-version-parsed gme patch/115/sql GMEBAOIB.pls 120.2.12020000.20
+      sql gme patch/115/sql GMEBAOIB.pls none none none package &phase=plb checkfile(120.0.12010000.22=120.2.12020000.20)(115.2=120.1):gme:patch/115/sql:GMEBAOIB.pls
+
+      # file-version-parsed gme patch/115/sql GMEBCHTKB.pls 120.0.12020000.2
+      sql gme patch/115/sql GMEBCHTKB.pls none none none package &phase=plb checkfile(120.0.12010000.2=120.0.12020000.2):gme:patch/115/sql:GMEBCHTKB.pls
+
+      # file-version-parsed gme patch/115/sql GMEBCHYVB.pls 120.0.12020000.2
+      sql gme patch/115/sql GMEBCHYVB.pls none none none package &phase=plb checkfile(120.0.12010000.2=120.0.12020000.2):gme:patch/115/sql:GMEBCHYVB.pls
+
+      # file-version-parsed gme patch/115/sql GMEBOHPB.pls 120.0.12020000.9
+      sql gme patch/115/sql GMEBOHPB.pls none none none package &phase=plb checkfile(120.0.12010000.9=120.0.12020000.9)(120.0.12000000.1=120.0.12010000.1):gme:patch/115/sql:GMEBOHPB.pls
+
+      # file-version-parsed gme patch/115/sql GMEBTOIB.pls 120.9.12020000.15
+      sql gme patch/115/sql GMEBTOIB.pls none none none package &phase=plb checkfile(120.0.12010000.24=120.9.12020000.15)(115.2=120.1):gme:patch/115/sql:GMEBTOIB.pls
+
+      # file-version-parsed gme patch/115/sql GMECRBTB.pls 120.9.12020000.8
+      sql gme patch/115/sql GMECRBTB.pls none none none package &phase=plb checkfile(120.5.12010000.13=120.9.12020000.8)(120.5.12010000.12=120.9.12020000.7):gme:patch/115/sql:GMECRBTB.pls
+
+      # file-version-parsed gme patch/115/sql GMECRSVB.pls 120.2.12020000.6
+      sql gme patch/115/sql GMECRSVB.pls none none none package &phase=plb checkfile(120.1.12010000.8=120.2.12020000.6):gme:patch/115/sql:GMECRSVB.pls
+
+      # file-version-parsed gme patch/115/sql GMEERESB.pls 120.2.12020000.2
+      sql gme patch/115/sql GMEERESB.pls none none none package &phase=plb checkfile(120.2.12010000.2=120.2.12020000.2)(115.8=120.1):gme:patch/115/sql:GMEERESB.pls
+
+      # file-version-parsed gme patch/115/sql GMEGAPIB.pls 120.41.12020000.4
+      sql gme patch/115/sql GMEGAPIB.pls none none none package &phase=plb checkfile(120.34.12010000.9=120.41.12020000.4)(120.30.12000000.11=120.34.12010000.7)(115.153=120.10):gme:patch/115/sql:GMEGAPIB.pls
+
+      # file-version-parsed gme patch/115/sql GMEGNTB.pls 120.11.12020000.9
+      sql gme patch/115/sql GMEGNTB.pls none none none package &phase=plb checkfile(120.8.12010000.12=120.11.12020000.9)(120.4.12000000.10=120.8.12010000.7)(120.4.12000000.9=120.8.12010000.6)(120.4.12000000.5=120.8.12010000.2)(115.41=120.2):gme:patch/115/sql:GMEGNTB.pls
+
+      # file-version-parsed gme patch/115/sql GMEGNTLB.pls 120.4.12020000.2
+      sql gme patch/115/sql GMEGNTLB.pls none none none package &phase=plb checkfile(120.4.12010000.2=120.4.12020000.2)(115.11=120.2):gme:patch/115/sql:GMEGNTLB.pls
+
+      # file-version-parsed gme patch/115/sql GMEGNTRB.pls 120.5.12020000.4
+      sql gme patch/115/sql GMEGNTRB.pls none none none package &phase=plb checkfile(120.5.12010000.4=120.5.12020000.4)(115.23=120.2):gme:patch/115/sql:GMEGNTRB.pls
+
+      # file-version-parsed gme patch/115/sql GMEMAPIB.pls 120.40.12020000.22
+      sql gme patch/115/sql GMEMAPIB.pls none none none package &phase=plb checkfile(120.33.12010000.32=120.40.12020000.22)(120.30.12000000.17=120.33.12010000.13)(120.30.12000000.16=120.33.12010000.12)(120.30.12000000.14=120.33.12010000.10)(120.30.12000000.8=120.33.12010000.4)(115.28=120.6):gme:patch/115/sql:GMEMAPIB.pls
+
+      # file-version-parsed gme patch/115/sql GMEMIRSB.pls 120.0.12020000.2
+      sql gme patch/115/sql GMEMIRSB.pls none none none package &phase=plb checkfile(120.0.12010000.2=120.0.12020000.2)(115.2=120.0):gme:patch/115/sql:GMEMIRSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEMLOVB.pls 120.41.12020000.11
+      sql gme patch/115/sql GMEMLOVB.pls none none none package &phase=plb checkfile(120.33.12010000.19=120.41.12020000.11)(120.30.12000000.13=120.33.12010000.10)(120.30.12000000.12=120.41):gme:patch/115/sql:GMEMLOVB.pls
+
+      # file-version-parsed gme patch/115/sql GMEMORSB.pls 120.12.12020000.2
+      sql gme patch/115/sql GMEMORSB.pls none none none package &phase=plb checkfile(120.12.12010000.2=120.12.12020000.2)(120.11.12000000.2=120.12):gme:patch/115/sql:GMEMORSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEMOTXB.pls 120.36.12020000.9
+      sql gme patch/115/sql GMEMOTXB.pls none none none package &phase=plb checkfile(120.29.12010000.17=120.36.12020000.9)(120.29.12010000.15=120.36.12020000.7)(120.22.12000000.18=120.29.12010000.11)(120.22.12000000.15=120.36):gme:patch/115/sql:GMEMOTXB.pls
+
+      # file-version-parsed gme patch/115/sql GMEMUSBVB.pls 120.1.12020000.3
+      sql gme patch/115/sql GMEMUSBVB.pls none none none package &phase=plb checkfile(120.1.12010000.3=120.1.12020000.3)(120.1.12010000.2=120.1.12020000.2):gme:patch/115/sql:GMEMUSBVB.pls
+
+      # file-version-parsed gme patch/115/sql GMEORESB.pls 120.9.12020000.4
+      sql gme patch/115/sql GMEORESB.pls none none none package &phase=plb checkfile(120.6.12010000.8=120.9.12020000.4)(120.6.12010000.7=120.9.12020000.3)(120.3.12000000.2=120.4):gme:patch/115/sql:GMEORESB.pls
+
+      # file-version-parsed gme patch/115/sql GMEOSPB.pls 120.0.12020000.23
+      sql gme patch/115/sql GMEOSPB.pls none none none package &phase=plb checkfile(120.0.12010000.23=120.0.12020000.23)(115.2=120.1):gme:patch/115/sql:GMEOSPB.pls
+
+      # file-version-parsed gme patch/115/sql GMEPAPIB.pls 120.82.12020000.39
+      sql gme patch/115/sql GMEPAPIB.pls none none none package &phase=plb checkfile(120.62.12010000.64=120.82.12020000.39)(115.152=120.9):gme:patch/115/sql:GMEPAPIB.pls
+
+      # file-version-parsed gme patch/115/sql GMERTOIB.pls 120.2.12020000.23
+      sql gme patch/115/sql GMERTOIB.pls none none none package &phase=plb checkfile(120.0.12010000.25=120.2.12020000.23)(115.2=120.1):gme:patch/115/sql:GMERTOIB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVACTB.pls 120.2.12020000.5
+      sql gme patch/115/sql GMEVACTB.pls none none none package &phase=plb checkfile(120.2.12010000.5=120.2.12020000.5)(120.2.12000000.2=120.2.12010000.2)(115.12=120.1):gme:patch/115/sql:GMEVACTB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCCBB.pls 120.10.12020000.8
+      sql gme patch/115/sql GMEVCCBB.pls none none none package &phase=plb checkfile(120.6.12010000.12=120.10.12020000.8)(120.6.12000000.6=120.6.12010000.6)(120.6.12000000.5=120.6.12010000.5)(115.19=120.2):gme:patch/115/sql:GMEVCCBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCCSB.pls 120.1.12020000.2
+      sql gme patch/115/sql GMEVCCSB.pls none none none package &phase=plb checkfile(120.1.12010000.2=120.1.12020000.2)(115.17=120.1):gme:patch/115/sql:GMEVCCSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCHGB.pls 120.2.12020000.2
+      sql gme patch/115/sql GMEVCHGB.pls none none none package &phase=plb checkfile(120.1.12010000.3=120.2.12020000.2)(120.1.12000000.2=120.1.12010000.2)(115.7=120.1):gme:patch/115/sql:GMEVCHGB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCLBB.pls 120.14.12020000.5
+      sql gme patch/115/sql GMEVCLBB.pls none none none package &phase=plb checkfile(120.8.12010000.11=120.14.12020000.5)(120.7.12000000.11=120.8.12010000.9)(120.7.12000000.8=120.8.12010000.6)(120.7.12000000.6=120.8.12010000.4)(115.30=120.1):gme:patch/115/sql:GMEVCLBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCMBB.pls 120.31.12020000.7
+      sql gme patch/115/sql GMEVCMBB.pls none none none package &phase=plb checkfile(120.22.12010000.16=120.31.12020000.7)(120.22.12000000.12=120.22.12010000.12)(120.22.12000000.10=120.31):gme:patch/115/sql:GMEVCMBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCMNB.pls 120.61.12020000.23
+      sql gme patch/115/sql GMEVCMNB.pls none none none package &phase=plb checkfile(120.36.12010000.44=120.61.12020000.23)(120.32.12000000.40=120.36.12010000.31)(120.32.12000000.35=120.36.12010000.26)(120.32.12000000.34=120.36.12010000.25)(120.32.12000000.31=120.62):gme:patch/115/sql:GMEVCMNB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCMSB.pls 120.21.12020000.11
+      sql gme patch/115/sql GMEVCMSB.pls none none none package &phase=plb checkfile(120.13.12010000.20=120.21.12020000.11)(120.11.12000000.15=120.13.12010000.13)(120.11.12000000.14=120.13.12010000.12)(120.11.12000000.11=120.21):gme:patch/115/sql:GMEVCMSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCRBB.pls 120.54.12020000.9
+      sql gme patch/115/sql GMEVCRBB.pls none none none package &phase=plb checkfile(120.33.12010000.26=120.54.12020000.9)(120.23.12000000.37=120.33.12010000.22)(120.23.12000000.25=120.33.12010000.10)(115.96=120.5):gme:patch/115/sql:GMEVCRBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVCRSB.pls 120.25.12020000.12
+      sql gme patch/115/sql GMEVCRSB.pls none none none package &phase=plb checkfile(120.16.12010000.22=120.25.12020000.12)(120.16.12010000.20=120.25.12020000.10)(115.69=120.1):gme:patch/115/sql:GMEVCRSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVDBSB.pls 120.3.12020000.6
+      sql gme patch/115/sql GMEVDBSB.pls none none none package &phase=plb checkfile(120.3.12010000.6=120.3.12020000.6)(120.2.12000000.2=120.3)(115.23=120.1):gme:patch/115/sql:GMEVDBSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVFPLB.pls 120.2.12020000.5
+      sql gme patch/115/sql GMEVFPLB.pls none none none package &phase=plb checkfile(120.2.12010000.5=120.2.12020000.5):gme:patch/115/sql:GMEVFPLB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVGRTB.pls 120.2.12020000.2
+      sql gme patch/115/sql GMEVGRTB.pls none none none package &phase=plb checkfile(120.2.12010000.4=120.2.12020000.2)(120.2.12000000.2=120.2.12010000.2)(115.15=120.1):gme:patch/115/sql:GMEVGRTB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVIBFB.pls 120.28.12020000.19
+      sql gme patch/115/sql GMEVIBFB.pls none none none package &phase=plb checkfile(120.13.12010000.35=120.28.12020000.19)(120.13.12000000.19=120.13.12010000.19)(120.13.12000000.17=120.29):gme:patch/115/sql:GMEVIBFB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVMOVB.pls 120.19.12020000.8
+      sql gme patch/115/sql GMEVMOVB.pls none none none package &phase=plb checkfile(120.10.12010000.17=120.19.12020000.8)(120.9.12000000.16=120.10.12010000.15)(120.9.12000000.11=120.19):gme:patch/115/sql:GMEVMOVB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVMTLB.pls 120.36.12020000.12
+      sql gme patch/115/sql GMEVMTLB.pls none none none package &phase=plb checkfile(120.28.12010000.22=120.36.12020000.12)(120.25.12000000.16=120.28.12010000.15)(120.25.12000000.10=120.36):gme:patch/115/sql:GMEVMTLB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVPCKB.pls 120.16.12020000.5
+      sql gme patch/115/sql GMEVPCKB.pls none none none package &phase=plb checkfile(120.7.12010000.12=120.16.12020000.5)(120.7.12000000.12=120.7.12010000.10)(120.7.12000000.10=120.16):gme:patch/115/sql:GMEVPCKB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVPHBB.pls 120.7.12020000.5
+      sql gme patch/115/sql GMEVPHBB.pls none none none package &phase=plb checkfile(120.6.12010000.6=120.7.12020000.5)(120.5.12000000.4=120.6.12010000.3)(115.47=120.1):gme:patch/115/sql:GMEVPHBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVPPRB.pls 120.3.12020000.5
+      sql gme patch/115/sql GMEVPPRB.pls none none none package &phase=plb checkfile(120.3.12010000.5=120.3.12020000.5)(120.3.12000000.3=120.3.12010000.3)(115.13=120.1):gme:patch/115/sql:GMEVPPRB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVPTXB.pls 120.69.12020000.41
+      sql gme patch/115/sql GMEVPTXB.pls none none none package &phase=plb checkfile(120.47.12010000.68=120.69.12020000.41)(120.34.12000000.63=120.47.12010000.40)(120.34.12000000.42=120.67):gme:patch/115/sql:GMEVPTXB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRLBB.pls 120.39.12020000.20
+      sql gme patch/115/sql GMEVRLBB.pls none none none package &phase=plb checkfile(120.29.12010000.29=120.39.12020000.20)(120.26.12000000.21=120.29.12010000.15)(120.26.12000000.12=120.29.12010000.6)(115.65=120.4):gme:patch/115/sql:GMEVRLBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRLSB.pls 120.15.12020000.11
+      sql gme patch/115/sql GMEVRLSB.pls none none none package &phase=plb checkfile(120.12.12010000.16=120.15.12020000.11)(120.12.12010000.14=120.15.12020000.9)(120.11.12000000.10=120.12.12010000.9)(115.49=120.2):gme:patch/115/sql:GMEVRLSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVROBB.pls 120.5.12020000.3
+      sql gme patch/115/sql GMEVROBB.pls none none none package &phase=plb checkfile(120.4.12010000.4=120.5.12020000.3)(120.3.12000000.3=120.4.12010000.2)(115.29=120.1):gme:patch/115/sql:GMEVROBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRRBB.pls 120.10.12020000.5
+      sql gme patch/115/sql GMEVRRBB.pls none none none package &phase=plb checkfile(120.10.12010000.6=120.10.12020000.5)(120.10.12000000.3=120.10.12010000.3)(115.29=120.1):gme:patch/115/sql:GMEVRRBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRSBB.pls 120.12.12020000.11
+      sql gme patch/115/sql GMEVRSBB.pls none none none package &phase=plb checkfile(120.9.12010000.14=120.12.12020000.11)(120.9.12010000.11=120.12.12020000.8)(120.9.12000000.7=120.9.12010000.7)(120.9.12000000.4=120.9.12010000.4)(120.9.12000000.3=120.9.12010000.3)(115.36=120.2):gme:patch/115/sql:GMEVRSBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRSSB.pls 120.13.12020000.6
+      sql gme patch/115/sql GMEVRSSB.pls none none none package &phase=plb checkfile(120.12.12010000.7=120.13.12020000.6)(120.9.12000000.6=120.12.12010000.4)(115.44=120.1):gme:patch/115/sql:GMEVRSSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRSVB.pls 120.43.12020000.13
+      sql gme patch/115/sql GMEVRSVB.pls none none none package &phase=plb checkfile(120.24.12010000.32=120.43.12020000.13)(120.22.12000000.27=120.24.12010000.23)(120.22.12000000.23=120.43):gme:patch/115/sql:GMEVRSVB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRWBB.pls 120.10.12020000.4
+      sql gme patch/115/sql GMEVRWBB.pls none none none package &phase=plb checkfile(120.8.12010000.6=120.10.12020000.4)(120.8.12000000.4=120.8.12010000.4)(120.8.12000000.3=120.10):gme:patch/115/sql:GMEVRWBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRWSB.pls 120.4.12020000.2
+      sql gme patch/115/sql GMEVRWSB.pls none none none package &phase=plb checkfile(120.4.12010000.2=120.4.12020000.2):gme:patch/115/sql:GMEVRWSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVRXNB.pls 120.20.12020000.13
+      sql gme patch/115/sql GMEVRXNB.pls none none none package &phase=plb checkfile(120.16.12010000.17=120.20.12020000.13)(120.11.12000000.11=120.16.12010000.7)(120.11.12000000.10=120.16.12010000.6)(120.11.12000000.9=120.16.12010000.5)(115.57=120.2):gme:patch/115/sql:GMEVRXNB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVSCBB.pls 120.12.12020000.14
+      sql gme patch/115/sql GMEVSCBB.pls none none none package &phase=plb checkfile(120.10.12010000.16=120.12.12020000.14)(120.8.12000000.9=120.10.12010000.8)(115.57=120.1):gme:patch/115/sql:GMEVSCBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVTRBB.pls 120.6.12020000.2
+      sql gme patch/115/sql GMEVTRBB.pls none none none package &phase=plb checkfile(120.5.12010000.3=120.6.12020000.2)(120.5.12000000.2=120.5.12010000.2)(115.5=120.2):gme:patch/115/sql:GMEVTRBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVURBB.pls 120.23.12020000.6
+      sql gme patch/115/sql GMEVURBB.pls none none none package &phase=plb checkfile(120.18.12010000.12=120.23.12020000.6)(120.14.12000000.11=120.18.12010000.8)(115.32=120.1):gme:patch/115/sql:GMEVURBB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVURSB.pls 120.7.12020000.3
+      sql gme patch/115/sql GMEVURSB.pls none none none package &phase=plb checkfile(120.6.12010000.4=120.7.12020000.3)(120.6.12000000.2=120.6.12010000.2)(115.23=120.1):gme:patch/115/sql:GMEVURSB.pls
+
+      # file-version-parsed gme patch/115/sql GMEVUSQB.pls 120.15.12020000.8
+      sql gme patch/115/sql GMEVUSQB.pls none none none package &phase=plb checkfile(120.10.12010000.13=120.15.12020000.8)(120.6.12000000.9=120.10.12010000.7)(120.6.12000000.6=120.10.12010000.4):gme:patch/115/sql:GMEVUSQB.pls
+
+      # file-version-parsed gme patch/115/sql GMEYCSTB.pls 120.0.12020000.4
+      sql gme patch/115/sql GMEYCSTB.pls none none none package &phase=plb checkfile(120.0.12010000.4=120.0.12020000.4)(115.2=120.1):gme:patch/115/sql:GMEYCSTB.pls
+
+      # file-version-parsed gme patch/115/sql GMEYMMPB.pls 120.0.12020000.2
+      sql gme patch/115/sql GMEYMMPB.pls none none none package &phase=plb checkfile(120.0.12010000.2=120.0.12020000.2):gme:patch/115/sql:GMEYMMPB.pls
+
+      # file-version-parsed gme patch/115/sql GME_YIELD_CALCULATION_PVT_B.pls 120.0.12020000.47
+      sql gme patch/115/sql GME_YIELD_CALCULATION_PVT_B.pls none none none package &phase=plb checkfile(120.0.12010000.75=120.0.12020000.47):gme:patch/115/sql:GME_YIELD_CALCULATION_PVT_B.pls
+
+      # file-version-parsed gmo patch/115/sql GMOVVBTB.pls 120.27.12020000.3
+      sql gmo patch/115/sql GMOVVBTB.pls none none none package &phase=plb checkfile(120.24.12010000.6=120.27.12020000.3)(120.21.12000000.6=120.27):gmo:patch/115/sql:GMOVVBTB.pls
+
+      # file-version-parsed gmp patch/115/sql GMPRSMSB.pls 120.4.12020000.2
+      sql gmp patch/115/sql GMPRSMSB.pls none none none package &phase=plb checkfile(120.0.12010000.3=120.4)(115.10=120.0):gmp:patch/115/sql:GMPRSMSB.pls
+
+      #
+      # Phase DAA - AOL Seed Data
+      #
+
+      # file-version-parsed gme patch/115/xml/US gmebhdre.wfx 120.0.12020000.2
+      exec java oracle/apps/fnd/wf WFXLoad.class java &phase=daa+38 checkfile(120.0.12010000.4=120.0.12020000.2):gme:patch/115/xml/US:gmebhdre.wfx -u &un_apps &pw_apps &jdbc_db_addr &jdbc_protocol US &fullpath_gme_patch/115/xml/US_gmebhdre.wfx
+
+      # file-version-parsed gme patch/115/xml/US gmebhlde.wfx 120.0.12020000.2
+      exec java oracle/apps/fnd/wf WFXLoad.class java &phase=daa+38 checkfile(120.0.12010000.4=120.0.12020000.2):gme:patch/115/xml/US:gmebhlde.wfx -u &un_apps &pw_apps &jdbc_db_addr &jdbc_protocol US &fullpath_gme_patch/115/xml/US_gmebhlde.wfx
+
+      # file-version-parsed gme patch/115/xml/US gmebhdrs.wfx 120.0.12020000.1
+      exec java oracle/apps/fnd/wf WFXLoad.class java &phase=daa+39 checkfile:gme:patch/115/xml/US:gmebhdrs.wfx -u &un_apps &pw_apps &jdbc_db_addr &jdbc_protocol US &fullpath_gme_patch/115/xml/US_gmebhdrs.wfx
+
+      # file-version-parsed gme patch/115/xml/US gmebhlds.wfx 120.0.12020000.1
+      exec java oracle/apps/fnd/wf WFXLoad.class java &phase=daa+39 checkfile:gme:patch/115/xml/US:gmebhlds.wfx -u &un_apps &pw_apps &jdbc_db_addr &jdbc_protocol US &fullpath_gme_patch/115/xml/US_gmebhlds.wfx
+
+      # file-version-parsed gme patch/115/import/US gmelkup.ldt 120.11.12020000.7
+      exec fnd bin FNDLOAD bin &phase=daa+51 checkfile:gme:patch/115/import/US:gmelkup.ldt &ui_apps 0 Y UPLOAD @FND:patch/115/import/aflvmlu.lct @GME:patch/115/import/US/gmelkup.ldt
+
+      # file-version-parsed gme patch/115/import/US gmemenu.ldt 120.22.12020000.7
+      exec fnd bin FNDLOAD bin &phase=daa+51 checkfile:gme:patch/115/import/US:gmemenu.ldt &ui_apps 0 Y UPLOAD @FND:patch/115/import/afsload.lct @GME:patch/115/import/US/gmemenu.ldt
+
+      # file-version-parsed gmd patch/115/import/US gmdmsg.ldt 120.73.12020000.7
+      exec fnd bin FNDLOAD bin &phase=daa+52 checkfile:gmd:patch/115/import/US:gmdmsg.ldt &ui_apps 0 Y UPLOAD @FND:patch/115/import/afmdmsg.lct @GMD:patch/115/import/US/gmdmsg.ldt
+
+      # file-version-parsed gme patch/115/import/US gmemsg.ldt 120.55.12020000.36
+      exec fnd bin FNDLOAD bin &phase=daa+52 checkfile:gme:patch/115/import/US:gmemsg.ldt &ui_apps 0 Y UPLOAD @FND:patch/115/import/afmdmsg.lct @GME:patch/115/import/US/gmemsg.ldt
+
+      # file-version-parsed gme patch/115/import/US gmetable.ldt 120.6.12020000.5
+      exec fnd bin FNDLOAD bin &phase=daa+52 checkfile:gme:patch/115/import/US:gmetable.ldt &ui_apps 0 Y UPLOAD @FND:patch/115/import/afdict.lct @GME:patch/115/import/US/gmetable.ldt
+
+      # file-version-parsed gme patch/115/import/US gmeprg.ldt 120.17.12020000.11
+      exec fnd bin FNDLOAD bin &phase=daa+56 checkfile:gme:patch/115/import/US:gmeprg.ldt &ui_apps 0 Y UPLOAD @FND:patch/115/import/afcpprog.lct @GME:patch/115/import/US/gmeprg.ldt
+
+      # file-version-parsed gme patch/115/import/US gmergup.ldt 120.6.12020000.5
+      exec fnd bin FNDLOAD bin &phase=daa+66 checkfile:gme:patch/115/import/US:gmergup.ldt &ui_apps 0 Y UPLOAD @FND:patch/115/import/afcpreqg.lct @GME:patch/115/import/US/gmergup.ldt
+
+      #
+      # Phase DAT - non-AOL Seed Data
+      #
+
+      # file-version-parsed gme patch/115/import/US gmebhdar.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat checkfile:gme:patch/115/import/US:gmebhdar.ldt &ui_apps 0 Y UPLOAD @AME:patch/115/import/amescvar.lct @GME:patch/115/import/US/gmebhdar.ldt
+
+      # file-version-parsed gme patch/115/import/US gmebhrar.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat checkfile:gme:patch/115/import/US:gmebhrar.ldt &ui_apps 0 Y UPLOAD @AME:patch/115/import/amescvar.lct @GME:patch/115/import/US/gmebhrar.ldt
+
+      # file-version-parsed gme patch/115/import/US gmetmpl.ldt 120.3.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat checkfile:gme:patch/115/import/US:gmetmpl.ldt &ui_apps 0 Y UPLOAD @XDO:patch/115/import/xdotmpl.lct @GME:patch/115/import/US/gmetmpl.ldt
+
+      # file-version-parsed gme patch/115/import/US gmexdodefn.ldt 120.2.12020000.6
+      exec fnd bin FNDLOAD bin &phase=dat checkfile:gme:patch/115/import/US:gmexdodefn.ldt &ui_apps 0 Y UPLOAD @XDO:patch/115/import/xdotmpl.lct @GME:patch/115/import/US/gmexdodefn.ldt
+
+      # file-version-parsed gme patch/115/publisher/defs GMEOSP.xml 120.0.12020000.2
+      exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:gme:patch/115/publisher/defs:GMEOSP.xml UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE DATA_TEMPLATE -APPS_SHORT_NAME gme -LOB_CODE GMEOSP -LANGUAGE 00 -XDO_FILE_TYPE XML-DATA-TEMPLATE -FILE_NAME &fullpath:gme:patch/115/publisher/defs:GMEOSP.xml
+
+      # file-version-parsed gme patch/115/publisher/templates/US GMEBEVRT.rtf 120.9.12020000.8
+      exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:gme:patch/115/publisher/templates/US:GMEBEVRT.rtf UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE TEMPLATE_SOURCE -APPS_SHORT_NAME gme -LOB_CODE GMEBEVRT.rtf -LANGUAGE en -TERRITORY US -XDO_FILE_TYPE RTF -TRANSLATE Y -FILE_NAME &fullpath:gme:patch/115/publisher/templates/US:GMEBEVRT.rtf
+
+      # file-version-parsed gme patch/115/publisher/templates/US GMEBHOLD.rtf 120.0.12020000.5
+      exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:gme:patch/115/publisher/templates/US:GMEBHOLD.rtf UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE TEMPLATE_SOURCE -APPS_SHORT_NAME gme -LOB_CODE GMEBHOLD.rtf -LANGUAGE en -TERRITORY US -XDO_FILE_TYPE RTF -TRANSLATE Y -FILE_NAME &fullpath:gme:patch/115/publisher/templates/US:GMEBHOLD.rtf
+
+      # file-version-parsed gme patch/115/publisher/templates/US GMEBHREL.rtf 120.0.12020000.5
+      exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:gme:patch/115/publisher/templates/US:GMEBHREL.rtf UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE TEMPLATE_SOURCE -APPS_SHORT_NAME gme -LOB_CODE GMEBHREL.rtf -LANGUAGE en -TERRITORY US -XDO_FILE_TYPE RTF -TRANSLATE Y -FILE_NAME &fullpath:gme:patch/115/publisher/templates/US:GMEBHREL.rtf
+
+      # file-version-parsed gme patch/115/publisher/templates/US GMEOSP.rtf 120.0.12020000.5
+      exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:gme:patch/115/publisher/templates/US:GMEOSP.rtf UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE TEMPLATE_SOURCE -APPS_SHORT_NAME GME -LOB_CODE GMEOSP -LANGUAGE en -TERRITORY US -XDO_FILE_TYPE RTF -TRANSLATE Y -FILE_NAME &fullpath:gme:patch/115/publisher/templates/US:GMEOSP.rtf
+
+      # file-version-parsed gme patch/115/publisher/templates/US GMESTPRT.rtf 120.9.12020000.4
+      exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:gme:patch/115/publisher/templates/US:GMESTPRT.rtf UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE TEMPLATE_SOURCE -APPS_SHORT_NAME gme -LOB_CODE GMESTPRT.rtf -LANGUAGE en -TERRITORY US -XDO_FILE_TYPE RTF -TRANSLATE Y -FILE_NAME &fullpath:gme:patch/115/publisher/templates/US:GMESTPRT.rtf
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_actns.xgm 120.10.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.5.12010000.7=120.10.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_actns.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_actns.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_bact.xgm 120.3.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.3.12010000.2=120.3.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_bact.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_bact.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_bact_updt.xgm 120.2.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.2.12010000.2=120.2.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_bact_updt.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_bact_updt.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_bpparam.xgm 120.3.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.3.12010000.2=120.3.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_bpparam.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_bpparam.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_brsrc.xgm 120.3.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.3.12010000.2=120.3.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_brsrc.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_brsrc.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_brsrc_updt.xgm 120.2.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.2.12010000.2=120.2.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_brsrc_updt.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_brsrc_updt.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_clse_ropn.xgm 120.2.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.2.12010000.2=120.2.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_clse_ropn.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_clse_ropn.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_hold.xgm 120.0.12020000.5
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.0.12010000.6=120.0.12020000.5):gme:patch/115/xml/US:gme_cbr_batch_hold.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_hold.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_matl.xgm 120.7.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.3.12010000.6=120.7.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_matl.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_matl.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_matl_trx.xgm 120.7.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.1.12010000.8=120.7.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_matl_trx.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_matl_trx.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_new.xgm 120.2.12020000.3
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.2.12010000.3=120.2.12020000.3):gme:patch/115/xml/US:gme_cbr_batch_new.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_new.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_release.xgm 120.6.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.2.12010000.6=120.6.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_release.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_release.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_rsrs_txns.xgm 120.1.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.1.12010000.2=120.1.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_rsrs_txns.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_rsrs_txns.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_step.xgm 120.3.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.3.12010000.2=120.3.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_step.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_step.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_step_actns.xgm 120.7.12020000.3
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.3.12010000.7=120.7.12020000.3):gme:patch/115/xml/US:gme_cbr_batch_step_actns.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_step_actns.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_terminate.xgm 120.2.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.2.12010000.2=120.2.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_terminate.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_terminate.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batch_updt.xgm 120.2.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.2.12010000.2=120.2.12020000.2):gme:patch/115/xml/US:gme_cbr_batch_updt.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batch_updt.xgm
+
+      # file-version-parsed gme patch/115/xml/US gme_cbr_batchstp_clse_ropn.xgm 120.3.12020000.2
+      exec java oracle/apps/ecx/loader LoadMap.class java &phase=dat checkfile(120.3.12010000.2=120.3.12020000.2):gme:patch/115/xml/US:gme_cbr_batchstp_clse_ropn.xgm &un_apps &pw_apps &jdbc_db_addr &fullpath_gme_patch/115/xml/US_gme_cbr_batchstp_clse_ropn.xgm
+
+      # file-version-parsed gmo patch/115/publisher/templates/US GMOCBRCOMN.rtf 120.27.12020000.7
+      exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:gmo:patch/115/publisher/templates/US:GMOCBRCOMN.rtf UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE TEMPLATE_SOURCE -APPS_SHORT_NAME gmo -LOB_CODE GMOCBRCOMN -LANGUAGE en -TERRITORY US -XDO_FILE_TYPE RTF -TRANSLATE Y -FILE_NAME &fullpath:gmo:patch/115/publisher/templates/US:GMOCBRCOMN.rtf
+
+      # file-version-parsed gme patch/115/import/US gmebhdat.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat+2 checkfile:gme:patch/115/import/US:gmebhdat.ldt &ui_apps 0 Y UPLOAD @AME:patch/115/import/amesmatt.lct @GME:patch/115/import/US/gmebhdat.ldt
+
+      # file-version-parsed gme patch/115/import/US gmebhrat.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat+2 checkfile:gme:patch/115/import/US:gmebhrat.ldt &ui_apps 0 Y UPLOAD @AME:patch/115/import/amesmatt.lct @GME:patch/115/import/US/gmebhrat.ldt
+
+      # file-version-parsed gme patch/115/import/US gmebhdau.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat+3 checkfile:gme:patch/115/import/US:gmebhdau.ldt &ui_apps 0 Y UPLOAD @AME:patch/115/import/amesmatr.lct @GME:patch/115/import/US/gmebhdau.ldt
+
+      # file-version-parsed gme patch/115/import/US gmebhrau.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat+3 checkfile:gme:patch/115/import/US:gmebhrau.ldt &ui_apps 0 Y UPLOAD @AME:patch/115/import/amesmatr.lct @GME:patch/115/import/US/gmebhrau.ldt
+
+      # file-version-parsed gme patch/115/import/US gmeattr.jlt 120.9.12020000.2
+      exec java oracle/apps/ak akload.class java &phase=dat+16 checkfile:gme:patch/115/import/US:gmeattr.jlt &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr UPLOAD &fullpath_gme_patch/115/import/US_gmeattr.jlt NCUPDATE &env=NLS_LANG
+
+      # file-version-parsed gme patch/115/import/US gmebhdai.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat+20 checkfile:gme:patch/115/import/US:gmebhdai.ldt &ui_apps 0 Y UPLOAD @EDR:patch/115/import/edramvar.lct @GME:patch/115/import/US/gmebhdai.ldt
+
+      # file-version-parsed gme patch/115/import/US gmebhrai.ldt 120.0.12020000.2
+      exec fnd bin FNDLOAD bin &phase=dat+20 checkfile:gme:patch/115/import/US:gmebhrai.ldt &ui_apps 0 Y UPLOAD @EDR:patch/115/import/edramvar.lct @GME:patch/115/import/US/gmebhrai.ldt
+
+      # file-version-parsed gme mds/invtxn/server IssueIngredientPage.xml 120.0.12020000.2
+      exec java oracle/jrad/tools/xml/importer XMLImporter.class java &phase=dat+24 checkfile(120.0.12010000.2=120.0.12020000.2):gme:mds/invtxn/server:IssueIngredientPage.xml &fullpath:gme:mds/invtxn/server:IssueIngredientPage.xml -username &un_apps -password &pw_apps -dbconnection &jdbc_db_addr -userId "1" -rootPackage /oracle/apps/gme -rootdir &fullpath:gme:mds:directory
+
+      #
+      # Phase UPG - non-AOL Transaction Data
+      #
+
+      # file-version-parsed gme patch/115/sql GMENIRST.sql 120.0.12020000.2
+      sql gme patch/115/sql GMENIRST.sql none none none sqlplus &phase=upg+2 checkfile:nocheck
+
+      #
+      # Phase DFR - Create deferred indexes
+      #
+
+      # file-version-parsed gme patch/115/odf GMEACT.odf 120.3.12020000.3
+      exec gme patch/115/odf GMEACT.odf odf &phase=dfr checkfile:gme:patch/115/odf:GMEACT.odf:dfr_indexes mode=indexes
+
+      # file-version-parsed gme patch/115/odf GMEPEPC.odf 120.8.12020000.4
+      exec gme patch/115/odf GMEPEPC.odf odf &phase=dfr checkfile:gme:patch/115/odf:GMEPEPC.odf:dfr_indexes mode=indexes
+
+      # file-version-parsed gme patch/115/odf GMERTXN.odf 120.2.12020000.5
+      exec gme patch/115/odf GMERTXN.odf odf &phase=dfr checkfile:gme:patch/115/odf:GMERTXN.odf:dfr_indexes mode=indexes
+
+      #
+      # Phase EN - Enable constraints, create triggers
+      #
+
+      # file-version-parsed gme patch/115/sql GMERTXSD.sql 120.2.12020000.2
+      sql gme patch/115/sql GMERTXSD.sql none none none sqlplus &phase=en checkfile(120.1.12010000.3=120.2.12020000.2):gme:patch/115/sql:GMERTXSD.sql
+
+      # file-version-parsed gme patch/115/sql GMERTXSI.sql 120.2.12020000.2
+      sql gme patch/115/sql GMERTXSI.sql none none none sqlplus &phase=en checkfile(120.1.12010000.3=120.2.12020000.2):gme:patch/115/sql:GMERTXSI.sql
+
+      # file-version-parsed gme patch/115/sql GMERTXSU.sql 120.2.12020000.2
+      sql gme patch/115/sql GMERTXSU.sql none none none sqlplus &phase=en checkfile(120.1.12010000.3=120.2.12020000.2):gme:patch/115/sql:GMERTXSU.sql
+
+      #
+      # Phase NONE - No phase specified. Sames as phase last.
+      #
+
+      # file-version-parsed gme patch/115/sql GME_BATCH_HISTORY_X1.sql 120.0.12020000.1
+      sql gme patch/115/sql GME_BATCH_HISTORY_X1.sql none none none sqlplus &phase=ccet checkfile:gme:patch/115/sql:GME_BATCH_HISTORY_X1.sql &un_gme
+
+      # file-version-parsed gme patch/115/sql GME_BATCH_HISTORY_X1.sql 120.0.12020000.1
+      sql ad patch/115/sql AD_ZD_TABLE_APPLY.sql none none none sqlplus &phase=acet checkfile:gme:patch/115/sql:GME_BATCH_HISTORY_X1.sql:fcet GME_BATCH_HISTORY_F1
+
+      # file-version-parsed gme patch/115/sql GME_BATCH_STEP_ACTIVITIES_X1.sql 120.0.12020000.1
+      sql gme patch/115/sql GME_BATCH_STEP_ACTIVITIES_X1.sql none none none sqlplus &phase=ccet checkfile:gme:patch/115/sql:GME_BATCH_STEP_ACTIVITIES_X1.sql &un_gme
+
+      # file-version-parsed gme patch/115/sql GME_BATCH_STEP_ACTIVITIES_X1.sql 120.0.12020000.1
+      sql ad patch/115/sql AD_ZD_TABLE_APPLY.sql none none none sqlplus &phase=acet checkfile:gme:patch/115/sql:GME_BATCH_STEP_ACTIVITIES_X1.sql:fcet GME_BATCH_STEP_ACTIVITIES_F1
+
+      # file-version-parsed gme patch/115/sql GME_BATCH_STEP_RESOURCES_X2.sql 120.0.12020000.2
+      sql gme patch/115/sql GME_BATCH_STEP_RESOURCES_X2.sql none none none sqlplus &phase=ccet checkfile:gme:patch/115/sql:GME_BATCH_STEP_RESOURCES_X2.sql &un_gme
+
+      # file-version-parsed gme patch/115/sql GME_BATCH_STEP_RESOURCES_X2.sql 120.0.12020000.2
+      sql ad patch/115/sql AD_ZD_TABLE_APPLY.sql none none none sqlplus &phase=acet checkfile:gme:patch/115/sql:GME_BATCH_STEP_RESOURCES_X2.sql:fcet GME_BATCH_STEP_RESOURCES_F2
+
+      # file-version-parsed gme patch/115/sql GME_RESOURCE_TXNS_X1.sql 120.0.12020000.1
+      sql gme patch/115/sql GME_RESOURCE_TXNS_X1.sql none none none sqlplus &phase=ccet checkfile:gme:patch/115/sql:GME_RESOURCE_TXNS_X1.sql &un_gme
+
+      # file-version-parsed gme patch/115/sql GME_RESOURCE_TXNS_X1.sql 120.0.12020000.1
+      sql ad patch/115/sql AD_ZD_TABLE_APPLY.sql none none none sqlplus &phase=acet checkfile:gme:patch/115/sql:GME_RESOURCE_TXNS_X1.sql:fcet GME_RESOURCE_TXNS_F1
+
+      #========================================#
+      # Actions for Generating Dependent Files #
+      #========================================#
+
+      genform   gmd      forms/US                  GMDOPRED.fmb
+      genform   gmd      forms/US                  GMDROTED.fmb
+      genform   gmd      forms/US                  GMDRVRED.fmb
+      genform   gme      forms/US                  GMEBDOHD.fmb
+      genform   gme      forms/US                  GMEBDTED.fmb
+      genform   gme      forms/US                  GMECBTCH.fmb
+      genform   gme      forms/US                  GMEIBFED.fmb
+      genform   gme      forms/US                  GMEINPSM.fmb
+      genform   gme      forms/US                  GMEMATED.fmb
+      genform   gme      forms/US                  GMEMSBCH.fmb
+      genform   gme      forms/US                  GMEMTORL.fmb
+      genform   gme      forms/US                  GMEPRMED.fmb
+      genform   gme      forms/US                  GMEPSCSM.fmb
+      genform   gme      forms/US                  GMEPWBSC.fmb
+      genform   gme      forms/US                  GMESMAED.fmb
+      genform   gme      forms/US                  GMESTPED.fmb
+      genform   gme      forms/US                  GMETTMTX.fmb
+      genform   gme      forms/US                  GMEWIPSM.fmb
+      genform   gme      forms/US                  GMEWKBCH.fmb
+      genrep    gme      reports/US                GMEBCHTK.rdf
+      genrep    gme      reports/US                GMEBCHYV.rdf
+      genfpll   gme      resource                  GMECOM.pll  
+      genform   gmp      forms/US                  GMPGRSRC.fmb
+      genform   gmp      forms/US                  GMPPLRSC.fmb
+
+    end actions
+  end bug gme 26397424
+
+end aru bug_26397424

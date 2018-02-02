@@ -1,0 +1,44 @@
+:PARAMETER.ORG_CODE = 'I20'
+and :MTL_TRX_LINE.TRANSACTION_TYPE_ID IN (35,43)
+and EXISTS(
+SELECT 1
+  FROM gme_batch_header gbh
+ WHERE gbh.batch_id = :GME_MATERIAL_DETAILS.BATCH_ID
+   AND ((gbh.attribute2 = 'I20_02' AND :mtl_trx_line.subinventory_code NOT IN ('I20_014', 'I20_016')) OR
+       (gbh.attribute2 = 'I20_01' AND :mtl_trx_line.subinventory_code NOT IN ('I20_013', 'I20_015'))))
+
+
+
+
+---车间暂存库对应控制
+(:PARAMETER.ORG_CODE = 'I20'
+and :MTL_TRX_LINE.TRANSACTION_TYPE_ID IN (35,43)
+and EXISTS(
+SELECT 1
+  FROM gme_batch_header gbh
+ WHERE gbh.batch_id = :GME_MATERIAL_DETAILS.BATCH_ID
+   AND ((gbh.attribute2 = 'I20_02' AND :mtl_trx_line.subinventory_code NOT IN ('I20_014', 'I20_016')) OR
+       (gbh.attribute2 = 'I20_01' AND :mtl_trx_line.subinventory_code NOT IN ('I20_013', 'I20_015'))  Or
+       (gbh.attribute2 = 'I20_03' AND :mtl_trx_line.subinventory_code NOT IN ('I20_021'))
+)))
+
+Or
+(:PARAMETER.ORG_CODE = 'I21'
+and :MTL_TRX_LINE.TRANSACTION_TYPE_ID IN (35,43)
+and EXISTS(
+SELECT 1
+  FROM gme_batch_header gbh
+ WHERE gbh.batch_id = :GME_MATERIAL_DETAILS.BATCH_ID
+   AND ((gbh.attribute2 = 'I21_01' AND :mtl_trx_line.subinventory_code NOT IN ('I22_002', 'I22_004','I22_011')))))
+
+Or
+(:PARAMETER.ORG_CODE = 'I02'
+and :MTL_TRX_LINE.TRANSACTION_TYPE_ID IN (35,43)
+and EXISTS(
+SELECT 1
+  FROM gme_batch_header gbh
+ WHERE gbh.batch_id = :GME_MATERIAL_DETAILS.BATCH_ID
+   AND ((gbh.attribute2 = 'I02_01' AND :mtl_trx_line.subinventory_code NOT IN ('I02_020')) OR
+        (gbh.attribute2 = 'I02_02' AND :mtl_trx_line.subinventory_code NOT IN ('I02_003'))  Or
+        (gbh.attribute2 = 'I02_03' AND :mtl_trx_line.subinventory_code NOT IN ('I02_013','I02_017','I02_026','I02_027'))
+)))

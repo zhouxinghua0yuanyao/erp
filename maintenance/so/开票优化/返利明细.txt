@@ -1,0 +1,37 @@
+--返利明细
+
+select cust.party_name customer,
+       a.account,
+       --a.fllx,
+       --a.flmc,
+       --a.jslx,
+       decode(a.flmc,
+              '0',
+              '月返',
+              '1',
+              '季返',
+              '2',
+              '年返',
+              '3',
+              '临时',
+              '4',
+              '临时',
+              '') fanlilx,
+       decode(a.flmc,
+              '0',
+              '月返计算',
+              '1',
+              '季返计算',
+              '2',
+              '年返计算',
+              '3',
+              '运补',
+              '4',
+              '其他',
+              '') fanlimc,
+              a.jslx,
+       decode(a.jslx, 0, '自动',2, '导入','') impType,
+       a.modedatacreatedate
+  from uf_customer_rebate a, VIEW_ERP_CUSTOMER cust
+ where cust.cust_account_id = a.customer and modedatacreatedate is null
+order by a.modedatacreatedate,cust.party_name

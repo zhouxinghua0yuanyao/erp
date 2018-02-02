@@ -1,0 +1,111 @@
+oa_slfl_flmxhz 使用返利明细，报表  备份视图oa_slfl_flmxhz_back
+原视图
+create or replace view oa_slfl_flmxhz as
+select (select party_name from VIEW_ERP_CUSTOMER where cust_account_id=a.customer) customer
+,a.account
+,a.fllx
+,a.flmc
+,a.jslx
+,a.modedatacreatedate  from uf_customer_rebate a order by a.customer;
+
+新视图
+create or replace view oa_slfl_flmxhz as
+select cust.party_name customer --OA返利结果
+,a.account
+,a.fllx
+,a.flmc
+,a.jslx
+,a.modedatacreatedate from uf_customer_rebate a, VIEW_ERP_CUSTOMER cust
+ where cust.cust_account_id = a.customer
+Union All --ERP返利结果
+Select hp.PARTY_NAME customer,
+       -dis.DISCOUNT_AMOUNT account,
+       decode(dis.DISCOUNT_TYPE,
+              '30',
+              0,
+              '20',
+              1,
+              '10',
+              2,
+              '40',
+              3,
+              '50',
+              4,
+              '') fllx,
+         decode(dis.DISCOUNT_TYPE,
+              '30',
+              0,
+              '20',
+              1,
+              '10',
+              2,
+              '40',
+              3,
+              '50',
+              4,
+              null) flmc,
+       3 jsxl,
+       to_char(oeh.CREATION_DATE,'yyyy-mm-dd') modedatacreatedate
+  from apps.oe_order_headers_all@erp       oeh,
+       apps.CUX_DIS_PRICE_DISCOUNT_ALL@erp dis,
+       apps.FND_LOOKUP_values@erp          fv,
+       apps.hz_parties@erp hp,
+       apps.hz_cust_accounts_all@erp       hca
+ where oeh.cancelled_flag = 'N'
+   and oeh.HEADER_ID = dis.SOURCE_HEADER_ID
+   and fv.Lookup_type = 'CUX_DISCOUNT_NAME'
+   and fv.language = 'ZHS'
+   and fv.Lookup_code = dis.DISCOUNT_TYPE
+   and hca.PARTY_ID=hp.PARTY_ID and oeh.SOLD_TO_ORG_ID=hca.CUST_ACCOUNT_ID
+
+
+ERP中返利视图
+v_oa_slfl_flmxhz
+create or replace view v_oa_slfl_flmxhz as
+select cust.cust_account_id,cust.party_name customer --OA返利结果
+,a.account
+,decode(a.fllx,
+              0,
+              '30',
+              1,
+              '20',
+              2,
+              '10',
+              3,
+              '40',
+              4,
+              '50',
+              '') fllx,
+decode(a.flmc,
+              0,
+              '30',
+              1,
+              '20',
+              2,
+              '10',
+              3,
+              '40',
+              4,
+              '50',
+              '') flmc,
+a.jslx
+,a.modedatacreatedate from uf_customer_rebate@oadb a, VIEW_ERP_CUSTOMER@oadb cust
+ where cust.cust_account_id = a.customer
+Union All --ERP返利结果
+Select hca.CUST_ACCOUNT_ID,hp.PARTY_NAME customer,
+       -dis.DISCOUNT_AMOUNT account,
+       dis.DISCOUNT_TYPE fllx,
+       dis.DISCOUNT_TYPE flmc,
+       3 jsxl,
+       to_char(oeh.CREATION_DATE,'yyyy-mm-dd') modedatacreatedate
+  from apps.oe_order_headers_all       oeh,
+       apps.CUX_DIS_PRICE_DISCOUNT_ALL dis,
+       apps.FND_LOOKUP_values          fv,
+       apps.hz_parties hp,
+       apps.hz_cust_accounts_all       hca
+ where oeh.cancelled_flag = 'N'
+   and oeh.HEADER_ID = dis.SOURCE_HEADER_ID
+   and fv.Lookup_type = 'CUX_DISCOUNT_NAME'
+   and fv.language = 'ZHS'
+   and fv.Lookup_code = dis.DISCOUNT_TYPE
+   and hca.PARTY_ID=hp.PARTY_ID and oeh.SOLD_TO_ORG_ID=hca.CUST_ACCOUNT_ID;

@@ -1,0 +1,5 @@
+select * from cux_dis_req_headers_all where req_number='D2017072600085'  --136177
+
+select * from cux_dis_req_line_inv_all where header_id=136177
+select * from cux_dis_req_line_inv_all where line_inv_id=168810
+--delete from cux_dis_req_line_inv_all where line_inv_id=168810

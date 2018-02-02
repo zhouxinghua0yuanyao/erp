@@ -1,0 +1,11 @@
+CUX_FUT_VPD_02
+283
+
+=(SELECT t.sid FROM v$mystat t where rownum = 1)
+
+
+
+SELECT s.prev_sql_addr,s.sql_address FROM v$session s WHERE s.sid = 102;
+
+
+SELECT sql_text FROM v$sqltext_with_newlines t WHERE t.address = '0000000390E496F0' ORDER BY t.piece;

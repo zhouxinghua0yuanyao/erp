@@ -1,0 +1,2 @@
+cd $AU_TOP
+frmcmp_batch module=$CUX_TOP/forms/ZHS/CUXDISPSOREQ.fmb userid=apps/apps0226 output_file=$CUX_TOP/forms/ZHS/CUXDISPSOREQ.fmx

@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Header: txk_R1220_OPC_mappings.xml 120.0.12020000.12 2018/01/17 08:44:35 summitra noship $ -->
+<!--
+# +======================================================================+
+# |            Copyright (c) 2013, 2018 Oracle and/or its affiliates.
+# |                         All rights reserved.                                                                                    
+# |                           Version 12.0.0
+# +======================================================================+
+-->
+<EBS release="R1220">
+    <consolidated_cloud_patch id="27331121" name="CLOUD EBS RELEASE 12.2 CONSOLIDATED DATABASE FIXES FOR OCT 2017"/>
+    <Technology name="DB_HOME" version="11.2.0.4.171017_DBCS">
+     <base_bugs id="21321429">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21321429</patch_id>
+        <file_name>p21321429_112041_Generic.zip</file_name>
+        <notes>11.2.0.4.1 version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="18708921">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18708921</patch_id>
+        <file_name>p18708921_112043_Linux-x86-64.zip</file_name>
+       <notes>11.2.0.4.3 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21028698">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21028698</patch_id>
+        <file_name>p21028698_112045_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.5 version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="16359751,18730542">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20883625</patch_id>
+        <file_name>p20883625_112046_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.6 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="19291380">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19291380</patch_id>
+        <file_name>p19291380_11204160119_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.160119 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="17901041">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>17901041</patch_id>
+        <file_name>p17901041_11204160419_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.160419 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21967332">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21967332</patch_id>
+        <file_name>p21967332_11204161018_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.161018 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="18665660">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18665660</patch_id>
+        <file_name>p18665660_11204161018_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.161018 version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="19791273,18284763">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26122634</patch_id>
+        <file_name>p26122634_11204170718_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.170718 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="26196152,19487147,20825533,23632545,25099339,20294666,17781991,26658759,20949558,18948524,21813400,20627866,22453212,24589081,22568797,17401353,14255128,19239846,19879144,20936905,16299727,19449552,22666802,24326444,21091431,20887355,20245930,22024071,23645516,24385983,17250794,25919622,25971286,23007241,19896336">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27238900</patch_id>
+        <file_name>p27238900_11204171017_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.171017 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="12574386,10427365,10019002">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26751367</patch_id>
+        <file_name>p26751367_11204171017_Linux-x86-64.zip</file_name>
+        <notes>11.2.0.4.171017 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="22496904">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22496904</patch_id>
+        <file_name>p22496904_11204171017_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.171017 version</notes>
+       </platform>
+    </base_bugs>
+	<base_bugs id="26911000,18485835,21614112">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27076225</patch_id>
+        <file_name>p27076225_11204171017_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.171017 version</notes>
+       </platform>
+    </base_bugs>
+	<base_bugs id="25906117">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25906117</patch_id>
+        <file_name>p25906117_112040_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="22731026">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22731026</patch_id>
+        <file_name>p22731026_112040_Generic.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="21904072">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21904072</patch_id>
+        <file_name>p21904072_112040_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="21864513">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21864513</patch_id>
+        <file_name>p21864513_112040_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="17801303,22737974,20476776,17654622">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>23477849</patch_id>
+        <file_name>p23477849_112040_Generic.zip</file_name>
+       </platform>
+    </base_bugs>
+    <base_bugs id="19949371">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19949371</patch_id>
+        <file_name>p19949371_112040_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+    <base_bugs id="19835133">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19835133</patch_id>
+        <file_name>p19835133_112040_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+    <base_bugs id="18966843">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18966843</patch_id>
+        <file_name>p18966843_112040_Generic.zip</file_name>
+       </platform>
+    </base_bugs>
+    <base_bugs id="18604144">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18604144</patch_id>
+        <file_name>p18604144_112040_Generic.zip</file_name>
+       </platform>
+    </base_bugs>
+    <base_bugs id="16075609">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>16075609</patch_id>
+        <file_name>p16075609_112040_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+    <base_bugs id="4189542,4247037,14046443,16989137,17402822,17429475,17501296,17629476,18419770,18685209,18689530,19472320,20523280">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20523280</patch_id>
+        <file_name>p20523280_112040_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+	</Technology>
+    <Technology name="DB_HOME" version="11.2.0.4.171017_DBCS_RAC">
+    <base_bugs id="21321429">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21321429</patch_id>
+        <file_name>p21321429_112041_Generic.zip</file_name>
+		<notes>11.2.0.4.1 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="18708921">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18708921</patch_id>
+        <file_name>p18708921_112043_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.3 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21028698">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21028698</patch_id>
+        <file_name>p21028698_112045_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.5 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="16359751,18730542">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20883625</patch_id>
+        <file_name>p20883625_112046_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.6 version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="20294666">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20294666</patch_id>
+        <file_name>p20294666_112046_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.6 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="19291380">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19291380</patch_id>
+        <file_name>p19291380_11204160119_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.160119 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="17901041">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>17901041</patch_id>
+        <file_name>p17901041_11204160419_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.160419 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="18665660">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18665660</patch_id>
+        <file_name>p18665660_11204161018_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.161018 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21967332">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21967332</patch_id>
+        <file_name>p21967332_11204161018_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.161018 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="19791273,18284763">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26122634</patch_id>
+        <file_name>p26122634_11204170718_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.170718 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="22496904">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22496904</patch_id>
+        <file_name>p22496904_11204171017_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.171017 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="26911000,18485835,21614112">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27076225</patch_id>
+        <file_name>p27076225_11204171017_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.171017 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="12574386,10427365,10019002">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26751367</patch_id>
+        <file_name>p26751367_11204171017_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.171017 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="26196152,20825533,19487147,24326444,21091431,23632545,25099339,20887355,17781991,26658759,20949558,21174504,21813400,22453212,20245930,20627866,22024071,24589081,24385983,23645516,22568797,17250794,25919622,17401353,14255128,25971286,19239846,19879144,20936905,25764020,16299727,19896336,22666802">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27238886</patch_id>
+        <file_name>p27238886_11204171017_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.171017 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="25906117">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25906117</patch_id>
+        <file_name>p25906117_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="19835133">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19835133</patch_id>
+        <file_name>p19835133_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="17801303,22737974,20476776,17654622">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>23477849</patch_id>
+        <file_name>p23477849_112040_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="22731026">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22731026</patch_id>
+        <file_name>p22731026_112040_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21904072">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21904072</patch_id>
+        <file_name>p21904072_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21864513">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21864513</patch_id>
+        <file_name>p21864513_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="19949371">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19949371</patch_id>
+        <file_name>p19949371_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="18966843">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18966843</patch_id>
+        <file_name>p18966843_112040_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="18604144">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>18604144</patch_id>
+        <file_name>p18604144_112040_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="16075609">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>16075609</patch_id>
+        <file_name>p16075609_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="4189542,4247037,14046443,16989137,17402822,17429475,17501296,17629476,18419770,18685209,18689530,19472320,20523280">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20523280</patch_id>
+        <file_name>p20523280_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	</Technology>
+    <Technology name="DB_HOME" version="11.2.0.4.170418_ECS">
+    <base_bugs id="21321429">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21321429</patch_id>
+        <file_name>p21321429_112042ExadataDatabase_Generic.zip</file_name>
+         <notes>11.2.0.4.2 Exadata Database version</notes>
+     </platform>
+    </base_bugs>
+    <base_bugs id="21028698">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21028698</patch_id>
+        <file_name>p21028698_1120415ExadataDatabase_Linux-x86-64.zip</file_name>
+         <notes>11.2.0.4.15 Exadata Database version</notes>
+     </platform>
+    </base_bugs>
+	<base_bugs id="12574386,10427365,10019002">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22513041</patch_id>
+        <file_name>p22513041_11204160119ExadataDatabase_Linux-x86-64.zip</file_name>
+         <notes>11.2.0.4.160119 Exadata Database version</notes>
+     </platform>
+    </base_bugs>
+	<base_bugs id="21967332">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21967332</patch_id>
+        <file_name>p21967332_11204161018ExadataDatabase_Linux-x86-64.zip</file_name>
+         <notes>11.2.0.4.160719 Exadata Database version</notes>
+     </platform>
+    </base_bugs>
+    <base_bugs id="21614112,21099502">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25788346</patch_id>
+        <file_name>p25788346_11204170418ExadataDatabase_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.170418 Exadata Database version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="20828947,20825533,22095821,23632545,25099339,17781991,20949558,18948524,21813400,20627866,22453212,24589081,21281607,22568797,19239846,23294548,20936905,18849970,22551446,22666802,24326444,24365589,21091431,20887355,19469538,23065323,22024071,23645516,23084142,17250794,25919622,23513711,23007241">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26369758</patch_id>
+        <file_name>p26369758_11204170418ExadataDatabase_Linux-x86-64.zip</file_name>
+		<notes>11.2.0.4.170418 Exadata Database version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="16075609">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>16075609</patch_id>
+        <file_name>p16075609_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="19835133">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19835133</patch_id>
+        <file_name>p19835133_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="4189542,4247037,16989137,17429475,17629476,19472320,20523280">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20523280</patch_id>
+        <file_name>p20523280_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="21864513">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21864513</patch_id>
+        <file_name>p21864513_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="21904072">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21904072</patch_id>
+        <file_name>p21904072_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="22496904">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22496904</patch_id>
+        <file_name>p22496904_112040_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="22731026">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22731026</patch_id>
+        <file_name>p22731026_112040_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="17801303,22737974,20476776,17654622">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>23477849</patch_id>
+        <file_name>p23477849_112040_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+	</Technology>
+    <Technology name="DB_HOME" version="12.1.0.2.171017_DBCS">
+    <base_bugs id="21904072">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21904072</patch_id>
+        <file_name>p21904072_121020_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+	<base_bugs id="22828765">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22828765</patch_id>
+        <file_name>p22828765_121020_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="22747454">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22747454</patch_id>
+        <file_name>p22747454_121020_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="19472320">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19472320</patch_id>
+        <file_name>p19472320_121020_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="20181016">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20181016</patch_id>
+        <file_name>p20181016_121020_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="20123899,15894842">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20204035</patch_id>
+        <file_name>p20204035_121020_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="20887355">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20887355</patch_id>
+        <file_name>p20887355_121020_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="21864513">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21864513</patch_id>
+        <file_name>p21864513_121020_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="22731026">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22731026</patch_id>
+        <file_name>p22731026_121020_Generic.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="25906117">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25906117</patch_id>
+        <file_name>p25906117_121020_Linux-x86-64.zip</file_name>
+      </platform>
+    </base_bugs>
+    <base_bugs id="20766180">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20766180</patch_id>
+        <file_name>p20766180_121024_Generic.zip</file_name>
+        <notes>12.1.0.2.4 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="25305405">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25305405</patch_id>
+        <file_name>p25305405_12102160119_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.160119 version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="21967332">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21967332</patch_id>
+        <file_name>p21967332_12102160419_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.160419 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21321429">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21321429</patch_id>
+        <file_name>p21321429_12102170117_Generic.zip</file_name>
+        <notes>12.1.0.2.170117 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="18485835,21614112,22660003,26911000">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27085757</patch_id>
+        <file_name>p27085757_12102160719_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.160719 version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="24007737">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>24007737</patch_id>
+        <file_name>p24007737_12102161018_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.161018 version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="24326444">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>24326444</patch_id>
+        <file_name>p24326444_12102161018_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.161018 version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="20839705">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20839705</patch_id>
+        <file_name>p20839705_12102170718_Generic.zip</file_name>
+        <notes>12.1.0.2.170718 version</notes>
+      </platform>
+    </base_bugs>
+	 <base_bugs id="18419520,26196152,21751519,23632545,22743059,25099339,24509056,14666816,26658759,22737974,21813400,22734547,18689530,24589081,21281607,22568797,20476776,19239846,22826718,18849970,22666802,23604553,22452653,18793246,22229581,25963024,22828827,23528412,22536802,26844281,23645516,25139545,24385983,23182225,25919622,25971286,21028698,21117072,19370504,23007241,23321125">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27267463</patch_id>
+        <file_name>p27267463_12102171017_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.171017 version</notes>
+      </platform>
+    </base_bugs>
+    </Technology>
+    <Technology name="DB_HOME" version="12.1.0.2.171017ProactiveBP_DBCS_RAC">
+	 <base_bugs id="22731026">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22731026</patch_id>
+        <file_name>p22731026_121027DBEngSysandDBIM_Generic.zip</file_name>
+        <notes>12.1.0.2.7 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21967332">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21967332</patch_id>
+        <file_name>p21967332_12102160119DBEngSysandDBIM_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.160119 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="24326444">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>24326444</patch_id>
+        <file_name>p24326444_12102170418ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.170418 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="24007737">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>24007737</patch_id>
+        <file_name>p24007737_12102170418ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.170418 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="21321429">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21321429</patch_id>
+        <file_name>p21321429_12102170718ProactiveBP_Generic.zip</file_name>
+        <notes>12.1.0.2.170718 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="20839705">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20839705</patch_id>
+        <file_name>p20839705_12102170718ProactiveBP_Generic.zip</file_name>
+        <notes>12.1.0.2.170718 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="26911000">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26911000</patch_id>
+        <file_name>p26911000_12102171017ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.171017 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="25305405">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25305405</patch_id>
+        <file_name>p25305405_12102171017ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.171017 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="18485835,21614112,22660003">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26800407</patch_id>
+        <file_name>p26800407_12102171017ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.171017 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="20382309,22518784,22828827">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27230323</patch_id>
+        <file_name>p27230323_12102171017ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.171017 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+	<base_bugs id="23604553,26196152,22452653,18793246,22229581,25963024,23632545,22743059,25099339,14666816,26658759,22737974,21813400,26844281,24589081,23645516,22568797,25139545,25919622,25971286,19239846,20476776,19370504,23321125,22666802">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>27234848</patch_id>
+        <file_name>p27234848_12102171017ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.171017 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="21904072">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21904072</patch_id>
+        <file_name>p21904072_121020_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="21864513">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21864513</patch_id>
+        <file_name>p21864513_121020_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="19472320">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19472320</patch_id>
+        <file_name>p19472320_121020_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="22747454">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22747454</patch_id>
+        <file_name>p22747454_121020_Generic.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="22828765">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22828765</patch_id>
+        <file_name>p22828765_121020_Generic.zip</file_name>
+       </platform>
+    </base_bugs>
+	<base_bugs id="25906117">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25906117</patch_id>
+        <file_name>p25906117_121020_Linux-x86-64.zip</file_name>
+       </platform>
+    </base_bugs>
+    </Technology>
+    <Technology name="DB_HOME" version="12.1.0.2.170418ProactiveBP_ECS">
+	<base_bugs id="22731026">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22731026</patch_id>
+        <file_name>p22731026_121027DBEngSysandDBIM_Generic.zip</file_name>
+         <notes>12.1.0.2.7 Proactive BP version</notes>
+     </platform>
+     </base_bugs>
+     <base_bugs id="20172151,20839705">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>24558611</patch_id>
+        <file_name>p24558611_1210212DBEngSysandDBIM_Generic.zip</file_name>
+         <notes>12.1.0.2.12 Proactive BP version</notes>
+     </platform>
+     </base_bugs>
+      <base_bugs id="21967332">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21967332</patch_id>
+        <file_name>p21967332_12102160119DBEngSysandDBIM_Linux-x86-64.zip</file_name>
+         <notes>12.1.0.2.160119 Proactive BP version</notes>
+     </platform>
+     </base_bugs>
+    <base_bugs id="20766180">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>20766180</patch_id>
+        <file_name>p20766180_12102161018ProactiveBP_Generic.zip</file_name>
+         <notes>12.1.0.2.161018 Proactive BP version</notes>
+     </platform>
+     </base_bugs>
+	 <base_bugs id="25643931">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>25643931</patch_id>
+        <file_name>p25643931_12102161018ProactiveBP_Linux-x86-64.zip</file_name>
+        <notes>12.1.0.2.161018 Proactive BP version</notes>
+      </platform>
+    </base_bugs>
+    <base_bugs id="22828827">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22828827</patch_id>
+        <file_name>p22828827_12102170117ProactiveBP_Linux-x86-64.zip</file_name>
+         <notes>12.1.0.2.170117 Proactive BP version</notes>
+    </platform>
+    </base_bugs>
+	<base_bugs id="24007737">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>24007737</patch_id>
+        <file_name>p24007737_12102170418ProactiveBP_Linux-x86-64.zip</file_name>
+         <notes>12.1.0.2.170418 Proactive BP version</notes>
+     </platform>
+    </base_bugs>
+	<base_bugs id="24326444">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>24326444</patch_id>
+        <file_name>p24326444_12102170418ProactiveBP_Linux-x86-64.zip</file_name>
+         <notes>12.1.0.2.170418 Proactive BP version</notes>
+     </platform>
+    </base_bugs>
+	<base_bugs id="23604553,22452653,24929210,22229581,21751519,18793246,22095821,23632545,22743059,25099339,14666816,26658759,22737974,21813400,26844281,24589081,22568797,23645516,25139545,23182225,25919622,23513711,20476776,19239846,21117072,19370504,23321125,22666802">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26940213</patch_id>
+        <file_name>p26940213_12102170418ProactiveBP_Linux-x86-64.zip</file_name>
+         <notes>12.1.0.2.170418 Proactive BP version</notes>
+     </platform>
+    </base_bugs>
+	  <base_bugs id="21321429">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21321429</patch_id>
+        <file_name>p21321429_12102170418ProactiveBP_Generic.zip</file_name>
+         <notes>12.1.0.2.170418 Proactive BP version</notes>
+     </platform>
+    </base_bugs>
+	<base_bugs id="18485835,19475484,21099502,21614112,22660003">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>26050755</patch_id>
+        <file_name>p26050755_12102170418ProactiveBP_Linux-x86-64.zip</file_name>
+         <notes>12.1.0.2.170418 Proactive BP version</notes>
+     </platform>
+    </base_bugs>
+	<base_bugs id="19472320">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>19472320</patch_id>
+        <file_name>p19472320_121020_Linux-x86-64.zip</file_name>
+      </platform>
+     </base_bugs>
+     <base_bugs id="21864513">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21864513</patch_id>
+        <file_name>p21864513_121020_Linux-x86-64.zip</file_name>
+      </platform>
+     </base_bugs>
+      <base_bugs id="21904072">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>21904072</patch_id>
+        <file_name>p21904072_121020_Linux-x86-64.zip</file_name>
+      </platform>
+     </base_bugs>
+     <base_bugs id="22747454">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22747454</patch_id>
+        <file_name>p22747454_121020_Generic.zip</file_name>
+      </platform>
+     </base_bugs>
+     <base_bugs id="22828765">
+      <platform id="226" name="LINUX_X86-64">
+        <patch_id>22828765</patch_id>
+        <file_name>p22828765_121020_Generic.zip</file_name>
+      </platform>
+     </base_bugs>
+	</Technology>
+</EBS>

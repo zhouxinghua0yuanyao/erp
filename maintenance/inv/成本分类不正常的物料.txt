@@ -1,0 +1,11 @@
+Select hou.ORGANIZATION_ID, hou.NAME, mtl.SEGMENT1, mtl.description
+  from mtl_system_items_b mtl, hr_all_organization_units hou
+ where mtl.ORGANIZATION_ID = hou.ORGANIZATION_ID
+   and hou.ORGANIZATION_ID not in (0, 98)
+   and not exists
+ (select cate.INVENTORY_ITEM_ID
+          from MTL_ITEM_CATEGORIES_V cate
+         where cate.category_set_name = '源耀物料流程成本分类'
+           and cate.INVENTORY_ITEM_ID = mtl.INVENTORY_ITEM_ID
+           and mtl.ORGANIZATION_ID = cate.ORGANIZATION_ID)
+ order by mtl.ORGANIZATION_ID, mtl.SEGMENT1

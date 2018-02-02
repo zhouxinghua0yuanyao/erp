@@ -1,0 +1,69 @@
+begin aru bug_13857555 
+
+  compatible release 12.0.0 
+
+  compatible platform GENERIC 
+
+  characterset us7ascii 
+
+  extension recordpatch 13857555 US 
+
+  extension patch_type software base 
+
+  extension fixes 13857555 iby C 
+
+  extension includes 13857555 iby C 
+
+  compatible feature checkfile 
+
+  extension trackable_entity iby product Oracle Payments 
+  extension based on iby C
+
+  begin bug iby 13857555
+    begin actions
+
+      #=================================#
+      # Actions for Copying Patch Files #
+      #=================================#
+
+      copy      iby      patch/115/sql             iby_dup_payee_fix.sql 120.2.12020000.2
+      copy      iby      patch/115/sql             iby_dup_payee_sel.sql 120.1.12020000.2
+      copy      iby      patch/115/sql             ibygdfb.pls  120.0.12020000.2
+      copy      iby      patch/115/sql             ibygdfs.pls  120.1.12020000.2
+
+      #=======================================#
+      # Actions for Applying Database Objects #
+      #=======================================#
+
+      #
+      # Phase PLS - Create Package Specifications
+      #
+
+      # file-version-parsed iby patch/115/sql ibygdfs.pls 120.1.12020000.2
+      sql iby patch/115/sql ibygdfs.pls none none none package &phase=pls checkfile(120.0.12010000.2=120.1)(120.1.12010000.26=120.29):iby:patch/115/sql:ibygdfs.pls
+
+      #
+      # Phase PLB - Create Package Bodies
+      #
+
+      # file-version-parsed iby patch/115/sql ibygdfb.pls 120.0.12020000.2
+      sql iby patch/115/sql ibygdfb.pls none none none package &phase=plb checkfile(120.1.12010000.26=120.29):iby:patch/115/sql:ibygdfb.pls
+
+      #
+      # Phase NOEXEC - These files are intentionally not executed.
+      #
+
+      # file-version-parsed iby patch/115/sql iby_dup_payee_fix.sql 120.2.12020000.2
+      # noexec iby patch/115/sql iby_dup_payee_fix.sql
+
+      # file-version-parsed iby patch/115/sql iby_dup_payee_sel.sql 120.1.12020000.2
+      # noexec iby patch/115/sql iby_dup_payee_sel.sql
+
+      #========================================#
+      # Actions for Generating Dependent Files #
+      #========================================#
+
+    end actions
+  end bug iby 13857555
+
+end aru bug_13857555

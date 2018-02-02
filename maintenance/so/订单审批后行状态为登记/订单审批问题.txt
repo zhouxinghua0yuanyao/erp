@@ -1,0 +1,2 @@
+select * from Oe_Order_Headers_All where order_number='1082017062809' -- attribute15 APPROVED
+update Oe_Order_Headers_All set attribute15='APPROVED'  where order_number='1082017062809'

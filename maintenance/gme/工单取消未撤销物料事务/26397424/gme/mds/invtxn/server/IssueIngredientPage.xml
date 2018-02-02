@@ -1,0 +1,56 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<!-- +======================================================================+ -->
+<!-- |    Copyright (c) 2005, 2016 Oracle and/or its affiliates.           | -->
+<!-- |                         All rights reserved.                         | -->
+<!-- |                           Version 12.0.0                             | -->
+<!-- +======================================================================+ -->
+<!-- dbdrv: exec java oracle/jrad/tools/xml/importer XMLImporter.class java &phase=dat+24 checkfile(120.0.12010000.2=120.0.12020000.2):~PROD:~PATH:~FILE &fullpath:~PROD:~PATH:~FILE -username &un_apps -password &pw_apps -dbconnection &jdbc_db_addr  -userId "1" -rootPackage /oracle/apps/~PROD  -rootdir &fullpath:~PROD:mds:directory  -->
+<page xmlns:jrad="http://xmlns.oracle.com/jrad" xmlns:oa="http://xmlns.oracle.com/oa" xmlns:ui="http://xmlns.oracle.com/uix/ui" version="9.0.3.8.10_1080" xml:lang="en-US" xmlns:user="http://xmlns.oracle.com/jrad/user" xmlns="http://xmlns.oracle.com/jrad" xmlns:mwa="http://xmlns.oracle.com/mwa" file-version="$Header: IssueIngredientPage.xml 120.0.12020000.2 2016/03/16 14:13:03 adeshmuk ship $">
+   <jrad:content>
+      <oa:pageLayout id="IssueIngredientPage" controllerClass="oracle.apps.mwa.personalization.webui.SampleMWAOACO" amDefName="oracle.apps.mwa.personalization.server.MwaXmlAM" windowTitle="Issue Ingred" title="Issue Ingred">
+         <ui:corporateBranding>
+            <oa:image id="corporateBrandingImage" source="/OA_MEDIA/FNDSSCORP.gif"/>
+         </ui:corporateBranding>
+         <ui:productBranding>
+            <oa:formattedText id="productBranding" text="Mobile Applications"/>
+         </ui:productBranding>
+         <ui:contents>
+            <oa:labeledFieldLayout id="dffContainer" addChildren="false" adminCustomizable="false" rendered="false">
+               <ui:contents/>
+            </oa:labeledFieldLayout>
+            <oa:contentContainer id="contentContainerRN" width="10%" text="Issue Ingred" background="dark">
+               <ui:contents>
+                  <oa:labeledFieldLayout id="pageFieldsRN" addChildren="false" adminCustomizable="false" rendered="false">
+                     <ui:contents>
+                        <mwa:LOVFieldBean id="BatchLoV" prompt="Batch" readOnly="false" enterableLength="40" required="yes" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="BatchLoV" className="oracle.apps.gme.lovs.server.BatchLoV"/>
+                        <mwa:LOVFieldBean id="StepLoV" prompt="Step" readOnly="false" enterableLength="40" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="StepLoV" className="oracle.apps.gme.lovs.server.StepLoV"/>
+                        <mwa:LOVFieldBean id="ItemLoV" prompt="Item" readOnly="false" enterableLength="40" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="ItemLoV" className="oracle.apps.gme.lovs.server.ItemLoV"/>
+                        <mwa:LOVFieldBean id="MaterialLineLoV" prompt="Line" readOnly="false" enterableLength="40" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="MaterialLineLoV" className="oracle.apps.gme.lovs.server.MaterialLineLoV"/>
+                        <mwa:LOVFieldBean id="RsrvLoV" prompt="Use Rsrv" readOnly="true" alignment="0" fieldName="RsrvLoV" className="oracle.apps.mwa.beans.LOVFieldBean"/>
+                        <mwa:LOVFieldBean id="IssueLpnLoV" prompt="LPN" readOnly="false" enterableLength="40" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="IssueLpnLoV" className="oracle.apps.gme.lovs.server.IssueLpnLoV "/>                        
+                        <mwa:LOVFieldBean id="RevisionLoV" prompt="Rev" readOnly="false" enterableLength="40" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="RevisionLoV" className="oracle.apps.gme.lovs.server.RevisionLoV"/>
+                        <mwa:LOVFieldBean id="SubinventoryLoV" prompt="Sub" readOnly="false" enterableLength="40" required="yes" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="SubinventoryLoV" className="oracle.apps.gme.lovs.server.SubInventoryLoV"/>
+                        <mwa:LOVFieldBean id="LocatorLoV" prompt="Locator" readOnly="false" enterableLength="40" required="yes" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="LocatorLoV" className="oracle.apps.gme.lovs.server.LocatorLoV"/>
+                        <mwa:LOVFieldBean id="UoMLoV" prompt="UOM" readOnly="false" enterableLength="40" required="yes" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="UoMLoV" className="oracle.apps.gme.lovs.server.UoMLoV"/>
+                        <mwa:TextFieldBean prompt="Sec UOM" readOnly="true" alignment="0" fieldName="" className="oracle.apps.mwa.beans.TextFieldBean"/>
+                        <mwa:TextFieldBean id="WipQty" prompt="Wip Qty" readOnly="true" alignment="0" fieldName="WipQty" className="oracle.apps.gme.utilities.server.NumberFieldBean"/>
+                        <mwa:TextFieldBean id="ActualQty" prompt="Act Qty" readOnly="true" alignment="0" fieldName="ActualQty" className="oracle.apps.gme.utilities.server.NumberFieldBean"/>
+                        <mwa:TextFieldBean id="TxnQty" prompt="Qty" readOnly="false" enterableLength="20" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="TxnQty" className="oracle.apps.gme.utilities.server.NumberFieldBean"/>
+                        <mwa:TextFieldBean id="TxnSecQty" prompt="Sec Qty" readOnly="false" enterableLength="20" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="TxnSecQty" className="oracle.apps.gme.utilities.server.NumberFieldBean"/>
+                        <mwa:TextFieldBean id="RemainingQty" prompt="Remaining" readOnly="true" alignment="0" fieldName="RemainingQty" className="oracle.apps.gme.utilities.server.NumberFieldBean"/>
+                        <mwa:LOVFieldBean id="ReasonLoV" prompt="Reason" readOnly="false" enterableLength="40" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="ReasonLoV" className="oracle.apps.gme.lovs.server.ReasonLoV"/>
+                        <mwa:TextFieldBean id="TxnDate" prompt="Txn Date" readOnly="false" enterableLength="20" required="yes" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="TxnDate" className="oracle.apps.gme.utilities.server.DateTimeFieldBean"/>
+                        <mwa:LOVFieldBean id="LotLoV" prompt="Lot" readOnly="false" enterableLength="80" required="yes" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="LotLoV" className="oracle.apps.gme.lovs.server.LotLoV"/>
+                        <mwa:TextFieldBean id="LotQty" prompt="Lot Qty" readOnly="false" enterableLength="20" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="LotQty" className="oracle.apps.gme.utilities.server.NumberFieldBean"/>
+                        <mwa:TextFieldBean id="LotSecQty" prompt="SecLotQty" readOnly="false" enterableLength="20" required="no" dfi="" dfiRequired="no" barcodeDelimiter="" alignment="0" fieldName="LotSecQty" className="oracle.apps.gme.utilities.server.NumberFieldBean"/>
+                        <mwa:ButtonFieldBean id="NextLotButton" prompt="Next Lot" fieldName="NextLotButton" className="oracle.apps.mwa.beans.ButtonFieldBean"/>
+                        <mwa:ButtonFieldBean id="SaveNextButton" prompt="Save/Next" fieldName="SaveNextButton" className="oracle.apps.mwa.beans.ButtonFieldBean"/>
+                        <mwa:ButtonFieldBean id="CancelButton" prompt="Cancel" fieldName="CancelButton" className="oracle.apps.mwa.beans.ButtonFieldBean"/>
+                     </ui:contents>
+                  </oa:labeledFieldLayout>
+               </ui:contents>
+            </oa:contentContainer>
+         </ui:contents>
+      </oa:pageLayout>
+   </jrad:content>
+</page>

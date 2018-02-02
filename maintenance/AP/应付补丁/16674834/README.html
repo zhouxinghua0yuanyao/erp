@@ -1,0 +1,193 @@
+<html>
+<head>
+<title>Update 16674834 - RCA PAY ADJ HAS INCORRECT ACCTG BECAUSE LAST DIST ROUNDING IS EXECUTED IN MIDDLE</title>
+
+<style type='text/css'>
+.OraHeaderSub
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:14pt;
+        color:#3a5a87;
+        font-weight:bold
+}
+.OraHeaderSubSub
+{
+        font-family:Tahoma,Helvetica,Geneva,sans-serif;
+        font-size:8pt;
+        color:#3a5a87;
+        font-weight:bold;
+}
+.OraTableCellText
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:9pt;
+        background-color:#eaeff5;
+        color:#000000;
+}
+.OraTableRowHeader
+{
+        font-family:Arial, Helvetica, Geneva, sans-serif;
+        font-size:10pt;
+        font-weight:bold;
+        text-align:left;
+        background-color:#cfe0f1;
+        color:#3c3c3c;
+        text-indent:1
+}
+.OraErrorText
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:10pt;
+        font-weight:bold;
+        color:#cc0000
+}
+
+.OraBGColorDark
+{
+    background-color:#3a5a87
+}
+.PhaseHeader
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:10pt;
+        text-align:left;
+        background-color:#cfe0f1;
+        color:#3c3c3c;
+        text-indent:1;
+}
+</style>
+
+</head>
+
+<body background=#ffffff>
+<table width=620>
+<tr><td>
+<table border=0 cellpadding=0 cellspacing=0 width=100%>
+<tr>
+<td valign=top width=100% height=14 class=OraBGColorDark>&nbsp;</td>
+</tr>
+</table>
+
+<table width=100% border="0" cellpadding=3>
+<tr>
+<th class=OraTableRowHeader colspan=2>
+Abstract
+</th>
+</tr>
+<tr>
+<td class=OraTableCellText colspan=2>
+RCA PAY ADJ HAS INCORRECT ACCTG BECAUSE LAST DIST ROUNDING IS EXECUTED IN MIDDLE
+</td>
+</tr>
+
+
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader nowrap>Update</td>
+<td class=OraTableCellText width="100%">16674834</td>
+</tr>
+<tr>
+<th class=OraTableRowHeader nowrap>Product</td>
+<td class=OraTableCellText width="100%">Oracle Payables</td>
+</tr>
+<tr>
+<th class=OraTableRowHeader nowrap>Release</td>
+<td class=OraTableCellText width="100%">R12</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader nowrap>Platform</td>
+<td class=OraTableCellText width="100%">Generic Platform</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader nowrap>Built</td>
+<td class=OraTableCellText width="100%">DEC-26-2014 17:26:01</td>
+</tr>
+
+<tr>
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader colspan=2>
+Instructions
+</th>
+</tr>
+<tr>
+<td class=OraTableCellText colspan=2>
+<pre>
+
+</pre>
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+<tr>
+<th class=OraTableRowHeader colspan=2>
+Description
+</th>
+</tr>
+<tr>
+<td class=OraTableCellText colspan=2>
+<pre>
+Description
+    Old Behavior
+         1. Payment Adjusted accounting having incorrect accounting
+         in following case,
+         - Single invoice have multiple adjustment.
+         - Adjusted distributions are like +x, -x, +x, -x etc. Mean
+         same amount added removed multiple times.
+         2. For 0.0 amount payment adjustment gain/loss line are not
+         getting calculated.
+    New Behavior
+        Payment adjusted event will get account with right entries.
+</pre>
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+
+
+<tr>
+<th class=OraTableRowHeader colspan=2>
+Bugs Fixed
+</th>
+</tr>
+<tr>
+<td class=OraTableCellText colspan=2>
+<pre>
+The following bugs are fixed by this patch:
+
+15831147 - ERROR IN CREATE ACCOUNTING FOR A RECONCILLED PAYMENT(REFUND)
+16164378 - CREATE ACCOUNTING WITH ERROR NUMBER 0
+16636525 - RCA PAYMENT CLEARING ADJUSTMENT CREATING INCORRECT ROUNDING FOR BANK CHARGE
+17600307 - R12.1.3: PAYMENT BASE AMOUNT IS NOT MATCH WITH ACCOUNTED AMOUNT IN XLA TABLE
+
+</pre>
+</td>
+</tr>
+</table><table border=0 cellpadding=0 cellspacing=0 width=100%>
+<tr>
+<td valign=top width=100% height=14 class=OraBGColorDark>&nbsp;</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,73 @@
+Dear customer: 
+
+ Thanks for your update. 
+ If it is ok to delete this invoice, based on your request, please try to do as following: 
+
+ 1. Please backup all the data in the test instance. 
+ 2. Please run below script in the test instance. 
+
+ delete from AP_INVOICES_ALL 
+ where invoice_id=29161; 
+
+ delete from AP_INVOICE_LINES_ALL 
+ where invoice_id=29161; 
+
+
+ delete from AP_INVOICE_DISTRIBUTIONS_ALL 
+ where invoice_id=29161; 
+
+
+ delete from AP_PAYMENT_SCHEDULES_ALL 
+ where invoice_id=29161; 
+
+
+ delete from ZX_LINES 
+ where trx_id=29161 
+ and application_id=200; 
+
+ delete from ZX_LINES_SUMMARY 
+ where trx_id=29161 
+ and application_id=200; 
+
+ delete from ZX_REC_NREC_DIST 
+ where trx_id=29161 
+ and application_id=200; 
+
+ delete from ZX_LINES_DET_FACTORS 
+ where trx_id=29161 
+ and application_id=200; 
+
+ delete from xla_events 
+ where event_id in (369021,369022) 
+ and application_id=200; 
+
+ delete from XLA_AE_HEADERS 
+ where event_id in (369021,369022) 
+ and application_id=200; 
+
+
+
+ delete from XLA_AE_LINES 
+ where AE_HEADER_ID in (2947214,2947215) 
+ and application_id=200; 
+
+ delete from XLA_DISTRIBUTION_LINKS 
+ where event_id in (369021,369022) 
+ and application_id=200; 
+
+ delete from XLA_TRANSACTION_ENTITIES 
+ where ENTITY_ID=313652 
+ and application_id=200; 
+
+ delete from XLA_ACCOUNTING_ERRORS 
+ where event_id in (369021,369022) 
+ and application_id=200; 
+
+ commit; 
+
+ The data transferred to gl, you need to manually reverse it to make it balance as 0 if you don't want to left the history. 
+
+
+ Thanks, 
+
+ Ling. 

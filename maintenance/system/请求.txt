@@ -1,0 +1,28 @@
+UPDATE FND_CONCURRENT_REQUESTS R
+    SET PHASE_CODE      = 'C',
+        STATUS_CODE     = 'D',
+        completion_text = '我要亲手灭掉他。'
+  WHERE R.REQUEST_ID = 1291122
+    AND PHASE_CODE = 'P'
+    AND STATUS_CODE IN ('I', 'Q')
+    AND (nvl(request_type, 'X') != 'S')
+                                          
+--uesr_id, resp_id, resp_appl_id                             
+
+DECLARE
+  v_request_id NUMBER;
+   v_message    VARCHAR2(300);
+   V_TRUE       BOOLEAN;
+ BEGIN
+   fnd_global.apps_initialize(1304,20420,1);
+   v_request_id := 1291122;
+   DBMS_OUTPUT.PUT_LINE('TEST BEFORE CANCEL');
+   V_TRUE := fnd_concurrent.cancel_request(Request_Id => v_request_id,
+                                           Message    => v_message);
+   DBMS_OUTPUT.PUT_LINE('TEST AFTER CANCEL ' || v_message);
+   
+   COMMIT;
+ EXCEPTION
+   WHEN OTHERS THEN
+     DBMS_OUTPUT.PUT_LINE('TEST AFTER exception');
+ END; 

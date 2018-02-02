@@ -1,0 +1,10 @@
+drop table rti_bak;
+drop table rli_bak;
+drop table mtli_bak;
+drop table mtlt_bak;
+drop table rsi_bak;
+drop table msni_bak;
+drop table msnt_bak;
+
+Ö´ÐÐ
+delete_stuck_rti_for_R121_and_above.sql

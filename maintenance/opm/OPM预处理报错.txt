@@ -1,0 +1,5 @@
+1) Create table gmlct_14509485 AS back-up
+  SELECT * FROM gmf_material_lot_cost_txns txn   WHERE NOT EXISTS ( SELECT 1 FROM gmf_lot_costs lc WHERE lc.header_id =   txn.cost_header_id);
+2) Delete orphan records in lot cost
+delete from gmf_material_lot_cost_txns where cost_trans_id IN ( Select   cost_trans_id from gmlct_14509485 );
+3) Please run OPM accounting Preprocessor again.

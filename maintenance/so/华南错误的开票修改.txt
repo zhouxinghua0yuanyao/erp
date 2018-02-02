@@ -1,0 +1,34 @@
+select rowid,scp.*
+  from cux_dis_ship_cfm_lns_all scp
+ where 
+ scp.CFM_ID in (Select fm.CFM_ID from cux_dis_ship_cfm_all fm where fm.CONFIRM_NUM='B0072017112100002')
+ and scp.cfm_lns_id in
+       (select sfm.CFM_LNS_ID
+          from CUX_DIS_SHIP_CFM_lns_all sfm
+         where sfm.LINE_INV_ID in
+               (select line_inv_id
+                  from cux_dis_req_line_inv_all
+                 where header_id in
+                       (select header_id
+                          from cux_dis_req_headers_all reqh
+                         where reqh.req_number = 'Z2017111600228')))
+
+select rowid,scp.*
+  from cux_dis_ship_cfm_price_all scp
+ where scp.cfm_lns_id in
+       (select sfm.CFM_LNS_ID
+          from CUX_DIS_SHIP_CFM_lns_all sfm
+         where 
+         sfm.CFM_ID in (Select fm.CFM_ID from cux_dis_ship_cfm_all fm where fm.CONFIRM_NUM='B0072017112100002')
+         and  sfm.LINE_INV_ID in
+               (select line_inv_id
+                  from cux_dis_req_line_inv_all
+                 where header_id in
+                       (select header_id
+                          from cux_dis_req_headers_all reqh
+                         where reqh.req_number = 'Z2017111600228'))) --217345
+
+select rowid,shpl.LINE_INV_ID,shpl.LOT_NUMBER,shpl.SHIPMENT_QUANTITY from cux_dis_txn_shp_lns_all shpl
+where shpl.LINE_INV_ID in
+(select line_inv_id from cux_dis_req_line_inv_all where header_id in
+(select header_id from cux_dis_req_headers_all reqh where reqh.req_number='Z2017111600228'))

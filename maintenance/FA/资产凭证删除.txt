@@ -1,0 +1,4 @@
+delete from xla_ae_headers where ae_header_id in (6160583,6160584)
+delete from xla_ae_lines where ae_header_id in(6160583,6160584)
+delete from xla_events where event_id in(500902,500919)
+delete from xla_transaction_entities where entity_id in(434429,434438)

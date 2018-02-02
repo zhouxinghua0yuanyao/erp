@@ -1,0 +1,609 @@
+CREATE OR REPLACE PACKAGE cux_dis_req_so_pkg IS
+
+  --部门
+  FUNCTION get_person_dept(p_sale_id IN NUMBER) RETURN VARCHAR2;
+
+  --create_req 创建发货通知单
+  PROCEDURE create_req(p_header_id     IN NUMBER
+                      ,p_org_id        IN NUMBER
+                      ,p_source_code   IN VARCHAR2
+                      ,x_return_status OUT NOCOPY VARCHAR2
+                      ,x_msg_count     OUT NOCOPY NUMBER
+                      ,x_msg_data      OUT NOCOPY VARCHAR2);
+
+END cux_dis_req_so_pkg;
+
+
+
+CREATE OR REPLACE PACKAGE BODY cux_dis_req_so_pkg IS
+
+  --  Constants
+  g_pkg_name CONSTANT VARCHAR2(30) := 'cux_dis_req_so_pkg';
+
+  --  Debug Enabled
+  g_debug VARCHAR2(1) := nvl(fnd_profile.value('AFLOG_ENABLED'), 'N');
+
+  /*消息处理 */
+  FUNCTION message_list RETURN VARCHAR2 IS
+    l_msg_data  VARCHAR2(2000);
+    l_msg_index NUMBER;
+    lv_message  VARCHAR2(20000);
+  BEGIN
+    FOR i IN 1 .. fnd_msg_pub.count_msg LOOP
+      fnd_msg_pub.get(p_msg_index     => i,
+                      p_encoded       => fnd_api.g_false,
+                      p_data          => l_msg_data,
+                      p_msg_index_out => l_msg_index);
+      IF lv_message IS NULL THEN
+        lv_message := l_msg_data;
+      ELSE
+        lv_message := lv_message || ' ' || l_msg_data;
+      END IF;
+    END LOOP;
+    RETURN lv_message;
+  END message_list;
+
+  --获取api的处理消息
+  FUNCTION get_api_msg RETURN VARCHAR2 IS
+    l_msg_data     VARCHAR2(2000);
+    l_message_list error_handler.error_tbl_type;
+  BEGIN
+    error_handler.get_message_list(x_message_list => l_message_list);
+  
+    FOR i IN 1 .. l_message_list.count LOOP
+      l_msg_data := l_message_list(i).message_text || l_msg_data;
+    END LOOP;
+    RETURN l_msg_data;
+  
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_api_msg;
+
+  --异常处理
+  PROCEDURE raise_exception(x_return_status VARCHAR2) IS
+    others_e EXCEPTION;
+  BEGIN
+    IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+      RAISE fnd_api.g_exc_error;
+    ELSIF x_return_status = fnd_api.g_ret_sts_success THEN
+      NULL;
+    ELSE
+      RAISE others_e;
+    END IF;
+  END raise_exception;
+
+  --部门
+  FUNCTION get_person_dept(p_sale_id IN NUMBER) RETURN VARCHAR2 IS
+    l_dept VARCHAR2(20);
+  BEGIN
+    IF p_sale_id IS NOT NULL THEN
+      SELECT gcc.segment2
+      INTO   l_dept
+      FROM   per_assignments_f    f
+            ,jtf_rs_salesreps     jt
+            ,gl_code_combinations gcc
+      WHERE  f.default_code_comb_id = gcc.code_combination_id
+      AND    f.person_id = jt.person_id
+      AND    jt.salesrep_id = p_sale_id;
+    END IF;
+    RETURN l_dept;
+  EXCEPTION
+    WHEN OTHERS THEN
+      RETURN NULL;
+  END get_person_dept;
+
+  PROCEDURE insert_log(p_text VARCHAR2) IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+  BEGIN
+    INSERT INTO cux.cux_log_test VALUES (p_text);
+    COMMIT;
+  END insert_log;
+
+  --create_req 创建发货通知单
+  PROCEDURE create_req(p_header_id     IN NUMBER
+                      ,p_org_id        IN NUMBER
+                      ,p_source_code   IN VARCHAR2
+                      ,x_return_status OUT NOCOPY VARCHAR2
+                      ,x_msg_count     OUT NOCOPY NUMBER
+                      ,x_msg_data      OUT NOCOPY VARCHAR2) IS
+  
+    l_api_name    CONSTANT VARCHAR2(30) := 'create_req';
+    l_api_version CONSTANT NUMBER := 1.0;
+    l_savepoint   CONSTANT VARCHAR2(30) := 'create_req';
+    l_header_rec     cux_dis_req_headers_all%ROWTYPE;
+    l_line_rec       cux_dis_req_so_cfm_temp%ROWTYPE;
+    l_contract_rec   cux_dis_contract_terms_all%ROWTYPE;
+    l_contract_count NUMBER;
+    l_avi_qty        NUMBER;
+    l_remain_qty     NUMBER;
+    l_inv_req_sum    NUMBER;
+    l_tmp_qty        NUMBER;
+  
+    --tmp 表
+    CURSOR cur_line(c_req_header_id IN NUMBER
+                   ,c_so_header_id  IN NUMBER) IS
+      SELECT 'Y' is_checked
+            ,sc.order_number
+            ,sc.contract_number
+            ,sc.price_contract_number
+            ,sc.source_comments
+            ,sc.ordered_date
+            ,sc.line_num
+            ,sc.customer_name
+            ,sc.item_number
+            ,sc.item_desc
+            ,sc.uom_desc
+            ,sc.ordered_quantity
+            ,sc.so_dept_name
+            ,sc.order_type_name
+            ,sc.business_type_name
+            ,sc.delivery_type_name
+            ,sc.currency_code
+            ,sc.unit_price
+            ,sc.rcv_org
+            ,sc.order_quantity_uom
+            ,sc.so_dept_code
+            ,sc.order_type_id
+            ,sc.business_type_code
+            ,sc.delivery_type_code
+            ,sc.cust_po_number
+            ,sc.product_desc
+            ,sc.delivery_method_name
+            ,sc.ciq_code
+            ,sc.project_name
+            ,sc.task_name
+            ,sc.customs_code_id
+            ,sc.so_header_id
+            ,sc.customer_id
+            ,sc.customer_site_id
+            ,sc.so_line_id
+            ,sc.req_type
+            ,sc.project_id
+            ,sc.task_id
+            ,sc.inventory_item_id
+            ,sc.delivery_method
+            ,sc.organization_id
+            ,sc.dept_code
+            ,sc.salesrep_id
+            ,sc.primary_uom_code
+            ,sc.line_set_id
+            ,sc.order_source_id
+            ,sc.source_document_line_id
+      FROM   cux_dis_req_so_cfm_v sc
+      WHERE  NOT EXISTS
+       (SELECT 1
+              FROM   cux_dis_req_line_so_all rls
+                    ,oe_order_lines_all      oel
+              WHERE  rls.header_id = c_req_header_id
+              AND    rls.so_line_id = oel.line_id
+              AND    rls.so_header_id = sc.so_header_id
+              AND    ((oel.order_source_id =
+                    cux_om_utl.get_cfm_order_src_id AND
+                    ((sc.order_source_id =
+                    cux_om_utl.get_cfm_order_src_id AND
+                    oel.source_document_line_id =
+                    sc.source_document_line_id) OR
+                    (sc.order_source_id <>
+                    cux_om_utl.get_cfm_order_src_id AND
+                    oel.source_document_line_id = sc.so_line_id))) OR
+                    (oel.order_source_id <>
+                    cux_om_utl.get_cfm_order_src_id AND
+                    ((sc.order_source_id =
+                    cux_om_utl.get_cfm_order_src_id AND
+                    oel.line_id = sc.source_document_line_id) OR
+                    (sc.order_source_id <>
+                    cux_om_utl.get_cfm_order_src_id AND
+                    oel.line_id = sc.so_line_id)))))
+      AND    (sc.so_header_id = c_so_header_id)
+      ORDER  BY cust_po_number
+               ,line_num;
+  
+    --inv 表
+    CURSOR cur_inv(c_req_header_id IN NUMBER
+                  ,c_so_line_id    IN NUMBER) IS
+      SELECT 'N' is_checked
+            ,item_number
+            ,item_desc
+            ,primary_uom_desc
+            ,req_uom_desc
+            ,req_qty
+            ,subinventory_name
+            ,lot_number
+            ,lot_expiration_date
+            ,lot_end_date
+            ,bag_qty
+            ,gross_weight
+            ,gross_weight_sum
+            ,net_weight
+            ,net_weight_sum
+            ,lenght
+            ,width
+            ,height
+            ,volume
+            ,locator_code
+            ,primary_uom_code
+            ,req_uom_code
+            ,project_name
+            ,delivery_method_name
+            ,packing_type_name
+            ,delivery_method
+            ,organization_name
+            ,txn_date
+            ,spec_desc
+            ,temp_id
+            ,subinventory_code
+            ,inventory_item_id
+            ,organization_id
+            ,locator_id
+            ,packing_type
+            ,project_id
+            ,task_id
+            ,req_type
+            ,so_line_id
+            ,po_line_id
+            ,req_header_id
+            ,dept_code
+            ,lot_control_code
+      FROM   cux_dis_req_inv_cfm_so_v
+      WHERE  (temp_id IS NULL OR req_header_id = c_req_header_id)
+      AND    (req_type LIKE 'SO_OUT')
+      AND    (so_line_id = c_so_line_id)
+      ORDER  BY subinventory_name
+               ,lot_number
+               ,locator_id;
+  
+  BEGIN
+    x_return_status := cux_api.start_activity(p_pkg_name       => g_pkg_name,
+                                              p_api_name       => l_api_name,
+                                              p_savepoint_name => l_savepoint,
+                                              p_init_msg_list  => 'T',
+                                              l_api_version    => l_api_version,
+                                              p_api_version    => l_api_version);
+    raise_exception(x_return_status);
+  
+    IF g_debug = 'Y' THEN
+      dbms_output.put_line('begin');
+    END IF;
+  
+    --1.0 创建合同
+    SELECT COUNT(1)
+    INTO   l_contract_count
+    FROM   cux_dis_contract_terms_all cdcta
+    WHERE  cdcta.source_header_id = p_header_id
+    AND    cdcta.source_type_code = 'OE'
+    AND    cdcta.org_id = p_org_id;
+  
+    IF l_contract_count = 0 THEN
+      l_contract_rec.contract_term_id         := cux_dis_contract_terms_s.nextval;
+      l_contract_rec.source_type_code         := 'OE';
+      l_contract_rec.source_header_id         := p_header_id;
+      l_contract_rec.org_id                   := p_org_id;
+      l_contract_rec.comments                 := '';
+      l_contract_rec.template_id              := 1101;
+      l_contract_rec.template_name            := '饲料开票室';
+      l_contract_rec.delivery_type_code       := 'SPOT';
+      l_contract_rec.pricing_type_code        := 'FIXED';
+      l_contract_rec.cargo_finish_type_code   := 'PAYMENT_FIRST';
+      l_contract_rec.shipping_type_code       := 'BY_CUSTOMER';
+      l_contract_rec.payment_method_code      := 'PAY_ALL_INADVANCE';
+      l_contract_rec.qty_settlement_type_code := 'SHIPPING_QTY';
+      l_contract_rec.inter_template_flag      := 'N';
+      l_contract_rec.created_by               := fnd_global.user_id;
+      l_contract_rec.creation_date            := SYSDATE;
+      l_contract_rec.last_updated_by          := fnd_global.user_id;
+      l_contract_rec.last_update_date         := SYSDATE;
+      l_contract_rec.last_update_login        := fnd_global.login_id;
+      INSERT INTO cux_dis_contract_terms_all VALUES l_contract_rec;
+    END IF;
+  
+    --创建贷项通知单
+    IF p_source_code = 'OE' THEN
+      --插入头表信息
+      l_header_rec := NULL;
+      SELECT oeh.transactional_curr_code
+            ,oeh.attribute3 dept_code
+            ,oeh.salesrep_id
+             
+            ,oeh.attribute1 business_type_code
+            ,cux_dis_req_common_utl.get_so_delivery_type(oeh.header_id,
+                                                         'OE') delivery_type_code
+            ,oeh.order_type_id
+             
+            ,oeh.sold_to_org_id     customer_id
+            ,oeh.ship_to_org_id
+            ,oeh.sold_to_contact_id
+            ,hl.location_id
+            ,ood.organization_id
+      INTO   l_header_rec.so_currency_code
+            ,l_header_rec.so_dept_code
+            ,l_header_rec.so_salesrep_id
+            ,l_header_rec.so_business_type_code
+            ,l_header_rec.so_delivery_type_code
+            ,l_header_rec.so_order_type_id
+            ,l_header_rec.customer_id
+            ,l_header_rec.customer_site_id
+            ,l_header_rec.cust_person_id
+            ,l_header_rec.location_id
+            ,l_header_rec.organization_id
+      FROM   oe_order_headers_all         oeh
+            ,hz_cust_accounts             hca
+            ,hz_parties                   hp
+            ,hz_cust_acct_sites           hcas
+            ,hz_party_sites               hps
+            ,hz_locations                 hl
+            ,hz_cust_site_uses            hcsu
+            ,ra_salesreps                 s
+            ,org_organization_definitions ood
+            ,oe_order_types_v             oot
+            ,oe_contacts_v                con
+      WHERE  oeh.sold_to_org_id = hca.cust_account_id
+      AND    hca.party_id = hp.party_id
+      AND    oeh.salesrep_id = s.salesrep_id(+)
+      AND    oeh.org_id = ood.operating_unit
+      AND    oeh.ship_to_org_id = hcsu.site_use_id(+)
+      AND    hcsu.cust_acct_site_id = hcas.cust_acct_site_id(+)
+      AND    hcas.party_site_id = hps.party_site_id(+)
+      AND    hps.location_id = hl.location_id(+)
+      AND    oeh.order_type_id = oot.order_type_id
+      AND    oeh.sold_to_contact_id = con.contact_id(+)
+      AND    nvl(oeh.cancelled_flag, 'N') = 'N'
+      AND    oeh.flow_status_code = 'BOOKED'
+      AND    oeh.attribute15 = 'APPROVED'
+      AND    oeh.header_id = p_header_id
+      AND    EXISTS (SELECT 1
+              FROM   oe_order_lines_all oel
+              WHERE  oel.header_id = oeh.header_id
+              AND    oel.flow_status_code = 'AWAITING_SHIPPING')
+      AND    ood.operating_unit = p_org_id;
+    
+      --插入头表信息
+      l_header_rec.header_id             := cux_dis_req_headers_s.nextval;
+      l_header_rec.req_type              := 'SO_OUT';
+      l_header_rec.req_number            := cux_dis_req_common_utl.get_req_number('SO_OUT');
+      l_header_rec.version               := 0;
+      l_header_rec.object_version_number := 1;
+      l_header_rec.req_status            := 'APPROVED';
+      l_header_rec.org_id                := p_org_id;
+      l_header_rec.req_person_id         := fnd_global.employee_id;
+      l_header_rec.req_dept_code         := l_header_rec.so_dept_code;
+      l_header_rec.req_date              := SYSDATE;
+    
+      l_header_rec.vendor_id      := NULL;
+      l_header_rec.vendor_site_id := NULL;
+      l_header_rec.so_header_id   := p_header_id;
+    
+      l_header_rec.appr_person_id       := fnd_global.employee_id;
+      l_header_rec.appr_date            := SYSDATE;
+      l_header_rec.attribute_category   := 'REQ_HEADER';
+      l_header_rec.created_by           := fnd_global.user_id;
+      l_header_rec.creation_date        := SYSDATE;
+      l_header_rec.last_updated_by      := fnd_global.user_id;
+      l_header_rec.last_update_date     := SYSDATE;
+      l_header_rec.last_update_login    := fnd_global.login_id;
+      l_header_rec.estimate_in_out_date := SYSDATE;
+    
+      --插表
+      INSERT INTO cux_dis_req_headers_all VALUES l_header_rec;
+    
+      --插入数据到临时表
+      DELETE FROM cux_dis_req_inv_cfm_temp
+      WHERE  req_header_id = l_header_rec.header_id;
+      DELETE FROM cux_dis_req_so_cfm_temp
+      WHERE  req_header_id = l_header_rec.header_id;
+    
+      --插入行表
+      FOR r_line IN cur_line(l_header_rec.header_id, p_header_id) LOOP
+      
+        l_line_rec                     := NULL;
+        l_line_rec.temp_id             := cux_dis_req_so_cfm_temp_s.nextval;
+        l_line_rec.is_checked          := r_line.is_checked;
+        l_line_rec.req_header_id       := l_header_rec.header_id;
+        l_line_rec.so_line_id          := r_line.so_line_id;
+        l_line_rec.custom_code         := r_line.ciq_code;
+        l_line_rec.spec_desc           := NULL;
+        l_line_rec.req_qty             := r_line.ordered_quantity;
+        l_line_rec.chinese_name        := NULL;
+        l_line_rec.english_name        := NULL;
+        l_line_rec.delivery_method     := r_line.delivery_method;
+        l_line_rec.bag_qty             := NULL;
+        l_line_rec.packing_type        := NULL;
+        l_line_rec.gross_weight        := NULL;
+        l_line_rec.gross_weight_sum    := NULL;
+        l_line_rec.net_weight          := NULL;
+        l_line_rec.net_weight_sum      := NULL;
+        l_line_rec.lenght              := NULL;
+        l_line_rec.width               := NULL;
+        l_line_rec.height              := NULL;
+        l_line_rec.volume              := NULL;
+        l_line_rec.origin_place        := NULL;
+        l_line_rec.manufacture_factory := NULL;
+        l_line_rec.tariff_rate         := NULL;
+        l_line_rec.tariff_amount       := NULL;
+        l_line_rec.added_tax_rate      := NULL;
+        l_line_rec.added_tax_amount    := NULL;
+        l_line_rec.comments            := NULL;
+      
+        INSERT INTO cux_dis_req_so_cfm_temp VALUES l_line_rec;
+      
+        --ivn
+        l_remain_qty := NULL;
+        FOR r_inv IN cur_inv(l_header_rec.header_id, r_line.so_line_id) LOOP
+          l_avi_qty := 0;
+          l_avi_qty := (cux_dis_req_common_utl.get_inv_can_use(p_line_inv_id       => NULL,
+                                                               p_temp_id           => NULL,
+                                                               p_req_header_id     => l_header_rec.header_id,
+                                                               p_organization_id   => r_inv.organization_id,
+                                                               p_inventory_item_id => r_inv.inventory_item_id,
+                                                               p_subinventory_code => r_inv.subinventory_code,
+                                                               p_locator_id        => r_inv.locator_id,
+                                                               p_lot_number        => r_inv.lot_number)
+                       -- 计算申请单位可用量
+                       * inv_convert.inv_um_convert(p_item_id       => r_inv.inventory_item_id,
+                                                     p_from_uom_code => r_inv.primary_uom_code,
+                                                     p_to_uom_code   => r_inv.req_uom_code));
+        
+          --计算临时表中的金额
+          l_tmp_qty := 0;
+          SELECT nvl(SUM(nvl(cdric.req_qty, 0)), 0)
+          INTO   l_tmp_qty
+          FROM   cux_dis_req_inv_cfm_temp cdric
+          WHERE  cdric.is_checked = 'Y'
+          AND    cdric.inventory_item_id = r_inv.inventory_item_id
+          AND    cdric.organization_id = r_inv.organization_id
+          AND    cdric.subinventory_code = r_inv.subinventory_code
+          AND    nvl(cdric.locator_id, -1) = nvl(r_inv.locator_id, -1)
+          AND    nvl(cdric.lot_number, -1) = nvl(r_inv.lot_number, -1)
+          AND    cdric.so_line_id <> r_inv.so_line_id
+          AND    cdric.req_header_id = l_header_rec.header_id;
+        
+          l_avi_qty := l_avi_qty - l_tmp_qty;
+        
+          --计算剩余金额
+          IF l_remain_qty IS NULL THEN
+            l_remain_qty := l_line_rec.req_qty;
+          END IF;
+        
+          --计算金额
+          IF l_remain_qty >= l_avi_qty
+             AND l_avi_qty > 0 THEN
+            r_inv.is_checked := 'Y';
+            r_inv.req_qty    := l_avi_qty;
+            l_remain_qty     := l_remain_qty - l_avi_qty;
+          ELSIF l_remain_qty < l_avi_qty
+                AND l_remain_qty <> 0 THEN
+            r_inv.is_checked := 'Y';
+            r_inv.req_qty    := l_remain_qty;
+            l_remain_qty     := 0;
+          ELSIF l_remain_qty = 0 THEN
+            EXIT;
+          ELSIF l_avi_qty <= 0 THEN
+            continue;
+          END IF;
+        
+          --库存表        
+          INSERT INTO cux_dis_req_inv_cfm_temp
+            (temp_id
+            ,is_checked
+            ,inventory_item_id
+            ,organization_id
+            ,spec_desc
+            ,subinventory_code
+            ,locator_id
+            ,lot_number
+            ,req_qty
+            ,txn_date
+            ,bag_qty
+            ,packing_type
+            ,gross_weight
+            ,gross_weight_sum
+            ,net_weight
+            ,net_weight_sum
+            ,lenght
+            ,width
+            ,height
+            ,volume
+            ,req_header_id
+            ,so_line_id
+            ,po_line_id
+            ,dept_code
+            ,delivery_method
+            ,locator_code
+            ,comments)
+          VALUES
+            (cux_dis_req_inv_cfm_temp_s.nextval
+            ,r_inv.is_checked
+            ,r_inv.inventory_item_id
+            ,r_inv.organization_id
+            ,r_inv.spec_desc
+            ,r_inv.subinventory_code
+            ,r_inv.locator_id
+            ,r_inv.lot_number
+            ,r_inv.req_qty
+            ,r_inv.txn_date
+            ,r_inv.bag_qty
+            ,r_inv.packing_type
+            ,r_inv.gross_weight
+            ,r_inv.gross_weight_sum
+            ,r_inv.net_weight
+            ,r_inv.net_weight_sum
+            ,r_inv.lenght
+            ,r_inv.width
+            ,r_inv.height
+            ,r_inv.volume
+            ,l_header_rec.header_id
+            ,r_inv.so_line_id
+            ,r_inv.po_line_id
+            ,r_inv.dept_code
+            ,r_inv.delivery_method
+            ,r_inv.locator_code
+            ,NULL);
+        END LOOP;
+      
+        --校验 可申请数量
+        SELECT nvl(SUM(t.req_qty), 0)
+        INTO   l_inv_req_sum
+        FROM   cux_dis_req_inv_cfm_temp t
+        WHERE  t.req_header_id = l_header_rec.header_id
+        AND    t.so_line_id = r_line.so_line_id
+        AND    t.is_checked = 'Y';
+        IF l_inv_req_sum < r_line.ordered_quantity THEN
+          cux_api.set_message('CUX',
+                              'CUX_FND_COMMON_MSG',
+                              'TOKEN',
+                              '销售订单' || r_line.order_number || '行' ||
+                              r_line.line_num || ' 大于可申请数量：' ||
+                              to_char(l_inv_req_sum, 'FM9999990.00999999'));
+          RAISE fnd_api.g_exc_error;
+        END IF;
+      
+      END LOOP;
+    
+      --确认行数据
+      cux_dis_req_common_pub.confirm_line(p_api_version   => 1.0,
+                                          p_init_msg_list => 'T',
+                                          p_commit        => 'F',
+                                          x_return_status => x_return_status,
+                                          x_msg_count     => x_msg_count,
+                                          x_msg_data      => x_msg_data,
+                                          p_header_id     => l_header_rec.header_id,
+                                          p_req_type      => 'SO_OUT',
+                                          p_source_code   => 'CUXDISREQSO');
+      raise_exception(x_return_status);
+    END IF;
+  
+    cux_api.end_activity(p_pkg_name  => g_pkg_name,
+                         p_api_name  => l_api_name,
+                         p_commit    => 'T',
+                         x_msg_count => x_msg_count,
+                         x_msg_data  => x_msg_data);
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name       => g_pkg_name,
+                                                   p_api_name       => l_api_name,
+                                                   p_savepoint_name => l_savepoint,
+                                                   p_exc_name       => cux_api.g_exc_name_error,
+                                                   x_msg_count      => x_msg_count,
+                                                   x_msg_data       => x_msg_data);
+      x_msg_data      := message_list;
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name       => g_pkg_name,
+                                                   p_api_name       => l_api_name,
+                                                   p_savepoint_name => l_savepoint,
+                                                   p_exc_name       => cux_api.g_exc_name_unexp,
+                                                   x_msg_count      => x_msg_count,
+                                                   x_msg_data       => x_msg_data);
+      x_msg_data      := message_list;
+    WHEN OTHERS THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name       => g_pkg_name,
+                                                   p_api_name       => l_api_name,
+                                                   p_savepoint_name => l_savepoint,
+                                                   p_exc_name       => cux_api.g_exc_name_others,
+                                                   x_msg_count      => x_msg_count,
+                                                   x_msg_data       => x_msg_data);
+      x_msg_data      := message_list;
+  END create_req;
+
+END cux_dis_req_so_pkg;

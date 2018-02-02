@@ -1,0 +1,65 @@
+
+If you want to insert periods before current starting period of OPM inventory organization, kindly ask help of your DBA to run scripts below one by one for new period:
+1.) Run sql below to get period_set_name and accounted_period_type :
+select b.period_set_name,                                              
+        b.accounted_period_type                                                                        
+   from org_organization_definitions a,                              
+        gl_sets_of_books b                                            
+  where a.organization_id = &organization_Id                          
+and a.set_of_books_id = b.set_of_books_id;  
+
+Å©²úÆ· org_id 161
+period_set_name YUANYAO_CAL
+accounted_period_type 21
+period_year 2017
+period_num 12
+period_name 2017-11
+start_date 2017-11-01
+end_date   2017-11-30
+period_id  39065
+
+2.) Run second sql below and export data into an excel format file, later those values will be used to run data fix for creation new inventory period:
+select period_set_name, period_year, period_num,                        
+          period_name, description,                                  
+          start_date, end_date                                        
+    from gl_periods a                                                
+   where period_year = &period_year  --please enter your year                                        
+      and a.period_set_name = &period_set_name                      
+     and period_type = &accounted_period_type                        
+     and a.adjustment_period_flag = 'N'                              
+     and (period_name, period_year) not in                            
+            (select period_name, period_year                          
+              from org_acct_periods                                  
+             where organization_id =&organization_Id  )                
+ order by period_num;                                                
+
+
+3.) Run data fix with the value returned from sql in 2.) above for each new period:
+--get newPeriodId for each period
+select org_acct_periods_s.nextval from dual;  
+                                                      
+--acct_period_id 39035
+-- created_by 1291
+--org_id 141 
+--PERIOD_SET_NAME	      ACCOUNTED_PERIOD_TYPE
+--YUANYAO_CAL	      21
+
+--insert one new period                            
+INSERT INTO ORG_ACCT_PERIODS                                            
+     (acct_period_id, organization_id, open_flag,                    
+      period_set_name, period_year,                                  
+     period_num, period_name, description,                            
+     period_start_date, schedule_close_date,                                                              
+     creation_date, created_by,                                      
+     last_update_date, last_updated_by,                              
+      last_update_login                                              
+    )                                                                
+     values                                                          
+     (&newPeriodId, &organizationId, 'Y',                          
+      &period_set_name, &period_year,                            
+      &period_num, &period_name, &description,                    
+      &start_date,&end_date,                                                                                              
+      sysdate, &update_by,                                          
+      sysdate, &update_by,                                          
+      &login_id                                                      
+      ); 

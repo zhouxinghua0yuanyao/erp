@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<patch_metadata>
+<patch_number>26397424</patch_number>
+<product>gme</product>
+<abstract><![CDATA[discrepancy quantity between gme_resource_txns and gme_batch_step_resources]]></abstract>
+<description><![CDATA[Functional Description
+   Before: The resource usage data is mismatched between the gme_resource_txns
+           and gme_batch_step_resources table.
+
+    After: The resource usage data is matched between the gme_resource_txns  and
+           gme_batch_step_resources table.
+
+    Technical Description: NA
+
+    Reference:
+       1. LPN added to the issue/return ingredient mobile page.
+       2. New Yield Measurement details and form changes, Note 2180160.1.]]></description>
+<entity_abbreviation>gme</entity_abbreviation>
+<release>R12</release>
+<based_on><![CDATA[C]]></based_on>
+<aru_update_date>JUL-28-2017 01:45:16</aru_update_date>
+ <manual_steps>
+  <steps_available>
+   <step product="ad" location="patch/115/manualsteps" filename="ad_apply_patch.xml" 
+    version="26397424:R12.GME.C"   category="Apply The Patch">Apply patch 
+   </step> 
+  </steps_available>
+ </manual_steps>
+<introducing>
+</introducing>
+<requires>
+</requires>
+</patch_metadata>

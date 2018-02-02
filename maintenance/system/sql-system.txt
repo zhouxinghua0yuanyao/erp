@@ -1,0 +1,59 @@
+Select Shipment_number,Status_Code,a.* from CUX_DIS_TXN_SHP_ALL a Where  Shipment_number='S2016052000046'
+
+Select Shipment_number,Status_Code,a.* from CUX_DIS_TXN_SHP_ALL a Where  a.SHIPMENT_ID=18787--Shipment_number='S2016052000046'  --S2016061300273
+
+UPDATE CUX_DIS_TXN_SHP_ALL SET STATUS_CODE='CANCELLED' WHERE SHIPMENT_ID=18787
+
+
+Oracle查看锁—尽量不要使用
+
+SELECT l.session_id sid,
+       s.blocking_session block_id,
+       s.serial#,
+       l.locked_mode,
+       l.oracle_username,
+       s.user#,
+       l.os_user_name,
+       s.machine,
+       s.terminal,
+       a.sql_text,
+       a.action,
+       l.object_id,
+       o.object_name,
+       substr(s.module, instr(s.module, 'frm:') + 4),
+       s.USERNAME,
+       s.CLIENT_IDENTIFIER,
+       s.BLOCKING_SESSION_STATUS
+  FROM v$sqlarea a, v$session s, v$locked_object l, all_objects o
+ WHERE l.session_id = s.sid
+   AND s.prev_sql_addr = a.address
+   AND l.object_id = o.object_id
+ ORDER BY sid, s.serial#;
+含义：sid在等待block_id，如果确认可以把block_id的进程杀掉，可以执行
+alter system kill session 'sid, serial#'; 
+此步骤一定要慎重，尽量不要使用，尤其是正式环境！！！
+
+SELECT l.session_id      sid,
+       s.serial#,
+       l.locked_mode,
+       l.oracle_username,
+       l.os_user_name,
+       s.machine,
+       s.terminal,
+       o.object_name,
+       s.logon_time FROM  v$locked_object l,
+       all_objects       o,
+       v$session         s WHERE l.object_id = o.object_id AND l.session_id = s.sid and object_name='OE_ORDER_LINES_ALL' ORDER BY sid,
+       s.serial#;  --2518 58459
+
+
+select event,count(*) from gv$session_wait group by event order by count(*) desc;
+
+      SELECT s.sid,s.serial#,p.spid, t.sql_text FROM v$session s, v$sql t, v$process p 
+      WHERE s.event LIKE 'row cache lock' AND t.sql_id = s.sql_id AND s.PADDR = p.ADDR ; 
+
+      Alter system kill session 'SID,SERIAL#'  ; 
+
+
+
+

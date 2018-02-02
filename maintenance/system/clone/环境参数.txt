@@ -1,0 +1,148 @@
+你好，
+
+        源耀EBS正式环境已经克隆完，具体信息如下：
+
+         192.168.1.233   appsrv.yuanyao.com
+
+         applprod/applprod123
+
+ 
+
+192.168.1.235   dbsrv.yuanyao.com
+
+          oraprod/oraprod123
+
+ 
+
+          ebs url:
+
+          http://appsrv.yuanyao.com:8000
+
+          sysadmin/sysadmin*123
+
+ 
+
+          weblogic console:
+
+          http://appsrv.yuanyao.com:7002/console                        ----if fs2 is run fs
+
+          http://appsrv.yuanyao.com:7001/console                        ----if fs1 is run fs
+
+          weblogic/manager*123
+
+ 
+
+         tns:
+
+         PROD=
+
+        (DESCRIPTION= 
+
+                (ADDRESS=(PROTOCOL=tcp)(HOST=dbsrv.yuanyao.com)(PORT=1521))
+
+            (CONNECT_DATA=
+
+                (SERVICE_NAME=PROD)
+
+                (INSTANCE_NAME=PROD)
+
+            )
+
+        )
+
+        apps/apps0226 system/manager0226
+
+ 
+
+      另外，请尽快测试正式环境是否存在form进程经常掉线的问题。
+
+
+Thanks & Best Regards!
+
+======================================================
+
+吴光养
+
+Mobile：(+86) 139 2870 9638
+
+Emaill：guangyang.wu@hand-china.com
+
+HAND Enterprise Solution Co., Ltd. 
+
+上海汉得信息技术股份有限公司
+
+======================================================
+
+ 
+
+
+
+发件人: zhangheng [mailto:heng.zhang01@hand-china.com] 
+发送时间: 2016年2月23日 14:13
+收件人: guangyang.wu@hand-china.com
+抄送: zhaoneng.chen@hand-china.com; 叶融 <rong.ye01@hand-china.com>; '肖俊强' <junqiang.xiao@hand-china.com>
+主题: 【源耀生物】正式环境克隆安排
+
+ 
+
+光养兄，
+
+    我们计划本周三（2016.2.24）从UAT3环境克隆出正式环境PROD。
+
+由于周三周四都需要环境来做培训，所以咱们可以周三白天在UAT3环境安装PATCH，傍晚铲掉UAT2然后停UAT3做备份克隆。
+
+ 
+
+*注意事项：
+
+1.       克隆前，UAT3环境先安装PATCH
+
+a.       ASCP的patch 19549533
+
+b.       PO的patch 22223199
+
+c.       GMF的patch 21493563
+
+d.       GME的patch 22673485
+
+e.       请按此顺序打patch，所有patch均已上传到了$PATCH_TOP
+
+2.       由于Solaris机器的应用服务器磁盘空间不够大，克隆之前需要把UAT2环境的应用铲掉，数据库仍然保留。
+
+3.       UAT3环境备份，克隆出正式环境PROD，要求：
+
+a.       端口：8000
+
+b.       各种密码复杂化
+
+c.       域名：shyuanyao.com(之前的环境都是yuanyao.com)
+
+4.       克隆之后的PROD环境，要求：
+
+a.       帮忙增加相关表空间
+
+b.       增加OACORE个数
+
+c.       环境备份规则，请帮忙定夺
+
+ 
+
+环境信息：
+
+应用服务器：192.168.1.233
+
+数据库服务器：192.168.1.235
+
+root/root*123
+
+UAT2(8008)环境和UAT3(8004)环境：apps/apps; system/manager; weblogic/manager1
+
+可以使用VNCSERVER
+
+ 
+
+请光养兄给我们留点时间，注意下克隆时间和注意事项，随时可以联系我。
+
+ 
+
+谢谢！

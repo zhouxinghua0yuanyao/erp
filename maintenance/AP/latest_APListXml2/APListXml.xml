@@ -1,0 +1,3608 @@
+
+<!-- 
+/*=============================================================================+
+|      Copyright (c) 2007 Oracle Corporation, Redwood Shores, CA, USA          |
+|                         All rights reserved.                                 |
++==============================================================================+
+|  APListXml.xml                                                               |
+|                                                                              |
+| HISTORY                                                                      |
+|       19-Aug-2007 ppodhiya Migrated to AP                                    |
+|       16-Sep-2011 shorgan  Localization error                                |
+|       08-May-2012 shorgan  Changed Bank Account and CE Statement Reconcils   |
+|                            tables to use ac.ce_bank_acct_use_id              |
+|       24-Oct-2012 shorgan  Added data from the following tables:             |
+|                             XLA_SUBLEDGERS, XLA_LAUNCH_OPTIONS,              |
+|                             XLA_LEDGER_OPTIONS, AP_TAX_CODES_ALL,            |
+|                             GL_LEDGER_NORM_SEG_VALS                          |
+|                                                                              |
++=============================================================================*/
+$Header: APListXml.xml 12.x.support.version 2014/06/06$
+-->
+<XMLTest 
+  xmlns="http://oracle.com/support/diag/XMLDiagTest" 
+  file-name="APListXml" file-version="12.x.support.version" compatible-with="XMLEngine" 
+  compatible-with-version="3.1">
+
+  <header>
+    <groupname>Invoice</groupname>
+    <testName>Invoice Data</testName>
+    <validApplications>
+      <application appId="200"/>
+      <application appId="7000"/>
+      <application appId="7002"/>
+      <application appId="7003"/>
+      <application appId="7004"/>
+    </validApplications>
+    <classNames>
+      <className name="oracle.apps.gl.diag.GLUtility"/>
+      <className name="oracle.apps.gl.diag.GLLedger"/>
+      <className name="oracle.apps.ap.diag.APUtility"/>
+      <className name="oracle.apps.ap.diag.APSearchCriteriaLov"/>
+      <className name="oracle.apps.ap.diag.APSupplierLov"/>
+      <className name="oracle.apps.ap.diag.APInvoiceIdByTypeLov"/>
+      <className name="oracle.apps.ap.diag.YesNoLov"/>
+    </classNames>
+    <description>This diagnostic test will display all of the data for all of the 
+      tables used to processs an invoice in Payables.</description>
+    <usageDescription>This test is applicable for all invoice and payment issues.</usageDescription>
+    <parameterDescription>
+    Responsibility Id - Required.  Use the list of values to select a valid responsibility. &lt;br/>
+      Invoice Id - Required.  If the invoice id is not known, enter search criteria and optionally  
+      enter supplier name to utilize the invoice id list of values.&lt;br>
+      Choose an invoice from the list of values provided.  List of values can be further restricted 
+      by providing a partial or full document number ( or invoice id ).&lt;br/>
+      Include GL Tables - Optional.  Yes is the default value. &lt;br/>
+      Include Related Data - Optional.  Yes is the default value. &lt;br/>
+      Max Lines Displayed - Optional. 500 is the default value.
+      </parameterDescription>
+    <inputParameters>
+      <inputParam name="apSearchCriteria" dataType="String" lovClass="oracle.apps.ap.diag.APSearchCriteriaLov" 
+        displayName="Search Criteria" nullAllowed="true">
+        <sql name="SQL_IP_SEARCH" fatalResult="0">
+          <statement>
+            SELECT 1
+            FROM   DUAL
+          </statement>
+        </sql>
+      </inputParam>
+      <inputParam name="apSupplier" dataType="String" lovClass="oracle.apps.ap.diag.APSupplierLov" 
+        displayName="Supplier Name" nullAllowed="true">
+        <sql name="SQL_IP_SUPPLIER" fatalResult="0">
+          <statement>
+            SELECT 1
+            FROM   DUAL
+          </statement>
+        </sql>
+      </inputParam>
+      <inputParam name="invoiceId" dataType="BigDecimal" lovClass="oracle.apps.ap.diag.APInvoiceIdByTypeLov" 
+        displayName="Invoice Id" nullAllowed="false">
+        <api name="API_IP_INVOICE_ID" fatalResult="false">
+          <method>oracle.apps.ap.diag.APUtility.isValidInvoice</method>
+          <apiParam dataType="Report" paramNumber="1">report</apiParam>
+          <apiParam dataType="String" paramNumber="2" value="$invoiceId"/>
+        </api>
+      </inputParam>
+      <inputParam name="includeGLTables" dataType="String" lovClass="oracle.apps.ap.diag.YesNoLov" 
+        displayName="Include GL Tables" nullAllowed="true" defaultValue="Yes"> <!-- Number of Journal Lines to Display -->
+        <sql name="SQL_IP_YES_NO" fatalResult="0">
+          <statement>
+            SELECT 1
+            FROM   DUAL
+          </statement>
+        </sql>
+      </inputParam>
+      <inputParam name="includeRelatedData" dataType="String" lovClass="oracle.apps.ap.diag.YesNoLov" 
+        displayName="Include Related Data" nullAllowed="true" defaultValue="Yes"> <!-- Number of Journal Lines to Display -->
+        <sql name="SQL_IP_YES_NO2" fatalResult="0">
+          <statement>
+            SELECT 1
+            FROM   DUAL
+          </statement>
+        </sql>
+      </inputParam>
+      <inputParam name="maxRowsDisplay" dataType="BigDecimal"  
+        displayName="Max Rows Displayed" nullAllowed="true" defaultValue="500"> <!-- Max Rows to Display -->
+        <sql name="SQL_IP_MAX_ROWS" fatalResult="0">
+          <statement>
+            SELECT 1
+            FROM   DUAL
+          </statement>
+        </sql>
+      </inputParam>
+    </inputParameters>
+  </header>
+
+  <sql name="SQL_INVOICE_ORG" actionType="storeOnly" saveAllColumns="true">
+    <statement>SELECT NVL(org_id, -99) org_id
+     FROM     AP_INVOICES_ALL
+     WHERE    invoice_id = :1 
+    </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+  </sql>
+
+  <sql name="SQL_LEDGER" actionType="storeOnly" saveAllColumns="true">
+    <statement>SELECT set_of_books_id ledger_id
+      FROM     AP_SYSTEM_PARAMETERS_ALL
+      WHERE    NVL(org_id, -99) = :1 
+    </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+  </sql>
+  
+  <sql name="SQL_COA" actionType="storeOnly" saveAllColumns="true">
+    <statement>SELECT chart_of_accounts_id
+      FROM     GL_LEDGERS
+      WHERE    ledger_id = :1 
+    </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_LEDGER.ledger_id"/>
+  </sql>
+
+  <api name="GL_PRIMARY_LEDGERS">
+    <method>oracle.apps.gl.diag.GLUtility.displayLedger</method>
+    <apiParam dataType="Report" paramNumber="1">report</apiParam>
+    <apiParam dataType="BigDecimal" paramNumber="2" value="$SQL_LEDGER.ledger_id"/>
+  </api>
+
+  <api name="GL_SECONDARY_LEDGERS">
+    <method>oracle.apps.gl.diag.GLUtility.displaySecondaryLedgers</method>
+    <apiParam dataType="Report" paramNumber="1">report</apiParam>
+    <apiParam dataType="BigDecimal" paramNumber="2" value="$SQL_LEDGER.ledger_id"/>
+    <apiParam dataType="boolean" paramNumber="3">true</apiParam>
+  </api>
+
+  <section title="Setup">
+    <sql name="SQL_AP_SYSTEM_PARAMETERS">
+      <statement>
+        SELECT   * 
+        FROM     AP_SYSTEM_PARAMETERS_ALL 
+        WHERE    NVL(org_id, -99) = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+      <tableHeading>AP_SYSTEM_PARAMETERS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_FINANCIALS_SYSTEM_PARAMS">
+      <statement>
+        SELECT   * 
+        FROM     FINANCIALS_SYSTEM_PARAMS_ALL 
+        WHERE    NVL(org_id, -99) = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+      <tableHeading>FINANCIALS_SYSTEM_PARAMS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_HR_OPERATING_UNITS">
+      <statement>
+        SELECT   *
+        FROM     HR_OPERATING_UNITS
+        WHERE    organization_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+      <tableHeading>HR_OPERATING_UNITS</tableHeading>
+    </sql>
+
+    <sql name="SQL_LEDGERS_2">
+      <statement>
+         select distinct gl.* 
+ from ap_invoices_all ai, gl_ledgers gl, gl_ledger_relationships glr1, 
+ gl_ledger_relationships glr2, 
+  gl_ledger_relationships glr3 
+ where glr3.source_ledger_id = ai.set_of_books_id 
+ and ai.invoice_id = :1 
+ and glr3.source_ledger_id = glr2.primary_ledger_id 
+ and glr2.target_ledger_id = glr1.primary_ledger_id 
+ and gl.ledger_id = glr1.source_ledger_id  
+      </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>GL_LEDGERS</tableHeading>
+    </sql>
+    
+<sql name="SQL_XLA_LEDGER_OPTIONS">
+     <statement>
+SELECT DISTINCT gl.*
+FROM ap_invoices_all ai,
+  XLA_LEDGER_OPTIONS gl,
+  gl_ledger_relationships glr1,
+  gl_ledger_relationships glr2,
+  gl_ledger_relationships glr3
+WHERE glr3.source_ledger_id = ai.set_of_books_id
+AND ai.invoice_id           = :1
+AND glr3.source_ledger_id   = glr2.primary_ledger_id
+AND glr2.target_ledger_id   = glr1.primary_ledger_id
+AND gl.ledger_id            = glr1.source_ledger_id
+AND gl.application_id = 200
+ORDER BY gl.ledger_id
+      </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_LEDGER_OPTIONS</tableHeading>
+</sql>
+
+<sql name="SQL_XLA_LAUNCH_OPTIONS">
+     <statement>
+SELECT DISTINCT gl.*
+FROM ap_invoices_all ai,
+  XLA_LAUNCH_OPTIONS gl,
+  gl_ledger_relationships glr1,
+  gl_ledger_relationships glr2,
+  gl_ledger_relationships glr3
+WHERE glr3.source_ledger_id = ai.set_of_books_id
+AND ai.invoice_id           = :1
+AND glr3.source_ledger_id   = glr2.primary_ledger_id
+AND glr2.target_ledger_id   = glr1.primary_ledger_id
+AND gl.ledger_id            = glr1.source_ledger_id
+AND gl.application_id = 200
+ORDER BY gl.ledger_id
+      </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_LAUNCH_OPTIONS</tableHeading>
+</sql>
+
+<sql name="SQL_XLA_SUBLEDGERS">
+     <statement>
+SELECT DISTINCT *
+FROM XLA_SUBLEDGERS
+WHERE application_id = 200
+      </statement>
+       <tableHeading>XLA_SUBLEDGERS</tableHeading>
+</sql>
+    
+	 <sql name="SQL_GL_LEDGER_CONFIG_DETAILS">
+      <statement>
+       select distinct glcd2.* 
+ from ap_invoices_all ai, GL_LEDGER_CONFIG_DETAILS glcd1, 
+ GL_LEDGER_CONFIG_DETAILS glcd2   
+ where ai.legal_entity_id = glcd1.object_id 
+ and glcd1.configuration_id = glcd2.configuration_id 
+ and glcd1.object_type_code = 'LEGAL_ENTITY' 
+ and ai.invoice_id = :1 
+ order by glcd2.object_id
+      </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>GL_LEDGER_CONFIG_DETAILS</tableHeading>
+    </sql>
+		 <sql name="SQL_GL_LEDGER_RELATIONSHIPS">
+      <statement>
+ select distinct glr1.* 
+ from ap_invoices_all ai, gl_ledgers gl, gl_ledger_relationships glr1, 
+  gl_ledger_relationships glr2, 
+   gl_ledger_relationships glr3 
+ where glr3.source_ledger_id = ai.set_of_books_id 
+ and ai.invoice_id = :1 
+ and glr3.source_ledger_id = glr2.primary_ledger_id 
+ and glr2.target_ledger_id = glr1.primary_ledger_id 
+ and gl.ledger_id = glr1.source_ledger_id
+      </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>GL_LEDGER_RELATIONSHIPS</tableHeading>
+    </sql>
+
+<sql name="SQL_GL_LEGAL_ENTITIES_BSVS">
+      <statement>
+SELECT * 
+ FROM GL_LEGAL_ENTITIES_BSVS 
+ WHERE legal_entity_id IN ( 
+ select distinct glcd2.object_id 
+ from ap_invoices_all ai, GL_LEDGER_CONFIG_DETAILS glcd1, 
+ GL_LEDGER_CONFIG_DETAILS glcd2 
+ where ai.legal_entity_id = glcd1.object_id 
+ and glcd1.configuration_id = glcd2.configuration_id 
+ and glcd1.object_type_code = 'LEGAL_ENTITY' 
+ and ai.invoice_id = :1 
+ and glcd1.object_type_code = glcd2.object_type_code)
+      </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>GL_LEGAL_ENTITIES_BSVS</tableHeading>
+    </sql>
+
+<sql name="SQL_LEDGER_SEG_VALS">
+     <statement>
+SELECT DISTINCT gl.*
+FROM ap_invoices_all ai,
+  GL_LEDGER_NORM_SEG_VALS gl,
+  gl_ledger_relationships glr1,
+  gl_ledger_relationships glr2,
+  gl_ledger_relationships glr3
+WHERE glr3.source_ledger_id = ai.set_of_books_id
+AND ai.invoice_id           = :1
+AND glr3.source_ledger_id   = glr2.primary_ledger_id
+AND glr2.target_ledger_id   = glr1.primary_ledger_id
+AND gl.ledger_id            = glr1.source_ledger_id
+ORDER BY gl.ledger_id
+      </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>GL_LEDGER_NORM_SEG_VALS</tableHeading>
+</sql>
+
+    <sql name="SQL_XLE_ENTITY_PROFILES">
+      <statement>
+      SELECT * 
+ FROM XLE_ENTITY_PROFILES 
+ WHERE legal_entity_id IN ( 
+ select distinct glcd2.object_id 
+ from ap_invoices_all ai, GL_LEDGER_CONFIG_DETAILS glcd1, 
+ GL_LEDGER_CONFIG_DETAILS glcd2   
+ where ai.legal_entity_id = glcd1.object_id 
+ and glcd1.configuration_id = glcd2.configuration_id 
+ and glcd1.object_type_code = 'LEGAL_ENTITY' 
+ and ai.invoice_id = :1 
+ and glcd1.object_type_code = glcd2.object_type_code 
+ )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLE_ENTITY_PROFILES</tableHeading>
+    </sql>
+
+    <sql name="SQL_FND_PRODUCT_INSTALLATIONS">
+      <statement>
+        SELECT   * 
+        FROM     FND_PRODUCT_INSTALLATIONS 
+        WHERE    application_id = 200
+      </statement>
+      <tableHeading>FND_PRODUCT_INSTALLATIONS</tableHeading>
+    </sql>
+
+    <sql name="SQL_FND_PRODUCT_GROUPS">
+      <statement>
+        SELECT   *
+        FROM     FND_PRODUCT_GROUPS
+      </statement>
+      <tableHeading>FND_PRODUCT_GROUPS</tableHeading>
+    </sql>
+  </section>
+
+  <section title="Summary">
+    <sql name="SQL_AP_INVOICES_ALL_KEY">
+      <statement>
+        SELECT   ai.invoice_id, 
+                 substr(ai.invoice_num,1,25)     invoice_num,
+                 substr(aps.vendor_name,1,25)    vendor_name, 
+                 ai.invoice_date, 
+                 ai.invoice_amount, 
+                 ai.base_amount, 
+                 substr(ai.invoice_type_lookup_code,1,15)  invoice_type_lookup_code, 
+                 substr(ai.invoice_currency_code,1,3)      invoice_currency_code, 
+                 substr(ai.payment_currency_code,1,3)      payment_currency_code, 
+                 ai.legal_entity_id, 
+                 ai.org_id 
+        FROM     AP_INVOICES_ALL ai, 
+                 AP_SUPPLIERS aps, 
+                 AP_SUPPLIER_SITES_ALL avs 
+        WHERE    ai.invoice_id = :1 
+        AND      ai.vendor_id = aps.vendor_id(+) 
+        AND      ai.vendor_site_id = avs.vendor_site_id(+) 
+        ORDER BY ai.invoice_id asc
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICES_ALL Key Columns</tableHeading>
+    </sql>
+    <message type="attention">The above result contains a join to the AP_SUPPLIERS 
+      table to retrieve the supplier name
+    </message>
+
+    <sql name="SQL_AP_INVOICE_LINES_ALL_KEY">
+      <statement>
+        SELECT   line_number, 
+	         line_type_lookup_code, 
+	         line_source,accounting_date, 
+	         period_name, amount,
+	         summary_tax_line_id,
+	         deferred_acctg_flag, 
+	         org_id 
+	FROM     AP_INVOICE_LINES_ALL 
+	WHERE    invoice_id = :1 
+	order by line_number asc
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICE_LINES_ALL Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_INVOICE_DISTRIBUTIONS_ALL_KEY">
+      <statement>
+              
+	SELECT   invoice_id, 
+	 invoice_line_number,
+	 substr(distribution_line_number,1,8)  distribution_line_number,  
+	 substr(line_type_lookup_code,1,9)     line_type_lookup_code,  
+	 accounting_date, 
+	 period_name, 
+	 amount, 
+	 base_amount, 
+	 posted_flag,
+	 match_status_flag,
+	 encumbered_flag,
+	 historical_flag,
+	 substr(dist_code_combination_id,1,15) dist_code_combination_id, 
+	 substr(accounting_event_id,1,15)      accounting_event_id,
+	 substr(bc_event_id,1,15)              bc_event_id,
+	 substr(invoice_distribution_id,1,15)  invoice_distribution_id, 
+	 substr(parent_reversal_id,1,15)       parent_reversal_id, 
+	 substr(po_distribution_id,1,15)       po_distribution_id, 
+	 summary_tax_line_id, detail_tax_dist_id,
+	 org_id  
+	FROM     AP_INVOICE_DISTRIBUTIONS_ALL 
+	WHERE    invoice_id = :1 
+	ORDER BY invoice_line_number, distribution_line_number asc
+	
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICE_DISTRIBUTIONS_ALL Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_PAYMENT_SCHEDULES_ALL_KEY">
+      <statement>
+        SELECT   amount_remaining, 
+                 batch_id, 
+                 due_date,  
+                 gross_amount, 
+                 hold_flag, 
+                 invoice_id,   
+                 payment_num, 
+                 substr(payment_status_flag,1,1) payment_status_flag, 
+                 org_id 
+        FROM     AP_PAYMENT_SCHEDULES_ALL 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PAYMENT_SCHEDULES_ALL Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_HOLDS_ALL_KEY">
+      <statement>
+        SELECT   held_by, 
+                 hold_date, 
+                 hold_lookup_code, 
+                 substr(hold_reason,1,25) hold_reason, 
+                 invoice_id, 
+                 release_lookup_code, 
+                 substr(release_reason,1,25) release_reason, 
+                 status_flag, 
+                 org_id 
+        FROM     AP_HOLDS_ALL  
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_HOLDS_ALL Key Columns</tableHeading>
+    </sql>
+  
+    <sql name="SQL_AP_DOCUMENTS_PAYABLE_KEY">
+      <statement>
+        SELECT   pay_proc_trxn_type_code, 
+                 calling_app_doc_unique_ref1  check_id, 
+                 calling_app_doc_unique_ref2  invoice_id, 
+                 calling_app_doc_unique_ref4  invoice_payment_id, 
+                 calling_app_doc_ref_number   invoice_number, 
+                 payment_function, 
+                 payment_date, 
+                 document_date, 
+                 document_type, 
+                 payment_currency_code, 
+                 payment_amount, 
+                 payment_method_code 
+        FROM     AP_DOCUMENTS_PAYABLE 
+        WHERE    calling_app_id = 200 
+        AND      calling_app_doc_unique_ref2 = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_DOCUMENTS_PAYABLE Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_INVOICE_PAYMENTS_ALL_KEY">
+      <statement>
+        SELECT   check_id, 
+                 substr(invoice_payment_id,1,15) invoice_payment_id,  
+                 amount, 
+                 payment_base_amount, 
+                 invoice_base_amount,
+                 accounting_date, 
+                 period_name, 
+                 posted_flag, 
+                 accounting_event_id, 
+                 invoice_id, 
+                 org_id 
+        FROM     AP_INVOICE_PAYMENTS_ALL  
+        WHERE    invoice_id = :1 
+        ORDER BY check_id asc
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICE_PAYMENTS_ALL Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_CHECKS_ALL_KEY">
+      <statement>
+        SELECT   check_id, 
+                 check_number, 
+                 vendor_site_code, 
+                 amount, 
+                 base_amount, 
+                 checkrun_id, 
+                 checkrun_name, 
+                 check_date, 
+                 substr(status_lookup_code,1,15) status_lookup_code, 
+                 void_date, 
+                 org_id         
+        FROM     AP_CHECKS_ALL 
+        WHERE    check_id IN 
+               ( SELECT distinct check_id 
+                 FROM   AP_INVOICE_PAYMENTS_ALL  
+                 WHERE  invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_CHECKS_ALL Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_PAYMENT_HISTORY_ALL_KEY">
+      <statement>
+        SELECT   payment_history_id, 
+                 check_id, 
+                 accounting_date, 
+                 substr(transaction_type,1,20)    transaction_type, 
+                 posted_flag,  
+                 substr(accounting_event_id,1,10) accounting_event_id,  
+                 rev_pmt_hist_id,  
+                 org_id 
+        FROM     AP_PAYMENT_HISTORY_ALL 
+        WHERE    check_id IN 
+               ( SELECT distinct check_id  
+                 FROM   AP_INVOICE_PAYMENTS_ALL  
+                 WHERE  invoice_id =  :1 )  
+        ORDER BY payment_history_id asc
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PAYMENT_HISTORY_ALL Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_SELECTED_INVOICES_ALL_KEY">
+      <statement>
+        SELECT   checkrun_name, 
+                payment_num, 
+                payment_amount, 
+                ok_to_pay_flag, 
+                dont_pay_reason_code, 
+                substr(vendor_name,1,25) vendor_name, 
+                substr(vendor_site_code,1,25) vendor_site_code, 
+                pay_selected_check_id, 
+                print_selected_check_id, 
+                org_id 
+       FROM     AP_SELECTED_INVOICES_ALL  
+       WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_SELECTED_INVOICES_ALL Key Columns</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_SELECTED_INVOICE_CHECKS_ALL_KEY">
+      <statement>
+        SELECT   asic.checkrun_name, 
+                 asic.check_number, 
+                 asic.check_amount, 
+                 asic.ok_to_pay_flag, 
+                 asic.dont_pay_reason_code, 
+                 asic.status_lookup_code, 
+                 substr(asic.vendor_name,1,25) vendor_name, 
+                 substr(asic.vendor_site_code,1,25) vendor_site_code, 
+                 asic.check_id, 
+                 asic.selected_check_id, 
+                 asic.org_id 
+        FROM     AP_SELECTED_INVOICE_CHECKS_ALL asic, 
+                 AP_SELECTED_INVOICES_ALL asi  
+        WHERE    asi.invoice_id = :1 
+        AND      ( asic.selected_check_id = asi.pay_selected_check_id 
+                 OR asic.selected_check_id = asi.print_selected_check_id )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_SELECTED_INVOICE_CHECKS_ALL Key Columns</tableHeading>
+    </sql>
+  </section>
+
+  <section title="Invoice" description="Several of the query results below have 
+    added account columns showing the account segment values.  These columns 
+    were added to show the corresponding account value for tables with code combination ids.">
+
+    <sql name="SQL_AP_BATCHES_ALL">
+      <statement>
+        SELECT   * 
+        FROM     AP_BATCHES_ALL 
+        WHERE    batch_id IN 
+                 ( SELECT batch_id FROM AP_INVOICES_ALL WHERE invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_BATCHES_ALL</tableHeading>
+    </sql>
+
+    <if test="$includeRelatedData = 'Yes'">
+      <then>
+        <sql name="SQL_AP_INVOICES_ALL_RELATED" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct ai.*, 
+                     fnd_flex_ext.get_segs('SQLGL','GL#', :1 , ai.accts_pay_code_combination_id) "Accts Pay Account" 
+            FROM     AP_INVOICES_ALL ai 
+            WHERE    ai.invoice_id IN 
+                   ( SELECT   aip.invoice_id 
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip, 
+                              AP_INVOICE_PAYMENTS_ALL aip2 
+                     WHERE    aip.check_id = aip2.check_id 
+                     AND      aip2.invoice_id = :2 
+                     UNION 
+                     SELECT   :3 FROM dual ) 
+            ORDER BY ai.invoice_id asc
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>AP_INVOICES_ALL</tableHeading>
+        </sql>
+      </then>
+      <else>
+        <sql name="SQL_AP_INVOICES_ALL" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   ai.* , 
+                     fnd_flex_ext.get_segs('SQLGL','GL#', :1 , ai.accts_pay_code_combination_id) "Accts Pay Account" 
+            FROM     AP_INVOICES_ALL ai 
+            WHERE    invoice_id = :2 
+            ORDER BY invoice_id asc
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>AP_INVOICES_ALL</tableHeading>
+        </sql>
+      </else>
+    </if>
+
+    <sql name="SQL_AP_INVOICE_LINES_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_INVOICE_LINES_ALL 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICE_LINES</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_INVOICE_DISTRIBUTIONS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   aid.*, 
+                 fnd_flex_ext.get_segs('SQLGL','GL#', :1 , aid.accts_pay_code_combination_id) "Accts Pay Account", 
+                 fnd_flex_ext.get_segs('SQLGL','GL#', :2 , aid.dist_code_combination_id) "Dist Account"   
+        FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid 
+        WHERE    aid.invoice_id = :3 
+        ORDER BY aid.invoice_id, aid.invoice_line_number, aid.distribution_line_number asc
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+      <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICE_DISTRIBUTIONS_ALL</tableHeading>
+    </sql>
+
+<api name="API_VALID_OBJECT_AP_AIDH">
+      <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getObjectExists</method>
+      <apiParam dataType="Report" paramNumber="1">report</apiParam>
+      <apiParam dataType="String" paramNumber="2">AP_INVOICE_DISTS_ARCH</apiParam>
+      <apiParam dataType="String" paramNumber="3">AP</apiParam>
+</api>
+<if test="$API_VALID_OBJECT_AP_AIDH">
+	<then>
+	  <sql name="SQL_AP_AIDH_COUNT" actionType="storeOnly" saveAllColumns="true">
+		<statement>
+		select count(*) count
+		from ap_invoice_dists_arch
+		WHERE invoice_id = :1 
+	    </statement>
+		<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	      </sql>
+
+		<if test="$SQL_AP_AIDH_COUNT.count > 0">
+		        <then>
+			    <sql name="SQL_AP_AIDH" maxDisplayRows="$maxRowsDisplay">
+			      <statement>
+					select aidh.*,
+					fnd_flex_ext.get_segs('SQLGL','GL#', :1 , aidh.accts_pay_code_combination_id) "Accts Pay Account", 
+			                fnd_flex_ext.get_segs('SQLGL','GL#', :2 , aidh.dist_code_combination_id) "Dist Account"   
+					from ap_invoice_dists_arch aidh
+					WHERE aidh.invoice_id = :3
+					ORDER BY aidh.invoice_distribution_id, aidh.invoice_line_number, 
+					aidh.distribution_line_number asc			      
+			      </statement>
+				      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+				      <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+				      <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+			      <tableHeading>AP_INVOICE_DISTS_ARCH</tableHeading>
+			    </sql>
+			</then>
+		</if>
+	</then>
+</if>
+
+
+    <sql name="SQL_ZX_LINES" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     ZX_LINES 
+        WHERE    application_id = 200 
+        AND      entity_code = 'AP_INVOICES' 
+        AND      trx_id = :1 
+        AND      event_class_code in ('STANDARD INVOICES' , 'PREPAYMENT INVOICES', 'EXPENSE REPORTS')
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>ZX_LINES</tableHeading>
+    </sql>
+	    <sql name="SQL_ZX_LINES_SUMMARY" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     zx_lines_summary 
+        WHERE    application_id = 200
+		AND      entity_code = 'AP_INVOICES' 
+        AND      trx_id = :1 
+        AND      event_class_code in ('STANDARD INVOICES' , 'PREPAYMENT INVOICES', 'EXPENSE REPORTS')
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>ZX_LINES_SUMMARY</tableHeading>
+    </sql>
+	    <sql name="SQL_ZX_REC_NREC_DIST" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     zx_rec_nrec_dist 
+        WHERE    application_id = 200
+		AND      entity_code = 'AP_INVOICES' 
+        AND      trx_id = :1 
+        AND      event_class_code in ('STANDARD INVOICES' , 'PREPAYMENT INVOICES', 'EXPENSE REPORTS')
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>ZX_REC_NREC_DIST</tableHeading>
+    </sql>
+	    <sql name="SQL_ZX_LINES_DET_FACTORS" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     zx_lines_det_factors 
+        WHERE    application_id = 200
+		AND      entity_code = 'AP_INVOICES' 
+        AND      trx_id = :1 
+        AND      event_class_code in ('STANDARD INVOICES' , 'PREPAYMENT INVOICES', 'EXPENSE REPORTS')
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>ZX_LINES_DET_FACTORS</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_PAYMENT_SCHEDULES_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_PAYMENT_SCHEDULES_ALL 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PAYMENT_SCHEDULES_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_RECURRING_PAYMENTS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+	select distinct arp.*
+	from ap_recurring_payments_all arp, 
+	ap_invoices_all ai
+	where ai.recurring_payment_id = arp.recurring_payment_id
+	and ai.invoice_id = :1;
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_RECURRING_PAYMENTS_ALL</tableHeading>
+    </sql>
+
+
+    <sql name="SQL_AP_HOLDS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_HOLDS_ALL 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_HOLDS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_HOLD_CODES" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_HOLD_CODES 
+        WHERE    hold_lookup_code IN 
+               ( SELECT   hold_lookup_code 
+                 FROM     AP_HOLDS_ALL 
+                 WHERE    invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_HOLD_CODES</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_TERMS" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_TERMS 
+        WHERE    term_id IN 
+               ( SELECT   distinct terms_id 
+                 FROM     AP_INVOICES_ALL 
+                 WHERE    invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_TERMS</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_TERMS_LINES" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_TERMS_LINES 
+        WHERE    term_id IN 
+               ( SELECT   distinct terms_id 
+                 FROM     AP_INVOICES_ALL 
+                 WHERE    invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_TERMS_LINES</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_INVOICE_PREPAYS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_INVOICE_PREPAYS_ALL 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICE_PREPAYS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_CHRG_ALLOCATIONS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   distinct aca.* 
+        FROM     AP_CHRG_ALLOCATIONS_ALL aca, 
+                 AP_INVOICE_DISTRIBUTIONS_ALL aid 
+        WHERE  ( aca.charge_dist_id = aid.invoice_distribution_id 
+              OR aca.item_dist_id   = aid.invoice_distribution_id ) 
+        AND      aid.invoice_id = :1 
+        ORDER BY aca.charge_dist_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_CHRG_ALLOCATIONS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_INV_APRVL_HIST_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * FROM AP_INV_APRVL_HIST_ALL 
+        WHERE    invoice_id = :1 
+        ORDER BY 1
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INV_APRVL_HIST_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_ALLOCATION_RULES" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_ALLOCATION_RULES 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_ALLOCATION_RULES</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_ALLOCATION_RULE_LINES" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_ALLOCATION_RULE_LINES 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_ALLOCATION_RULE_LINES</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_SELF_ASSESSED_TAX_DIST_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_SELF_ASSESSED_TAX_DIST_ALL 
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_SELF_ASSESSED_TAX_DIST_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_INVOICE_RELATIONSHIPS" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_INVOICE_RELATIONSHIPS  
+        WHERE    original_invoice_id = :1  
+        OR       related_invoice_id  = :2 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INVOICE_RELATIONSHIPS</tableHeading>
+    </sql>
+  </section>
+  
+  <section title="Payment" description="Several of the query results below have added 
+    account columns showing the account segment values.  These columns were added to 
+    show the corresponding account value for tables with code combination ids.">
+
+    <sql name="SQL_AP_DOCUMENTS_PAYABLE" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_DOCUMENTS_PAYABLE 
+        WHERE    calling_app_id = 200 
+        AND      calling_app_doc_unique_ref2 = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_DOCUMENTS_PAYABLE</tableHeading>
+    </sql>
+
+    <if test="$includeRelatedData = 'Yes'">
+      <then>
+        <sql name="SQL_AP_INVOICE_PAYMENTS_ALL_RELATED" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct aip.*, 
+                     fnd_flex_ext.get_segs('SQLGL','GL#', :1 , aip.accts_pay_code_combination_id) "Accts Pay Account" 
+            FROM     AP_INVOICE_PAYMENTS_ALL aip,  
+                     AP_INVOICE_PAYMENTS_ALL aip2 
+            WHERE    aip2.check_id = aip.check_id 
+            AND      aip2.invoice_id = :2 
+            ORDER BY aip.check_id asc, aip.invoice_payment_id asc 
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>AP_INVOICE_PAYMENTS_ALL</tableHeading>
+        </sql>
+      </then>
+      <else>
+        <sql name="SQL_AP_INVOICE_PAYMENTS_ALL" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   aip.*, 
+                     fnd_flex_ext.get_segs('SQLGL','GL#', :1 , aip.accts_pay_code_combination_id) "Accts Pay Account" 
+            FROM     AP_INVOICE_PAYMENTS_ALL aip 
+            WHERE    aip.invoice_id = :2 
+            ORDER BY aip.check_id asc, aip.invoice_payment_id asc
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>AP_INVOICE_PAYMENTS_ALL</tableHeading>
+        </sql>
+      </else>
+    </if>
+
+    <sql name="SQL_AP_CHECKS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_CHECKS_ALL 
+        WHERE    check_id IN 
+               ( SELECT   check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_CHECKS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_PAYMENT_DISTRIBUTIONS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   tab.* 
+        FROM     AP_INVOICE_PAYMENTS_ALL aip, 
+                 AP_PAYMENT_DISTRIBUTIONS_ALL tab 
+        WHERE    aip.invoice_payment_id = tab.invoice_payment_id 
+        AND      aip.invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PAYMENT_DISTRIBUTIONS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_PAYMENT_HISTORY_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_PAYMENT_HISTORY_ALL 
+        WHERE    check_id IN 
+               ( SELECT   distinct check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :1 ) 
+        ORDER BY accounting_event_id asc
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PAYMENT_HISTORY_ALL</tableHeading>
+    </sql>
+
+<if test="$includeRelatedData = 'Yes'">
+          <then>
+         <sql name="SQL_AP_PAYMENT_HIST_DISTS_RELATED" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+          
+              
+      		SELECT  distinct aphd.* 
+                FROM     ap_payment_hist_dists aphd,
+                AP_PAYMENT_HISTORY_ALL aph 
+                WHERE aph.payment_history_id = aphd.payment_history_id
+                and aph.check_id IN 
+                               ( SELECT   distinct check_id 
+                                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                                 WHERE    invoice_id = :1 ) 
+                ORDER BY aphd.payment_history_id asc
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>AP_PAYMENT_HIST_DISTS</tableHeading>
+    </sql>
+  	  </then>
+	      <else>
+	    <sql name="SQL_AP_PAYMENT_HIST_DISTS" maxDisplayRows="$maxRowsDisplay">
+	      <statement>
+
+
+		SELECT   aphd.* 
+		FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid, 
+			 AP_PAYMENT_HIST_DISTS aphd, 
+			 AP_PAYMENT_HISTORY_ALL aph 
+		WHERE    aid.invoice_id = :1 
+		AND      aid.invoice_distribution_id = aphd.invoice_distribution_id   
+		AND      aph.payment_history_id = aphd.payment_history_id
+		ORDER BY aphd.payment_history_id asc
+	      </statement>
+	      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	      <tableHeading>AP_PAYMENT_HIST_DISTS</tableHeading>
+	    </sql>
+            </else>
+</if>
+
+    <sql name="SQL_AP_INV_SELECTION_CRITERIA_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+      
+      SELECT   *
+      FROM     AP_INV_SELECTION_CRITERIA_ALL
+      WHERE    checkrun_name IN
+              ( SELECT   checkrun_name
+              FROM     AP_CHECKS_ALL
+              WHERE    check_id IN
+                 ( SELECT   check_id
+                 FROM     AP_INVOICE_PAYMENTS_ALL
+           WHERE    invoice_id = :1 ) )
+      
+        
+      </statement>
+       <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_INV_SELECTION_CRITERIA_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_SELECTED_INVOICES_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   *  
+        FROM     AP_SELECTED_INVOICES_ALL  
+        WHERE    invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_SELECTED_INVOICES_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_SELECTED_INVOICE_CHECKS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   asic.* 
+        FROM     AP_SELECTED_INVOICE_CHECKS_ALL asic, 
+                 AP_SELECTED_INVOICES_ALL asi  
+        WHERE    asi.invoice_id = :1 
+        AND    ( asic.selected_check_id = asi.pay_selected_check_id 
+              OR asic.selected_check_id = print_selected_check_id )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_SELECTED_INVOICE_CHECKS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_IBY_DOCS_PAYABLE_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     IBY_DOCS_PAYABLE_ALL 
+        WHERE    calling_app_id = 200 
+        AND      calling_app_doc_unique_ref2 = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>IBY_DOCS_PAYABLE_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_IBY_PAYMENTS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   *   
+        FROM     IBY_PAYMENTS_ALL 
+        WHERE    payment_id IN 
+               ( SELECT   payment_id 
+                 FROM     IBY_DOCS_PAYABLE_ALL 
+                 WHERE    calling_app_id = 200 
+                 AND      calling_app_doc_unique_ref2 = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>IBY_PAYMENTS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_IBY_PAY_INSTRUCTIONS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     IBY_PAY_INSTRUCTIONS_ALL  
+        WHERE    payment_instruction_id IN 
+               ( SELECT   payment_instruction_id 
+                 FROM     IBY_PAYMENTS_ALL 
+                 WHERE    payment_id IN 
+               ( SELECT   payment_id 
+                 FROM     IBY_DOCS_PAYABLE_ALL 
+                 WHERE    calling_app_id = 200 
+                 AND      calling_app_doc_unique_ref2 = :1 ) )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>IBY_PAY_INSTRUCTIONS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_RECON_DISTRIBUTIONS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   * 
+        FROM     AP_RECON_DISTRIBUTIONS_ALL 
+        WHERE    check_id IN 
+               ( SELECT   check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_RECON_DISTRIBUTIONS_ALL</tableHeading>
+    </sql>
+
+  </section>
+  
+  <section title="Withholding Tax">
+  
+  <api name="API_VALID_COLUMN_AP_PAY_AWT">
+        <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getColumnExists</method>
+        <apiParam dataType="Report" paramNumber="1">report</apiParam>
+        <apiParam dataType="String" paramNumber="2">PAY_AWT_GROUP_ID</apiParam>
+        <apiParam dataType="String" paramNumber="3">AP_INVOICES_ALL</apiParam>
+  </api>
+  
+  <if test="$API_VALID_COLUMN_AP_PAY_AWT">
+  	<then>
+	<sql name="SQL_AP_AWT_TAX_RATES" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+                   select distinct awt.*
+		                 from   ap_tax_codes_all atc,
+		                        ap_awt_tax_rates_all awt
+		                 where  awt.tax_name = atc.name
+		                   and  atc.tax_id in (select distinct aid.tax_code_id tax_code_id
+		                                       from   ap_invoice_distributions_all aid,
+		                                              ap_tax_codes_all atc
+		                                       where  aid.tax_code_id = atc.tax_id
+		                                         and  aid.tax_code_id is not null
+		                                         and  atc.tax_type = 'AWT'
+		                                         and  aid.invoice_id = :1)
+		                 UNION
+		                 select distinct awt.* 
+		                 from   ap_awt_tax_rates_all awt
+		                 where  awt.tax_rate_id in (select distinct aid.awt_tax_rate_id
+		                                            from   ap_invoice_distributions_all aid
+		                                            where  aid.awt_tax_rate_id is not null
+                                           and  aid.invoice_id = :2)
+                   
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_AWT_TAX_RATES</tableHeading>
+    </sql>
+  
+  <sql name="SQL_AP_TAX_CODES" maxDisplayRows="$maxRowsDisplay">
+        <statement>
+        SELECT DISTINCT atc.*
+	FROM ap_invoice_distributions_all aid,
+	  ap_tax_codes_all atc
+	WHERE aid.tax_code_id = atc.tax_id
+	AND aid.tax_code_id  IS NOT NULL
+	AND atc.tax_type      = 'AWT'
+	AND aid.invoice_id    = :1
+        </statement>
+        <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+        <tableHeading>AP_TAX_CODES_ALL</tableHeading>
+    </sql>
+    
+      	<sql name="SQL_AP_AWT_GROUPS" maxDisplayRows="$maxRowsDisplay">
+              <statement>
+                                    select distinct awt.*
+      		                       from   ap_awt_groups awt
+      		                       where  awt.group_id in (select distinct aid.awt_group_id
+      		                                               from   ap_invoice_distributions_all aid
+      		                                               where  aid.awt_group_id is not null
+      		                                                 and  aid.invoice_id = :1
+      		                                                 UNION
+                                                        select distinct aid.pay_awt_group_id
+      		                                               from   ap_invoice_distributions_all aid
+      		                                               where  aid.pay_awt_group_id is not null
+      		                                                 and  aid.invoice_id = :2
+      		                                                 UNION
+                                                        select distinct ai.awt_group_id
+      		                                               from   ap_invoices_all ai
+      		                                               where  ai.awt_group_id is not null
+      		                                                 and  ai.invoice_id = :3
+      		                                                 UNION
+                                                        select distinct ai.pay_awt_group_id
+      		                                               from   ap_invoices_all ai
+      		                                               where  ai.pay_awt_group_id is not null
+      		                                                 and  ai.invoice_id = :4)
+              </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+              <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+              <sqlParam bindTo="4" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>AP_AWT_GROUPS</tableHeading>
+          </sql>
+          
+          <sql name="SQL_AP_AWT_GROUP_TAXES" maxDisplayRows="$maxRowsDisplay">
+                    <statement>
+                         select distinct awt.*
+      		                    from   AP_AWT_GROUP_TAXES_ALL awt
+      		                          where  awt.group_id in (select distinct aid.awt_group_id
+      		                                               from   ap_invoice_distributions_all aid
+      		                                               where  aid.awt_group_id is not null
+      		                                                 and  aid.invoice_id = :1
+                                                        UNION
+                                                        select distinct aid.pay_awt_group_id
+      		                                               from   ap_invoice_distributions_all aid
+      		                                               where  aid.pay_awt_group_id is not null
+      		                                                 and  aid.invoice_id = :2
+                                                        UNION
+                                                        select distinct ai.awt_group_id
+      		                                               from   ap_invoices_all ai
+      		                                               where  ai.awt_group_id is not null
+      		                                                 and  ai.invoice_id = :3
+                                                        UNION
+                                                        select distinct ai.pay_awt_group_id
+      		                                               from   ap_invoices_all ai
+      		                                               where  ai.pay_awt_group_id is not null
+      		                                                 and  ai.invoice_id = :4
+                                                        )
+                  </statement>
+                  <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+		  <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+		  <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+              	  <sqlParam bindTo="4" dataType="BigDecimal" value="$invoiceId"/>
+                  <tableHeading>AP_AWT_GROUP_TAXES_ALL</tableHeading>
+    </sql>
+  
+  	<sql name="SQL_AP_AWT_TEMP_DISTRIBUTIONS" maxDisplayRows="$maxRowsDisplay">
+                <statement>
+                   select *
+                  FROM   ap_awt_temp_distributions_all
+                where  invoice_id = :1
+              </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>AP_AWT_TEMP_DISTRIBUTIONS_ALL</tableHeading>
+      </sql>
+	</then>
+	<else>
+    <sql name="SQL_AP_AWT_TAX_RATES2" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+                   select distinct awt.*
+		                 from   ap_tax_codes_all atc,
+		                        ap_awt_tax_rates_all awt
+		                 where  awt.tax_name = atc.name
+		                   and  atc.tax_id in (select distinct aid.tax_code_id tax_code_id
+		                                       from   ap_invoice_distributions_all aid,
+		                                              ap_tax_codes_all atc
+		                                       where  aid.tax_code_id = atc.tax_id
+		                                         and  aid.tax_code_id is not null
+		                                         and  atc.tax_type = 'AWT'
+		                                         and  aid.invoice_id = :1)
+		                 UNION
+		                 select distinct awt.* 
+		                 from   ap_awt_tax_rates_all awt
+		                 where  awt.tax_rate_id in (select distinct aid.awt_tax_rate_id
+		                                            from   ap_invoice_distributions_all aid
+		                                            where  aid.awt_tax_rate_id is not null
+                                           and  aid.invoice_id = :2)
+                   
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_AWT_TAX_RATES</tableHeading>
+    </sql>
+  
+  <sql name="SQL_AP_TAX_CODES2" maxDisplayRows="$maxRowsDisplay">
+        <statement>
+        SELECT DISTINCT atc.*
+	FROM ap_invoice_distributions_all aid,
+	  ap_tax_codes_all atc
+	WHERE aid.tax_code_id = atc.tax_id
+	AND aid.tax_code_id  IS NOT NULL
+	AND atc.tax_type      = 'AWT'
+	AND aid.invoice_id    = :1
+        </statement>
+        <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+        <tableHeading>AP_TAX_CODES_ALL</tableHeading>
+      </sql>
+  
+  
+    <sql name="SQL_AP_AWT_GROUPS2" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+                                  select distinct awt.*
+    		                       from   ap_awt_groups awt
+    		                       where  awt.group_id in (
+                                                      select distinct aid.awt_group_id
+    		                                               from   ap_invoice_distributions_all aid
+    		                                               where  aid.awt_group_id is not null
+    		                                                 and  aid.invoice_id = :1
+                                                      UNION   
+                                                      select distinct ai.awt_group_id
+    		                                               from   ap_invoices_all ai
+    		                                               where  ai.awt_group_id is not null
+    		                                                 and  ai.invoice_id = :2
+                                                      )  
+            </statement>
+            		  <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	                  <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>	                  
+            <tableHeading>AP_AWT_GROUPS_SQL</tableHeading>
+        </sql>
+        
+        <sql name="SQL_AP_AWT_GROUP_TAXES2" maxDisplayRows="$maxRowsDisplay">
+                <statement>
+                       select distinct awt.*
+    		                    from   AP_AWT_GROUP_TAXES_ALL awt
+    		                          where  awt.group_id in (
+                                                      select distinct aid.awt_group_id
+    		                                               from   ap_invoice_distributions_all aid
+    		                                               where  aid.awt_group_id is not null
+    		                                                 and  aid.invoice_id = :1
+                                                      UNION   
+                                                      select distinct ai.awt_group_id
+    		                                               from   ap_invoices_all ai
+    		                                               where  ai.awt_group_id is not null
+    		                                                 and  ai.invoice_id = :2
+                                                      )  
+                </statement>
+                	  <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	                  <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>	                  
+                <tableHeading>AP_AWT_GROUP_TAXES_ALL</tableHeading>
+        </sql>
+  
+  <sql name="SQL_AP_AWT_TEMP_DISTRIBUTIONS2" maxDisplayRows="$maxRowsDisplay">
+              <statement>
+                   select *
+                  FROM   ap_awt_temp_distributions_all
+                where  invoice_id = :1
+              </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>AP_AWT_TEMP_DISTRIBUTIONS_ALL</tableHeading>
+      </sql>
+  </else>
+  </if>
+  
+  </section>
+   
+  
+  <section title="Accounting">
+    <sql name="SQL_XLA_EVENTS_INVOICE" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        select distinct xe.* 
+ from ap_invoices_all ai, xla_events xe, xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and xe.application_id = 200
+ and ai.invoice_id = :1 
+ and xte.entity_code = 'AP_INVOICES' 
+ and nvl(xte.source_id_int_1, -99) = ai.invoice_id 
+ and xte.entity_id = xe.entity_id
+ order by xe.entity_id, xe.event_number
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_EVENTS (Invoice)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_AE_HEADERS_INVOICE" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+       select distinct xeh.* 
+ from xla_ae_headers xeh, ap_invoices_all ai, xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and xeh.application_id = 200
+ and ai.invoice_id = :1 
+ and xte.entity_code = 'AP_INVOICES' 
+ and nvl(xte.source_id_int_1, -99) = ai.invoice_id 
+ and xte.entity_id = xeh.entity_id
+ ORDER BY xeh.event_id, xeh.ae_header_id asc
+
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_AE_HEADERS (Invoice)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_AE_LINES_INVOICE" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        select distinct xel.*,
+               fnd_flex_ext.get_segs('SQLGL','GL#', :1 , xel.code_combination_id) "Account"
+ from xla_ae_lines xel, xla_ae_headers xeh, ap_invoices_all ai, 
+ xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and xel.application_id = 200
+ and xeh.application_id = 200
+ and ai.invoice_id = :2 
+ and xel.ae_header_id = xeh.ae_header_id 
+ and xte.entity_code = 'AP_INVOICES' 
+ and nvl(xte.source_id_int_1, -99) = ai.invoice_id 
+ and xte.entity_id = xeh.entity_id
+ ORDER BY  xel.ae_header_id, xel.ae_line_num asc 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_AE_LINES (Invoice)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_DISTRIBUTION_LINKS_INVOICE" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        select distinct xdl.* 
+ from xla_distribution_links xdl, xla_ae_headers xeh, ap_invoices_all ai, 
+ xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and xdl.application_id = 200
+ and xeh.application_id = 200
+ and ai.invoice_id = :1 
+ and xdl.ae_header_id = xeh.ae_header_id 
+ and xte.entity_code = 'AP_INVOICES' 
+ and nvl(xte.source_id_int_1, -99) = ai.invoice_id 
+ and xte.entity_id = xeh.entity_id
+ ORDER BY xdl.event_id, xdl.ae_header_id, xdl.ae_line_num asc 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_DISTRIBUTION_LINKS (Invoice)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_TRANSACTION_ENTITIES_INVOICE" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+   select distinct xte.* 
+ from ap_invoices_all ai, xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and ai.invoice_id = :1 
+ and xte.entity_code = 'AP_INVOICES' 
+ and nvl(xte.source_id_int_1, -99) = ai.invoice_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_TRANSACTION_ENTITIES (Invoice)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_ACCOUNTING_ERRORS_INVOICE" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        select distinct xae.* 
+ from ap_invoices_all ai, xla_events xe, xla.xla_transaction_entities xte, 
+ xla_accounting_errors xae 
+ where xte.application_id = 200 
+ and xe.application_id = 200
+ and xae.application_id = 200
+ and ai.invoice_id = :1 
+ and xe.event_id = xae.event_id 
+ and xte.entity_code = 'AP_INVOICES' 
+ and nvl(xte.source_id_int_1, -99) = ai.invoice_id 
+ and xte.entity_id = xe.entity_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_ACCOUNTING_ERRORS (Invoice)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_EVENTS_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        select distinct xe.* 
+ from ap_invoice_payments_all aip, xla_events xe, xla.xla_transaction_entities 
+ xte 
+ where xte.application_id = 200 
+ and xe.application_id = 200
+ and aip.invoice_id = :1 
+ and xte.entity_code = 'AP_PAYMENTS' 
+ and nvl(xte.source_id_int_1, -99) = aip.check_id 
+ and xte.entity_id = xe.entity_id
+ order by xe.entity_id, xe.event_number
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>     
+      <tableHeading>XLA_EVENTS (Payment)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_AE_HEADERS_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+   select distinct xeh.* 
+ from xla_ae_headers xeh, ap_invoice_payments_all aip, 
+ xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and xeh.application_id = 200
+ and aip.invoice_id = :1 
+ and xte.entity_code = 'AP_PAYMENTS' 
+ and nvl(xte.source_id_int_1, -99) = aip.check_id 
+ and xte.entity_id = xeh.entity_id
+ ORDER BY xeh.event_id, xeh.ae_header_id asc
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>    
+      <tableHeading>XLA_AE_HEADERS (Payment)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_AE_LINES_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        select distinct xel.*,
+               fnd_flex_ext.get_segs('SQLGL','GL#', :1 , xel.code_combination_id) "Account"
+ from xla_ae_lines xel, xla_ae_headers xeh, ap_invoice_payments_all aip, 
+ xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and xel.application_id = 200
+ and xeh.application_id = 200
+ and aip.invoice_id = :2 
+ and xel.ae_header_id = xeh.ae_header_id 
+ and xte.entity_code = 'AP_PAYMENTS' 
+ and nvl(xte.source_id_int_1, -99) = aip.check_id 
+ and xte.entity_id = xeh.entity_id
+ ORDER BY  xel.ae_header_id, xel.ae_line_num asc 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>      
+      <tableHeading>XLA_AE_LINES (Payment)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_DISTRIBUTION_LINKS_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        select distinct xdl.* 
+ from xla_distribution_links xdl, xla_ae_headers xeh, ap_invoice_payments_all 
+ aip, xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and xeh.application_id = 200
+ and xdl.application_id = 200
+ and aip.invoice_id = :1 
+ and xdl.ae_header_id = xeh.ae_header_id 
+ and xte.entity_code = 'AP_PAYMENTS' 
+ and nvl(xte.source_id_int_1, -99) = aip.check_id 
+ and xte.entity_id = xeh.entity_id
+ ORDER BY xdl.event_id, xdl.ae_header_id, xdl.ae_line_num asc 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>   
+      <tableHeading>XLA_DISTRIBUTION_LINKS (Payment)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_TRANSACTION_ENTITIES_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+ select distinct xte.* 
+ from ap_invoice_payments_all aip, xla.xla_transaction_entities xte 
+ where xte.application_id = 200 
+ and aip.invoice_id = :1 
+ and xte.entity_code = 'AP_PAYMENTS' 
+ and nvl(xte.source_id_int_1, -99) = aip.check_id 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>   
+      <tableHeading>XLA_TRANSACTION_ENTITIES (Payment)</tableHeading>
+    </sql>
+
+    <sql name="SQL_XLA_ACCOUNTING_ERRORS_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+       select distinct xae.* 
+ from ap_invoice_payments_all aip, xla_events xe, xla.xla_transaction_entities 
+ xte, xla_accounting_errors xae 
+ where xte.application_id = 200 
+ and xe.application_id = 200
+ and xae.application_id = 200
+ and aip.invoice_id = :1 
+ and xe.event_id = xae.event_id 
+ and xte.entity_code = 'AP_PAYMENTS' 
+ and nvl(xte.source_id_int_1, -99) = aip.check_id 
+ and xte.entity_id = xe.entity_id 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>    
+      <tableHeading>XLA_ACCOUNTING_ERRORS (Payment)</tableHeading>
+    </sql>
+  </section>
+ 
+  <section title="Trial Balance">
+    <sql name="SQL_AP_LIABILITY_BALANCE">
+      <statement>
+        
+        select *
+	from ap_liability_balance
+	where invoice_id = :1
+	order by ae_header_id;
+
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_LIABILITY_BALANCE</tableHeading>
+    </sql>
+    
+    <sql name="SQL_XLA_TRIAL_BALANCES">
+      <statement>
+          SELECT *
+          FROM XLA_TRIAL_BALANCES XTB
+          WHERE (SELECT XTE.ENTITY_ID
+                 FROM XLA.XLA_TRANSACTION_ENTITIES XTE
+                 WHERE XTE.APPLICATION_ID = 200
+                       AND XTE.LEDGER_ID = :1
+                       AND XTE.ENTITY_CODE = 'AP_INVOICES'
+                       AND NVL(XTE.SOURCE_ID_INT_1,-99) = :2)
+            IN (XTB.APPLIED_TO_ENTITY_ID, XTB.SOURCE_ENTITY_ID)
+          ORDER BY DEFINITION_CODE, LEDGER_ID
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_LEDGER.ledger_id"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>XLA_TRIAL_BALANCES</tableHeading>
+    </sql> 
+  </section>
+ 
+  <api name="API_VALID_OBJECT_AX_EVENTS">
+    <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getObjectExists</method>
+    <apiParam dataType="Report" paramNumber="1">report</apiParam>
+    <apiParam dataType="String" paramNumber="2">AX_EVENTS</apiParam>
+    <apiParam dataType="String" paramNumber="3">AX</apiParam>
+  </api>
+
+  <if test="$API_VALID_OBJECT_AX_EVENTS">
+    <then>
+      <sql name="SQL_115_AX" actionType="storeOnly" saveAllColumns="true">
+      <statement>
+        SELECT   event_id 
+        FROM     AX.AX_EVENTS 
+        WHERE    application_id = 200 
+        AND      event_type like 'NON_CASH%'  
+        AND      event_field1 = :1 
+        AND      NVL(org_id, -99)= :2  
+        UNION  
+        SELECT   event_id  
+        FROM     AX.AX_EVENTS  
+        WHERE    application_id = 200 
+        AND    ( event_type like 'CASH%' OR event_type like 'FUTURE%' )
+        AND      event_field1 IN 
+               ( SELECT   check_id FROM AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :3 ) 
+        AND      NVL(org_id, -99) = :4  
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+      <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="4" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+    </sql>
+    <if test="$SQL_115_AX._RowCount > 0">
+      <then>
+        <section title="11.5 AX Accounting">
+          <sql name="SQL_AX_EVENTS_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   e.*
+              FROM     AX.AX_EVENTS e  
+              WHERE    e.application_id = 200 
+              AND      e.event_type like 'NON_CASH%' 
+              AND      e.event_field1 = :1 
+              AND      NVL(e.org_id, -99) = :2 
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_EVENTS (Invoice)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AX_SLE_HEADERS_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   h.* 
+              FROM     AX.AX_SLE_HEADERS h, 
+                       AX.AX_EVENTS e 
+              WHERE    h.event_id = e.event_id 
+              AND      e.application_id = 200  
+              AND      e.event_type like 'NON_CASH%'  
+              AND      e.event_field1 = :1 
+              AND      NVL(e.org_id, -99) = :2 
+              ORDER BY h.set_of_books_id asc, h.event_id asc
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_SLE_HEADERS (Invoice)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AX_SLE_LINES_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   l.*        
+              FROM     AX.AX_EVENTS e, 
+                       AX.AX_SLE_HEADERS h, 
+                       AX.AX_SLE_LINES l 
+              WHERE    l.set_of_books_id     = h.set_of_books_id 
+              AND      l.journal_sequence_id = h.journal_sequence_id           
+              AND      l.sle_header_id       = h.sle_header_id         
+              AND      h.event_id =  e.event_id 
+              AND      e.application_id = 200  
+              AND      e.event_type like 'NON_CASH%'  
+              AND      e.event_field1 = :1     
+              AND      NVL(e.org_id, -99) = :2 
+              ORDER BY h.set_of_books_id, h.sle_header_id, l.sle_line_num
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_SLE_LINES (Invoice)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AX_DOCUMENT_STATUSES_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   * 
+              FROM     AX.AX_DOCUMENT_STATUSES 
+              WHERE    document_id1 = :1 
+              AND      NVL(org_id, -99) = :2 
+              AND      document_code = 'INVOICE' 
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_DOCUMENT_STATUSES (Invoice)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AX_EVENTS_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   e.* 
+              FROM     AX.AX_EVENTS e  
+              WHERE    e.application_id = 200 
+              AND    ( e.event_type like 'CASH%' OR e.event_type like 'FUTURE%' )
+              AND      e.event_field1 IN 
+                     ( SELECT   check_id FROM AP_INVOICE_PAYMENTS_ALL 
+                       WHERE    invoice_id = :1 ) 
+              AND      NVL(e.org_id, -99) = :2 
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_EVENTS (Payment)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AX_SLE_HEADERS_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   h.* 
+              FROM     AX.AX_SLE_HEADERS h, 
+                       AX.AX_EVENTS e 
+              WHERE    h.event_id = e.event_id 
+              AND      e.application_id = 200  
+              AND    ( e.event_type like 'CASH%' OR e.event_type like 'FUTURE%' )
+              AND      e.event_field1 IN 
+                     ( SELECT   check_id FROM AP_INVOICE_PAYMENTS_ALL 
+                       WHERE    invoice_id = :1 )     
+              AND      NVL(e.org_id, -99) = :2 
+              ORDER BY h.set_of_books_id asc, h.event_id asc 
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_SLE_HEADERS (Payment)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AX_SLE_LINES_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   l.*        
+              FROM     AX.AX_EVENTS e, 
+                       AX.AX_SLE_HEADERS h, 
+                       AX.AX_SLE_LINES l 
+              WHERE    l.set_of_books_id     = h.set_of_books_id 
+              AND      l.journal_sequence_id = h.journal_sequence_id           
+              AND      l.sle_header_id       = h.sle_header_id         
+              AND      h.event_id =  e.event_id 
+              AND      e.application_id = 200  
+              AND    ( e.event_type like 'CASH%' OR e.event_type like 'FUTURE%' )   
+              AND      e.event_field1 IN 
+                     ( SELECT   check_id FROM AP_INVOICE_PAYMENTS_ALL 
+                       WHERE    invoice_id = :1 )         
+              AND      NVL(e.org_id, -99) = :2  
+              ORDER BY h.set_of_books_id, h.sle_header_id, l.sle_line_num
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_SLE_LINES (Payment)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AX_DOCUMENT_STATUSES_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   * 
+              FROM     AX.AX_DOCUMENT_STATUSES 
+              WHERE    document_id1 IN 
+                     ( SELECT   check_id FROM AP_INVOICE_PAYMENTS_ALL 
+                       WHERE    invoice_id = :1 ) 
+              AND      NVL(org_id, -99) = :2 
+              AND      document_code = 'CHECK' 
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+            <tableHeading>AX_DOCUMENT_STATUSES (Payment)</tableHeading>
+          </sql>
+        </section>
+      </then>
+    </if>
+   </then>
+  </if>
+
+  <api name="API_VALID_OBJECT_AP_ACCNT">
+    <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getObjectExists</method>
+    <apiParam dataType="Report" paramNumber="1">report</apiParam>
+    <apiParam dataType="String" paramNumber="2">AP_ACCOUNTING_EVENTS_ALL</apiParam>
+  </api>
+
+  <if test="$API_VALID_OBJECT_AP_ACCNT">
+   <then>
+      <sql name="SQL_115_AP_ACCOUNTING" actionType="storeOnly" saveAllColumns="true">
+      <statement>
+        SELECT   accounting_event_id 
+        FROM     AP_ACCOUNTING_EVENTS_ALL 
+        WHERE    source_table = 'AP_INVOICES' 
+        AND      source_id = :1  
+        UNION 
+        SELECT   distinct e.accounting_event_id 
+        FROM     AP_ACCOUNTING_EVENTS_ALL e,  
+               ( SELECT   distinct aip.check_id, aph.payment_history_id   
+                 FROM     AP_INVOICE_PAYMENTS_ALL aip, 
+                          AP_PAYMENT_HISTORY_ALL aph 
+                 WHERE    aip.invoice_id = :2 
+                 AND      aph.check_id(+) = aip.check_id ) ct 
+        WHERE  ( ( e.source_id = ct.check_id           AND e.source_table = 'AP_CHECKS' ) 
+        OR       ( e.source_id = ct.payment_history_id AND e.source_table = 'AP_PAYMENT_HISTORY' ) ) 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+    </sql>
+    <if test="$SQL_115_AP_ACCOUNTING._RowCount > 0">
+      <then>
+        <section title="11.5 AP Accounting">
+          <sql name="SQL_AP_ACCOUNTING_EVENTS_ALL_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   e.* 
+              FROM     AP_ACCOUNTING_EVENTS_ALL e  
+              WHERE    e.source_id = :1  
+              AND      e.source_table = 'AP_INVOICES' 
+              ORDER BY e.accounting_event_id asc
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_ACCOUNTING_EVENTS_ALL (Invoice)</tableHeading>
+          </sql>
+    
+          <sql name="SQL_AP_AE_HEADERS_ALL_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   h.* 
+              FROM     AP_AE_HEADERS_ALL h, 
+                       AP_ACCOUNTING_EVENTS_ALL e  
+              WHERE    h.accounting_event_id = e.accounting_event_id 
+              AND      e.source_id = :1  
+              AND      e.source_table = 'AP_INVOICES' 
+              ORDER BY h.ae_header_id asc
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_AE_HEADERS_ALL (Invoice)</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_AE_LINES_ALL_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   l.*, 
+                       fnd_flex_ext.get_segs('SQLGL','GL#', :1 , l.code_combination_id) Account 
+              FROM     AP_AE_LINES_ALL l,
+                       AP_AE_HEADERS_ALL h, 
+                       AP_ACCOUNTING_EVENTS_ALL e  
+              WHERE    l.ae_header_id = h.ae_header_id 
+              AND      h.accounting_event_id = e.accounting_event_id 
+              AND      e.source_id = :2  
+              AND      e.source_table = 'AP_INVOICES' 
+              ORDER BY l.ae_header_id asc, l.ae_line_number
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_AE_LINES_ALL (Invoice)</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_ENCUMBRANCE_LINES_ALL_INVOICE" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   enc.* 
+              FROM     AP_ENCUMBRANCE_LINES_ALL enc, 
+                       AP_INVOICE_DISTRIBUTIONS_ALL aid 
+              WHERE    aid.invoice_id = :1 
+              AND      aid.invoice_distribution_id = enc.invoice_distribution_id 
+              ORDER BY enc.invoice_distribution_id asc
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_ENCUMBRANCE_LINES_ALL (Invoice)</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_ACCOUNTING_EVENTS_ALL_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   distinct e.* 
+              FROM     AP_ACCOUNTING_EVENTS_ALL e,  
+                     ( SELECT   distinct aip.check_id, aph.payment_history_id    
+                       FROM     AP_INVOICE_PAYMENTS_ALL aip, 
+                                AP_PAYMENT_HISTORY_ALL aph 
+                       WHERE    aip.invoice_id = :1 
+                       AND      aph.check_id(+) = aip.check_id ) ct 
+              WHERE  ( ( e.source_id = ct.check_id           AND e.source_table = 'AP_CHECKS' ) 
+              OR       ( e.source_id = ct.payment_history_id AND e.source_table = 'AP_PAYMENT_HISTORY' ) ) 
+              ORDER BY e.accounting_event_id asc
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_ACCOUNTING_EVENTS_ALL (Payment)</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_AE_HEADERS_ALL_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   distinct h.* 
+              FROM     AP_AE_HEADERS_ALL h, 
+                       AP_ACCOUNTING_EVENTS_ALL e,  
+                     ( SELECT   distinct aip.check_id, aph.payment_history_id    
+                       FROM     AP_INVOICE_PAYMENTS_ALL aip, 
+                                AP_PAYMENT_HISTORY_ALL aph 
+                       WHERE    aip.invoice_id = :1 
+                       AND      aph.check_id(+) = aip.check_id ) ct 
+              WHERE    h.accounting_event_id = e.accounting_event_id 
+              AND    ( ( e.source_id = ct.check_id           AND e.source_table = 'AP_CHECKS' ) 
+              OR       ( e.source_id = ct.payment_history_id AND e.source_table = 'AP_PAYMENT_HISTORY' ) ) 
+              ORDER BY h.ae_header_id asc
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_AE_HEADERS_ALL (Payment)</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_AE_LINES_ALL_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   distinct l.*, 
+                       fnd_flex_ext.get_segs('SQLGL','GL#', :1 , l.code_combination_id) Account 
+              FROM     AP_AE_LINES_ALL l,
+                       AP_AE_HEADERS_ALL h, 
+                       AP_ACCOUNTING_EVENTS_ALL e, 
+                     ( SELECT   distinct aip.check_id, aph.payment_history_id    
+                       FROM     AP_INVOICE_PAYMENTS_ALL aip, 
+                                AP_PAYMENT_HISTORY_ALL aph 
+                       WHERE    aip.invoice_id = :2 
+                       AND      aph.check_id(+) = aip.check_id ) ct 
+              WHERE    l.ae_header_id = h.ae_header_id 
+              AND      h.accounting_event_id = e.accounting_event_id 
+              AND    ( ( e.source_id = ct.check_id           AND e.source_table = 'AP_CHECKS' ) 
+              OR       ( e.source_id = ct.payment_history_id AND e.source_table = 'AP_PAYMENT_HISTORY' ) ) 
+              ORDER BY l.ae_header_id asc, l.ae_line_number
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+            <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_AE_LINES_ALL (Payment)</tableHeading>
+          </sql>
+        </section>
+      </then>
+    </if>
+   </then>
+  </if>
+
+<api name="API_VALID_OBJECT_AP_UNDO">
+      <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getObjectExists</method>
+      <apiParam dataType="Report" paramNumber="1">report</apiParam>
+      <apiParam dataType="String" paramNumber="2">AP_UNDO_EVENT_LOG</apiParam>
+      <apiParam dataType="String" paramNumber="3">APPS</apiParam>
+</api>
+  <if test="$API_VALID_OBJECT_AP_UNDO">
+    <then>
+	  <sql name="SQL_AP_UNDO" actionType="storeOnly" saveAllColumns="true">
+		<statement>
+		  select count(*) count
+		  from AP_undo_event_log 
+		  where invoice_id = :1
+		  OR check_id in (select x.check_id 
+		  from ap_invoice_payments_all x
+		  where x.invoice_id = :2);
+	    </statement>
+		<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+		<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+	      </sql>
+
+	      <if test="$SQL_AP_UNDO.count > 0">
+        <then>
+		<section title="Events Updated/Created by the Undo Script ">
+	
+			<sql name="SQL_AP_UNDO_EVENT_LOG">
+				<statement>
+				  select *
+				  from AP_undo_event_log 
+				  where invoice_id = :1
+				  OR check_id in (select x.check_id 
+				  from ap_invoice_payments_all x
+				  where x.invoice_id = :2)
+				</statement>
+			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+			<tableHeading>AP_UNDO_EVENT_LOG</tableHeading>
+			</sql>
+
+			<sql name="SQL_AP_ORIGINAL_EVENTS">
+				<statement>
+				  select distinct xe.* 
+				    from xla_distribution_links xdl, 
+				    xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				    ap_undo_event_log undo 
+				    where xe.application_id = 200
+				    and xeh.application_id = 200
+				    and xel.application_id = 200
+				    and xdl.application_id = 200
+				    and xe.event_id = undo.e3
+				    and xel.ae_header_id = xeh.ae_header_id 
+				    and xe.event_id = xeh.event_id 
+				    and xdl.ae_header_id = xeh.ae_header_id
+				    and xdl.event_id = xe.event_id
+				    and (invoice_id = :1
+				    OR check_id in (select x.check_id 
+				    from ap_invoice_payments_all x
+				    where x.invoice_id = :2)
+				    )
+				    order by xe.event_id
+				</statement>
+			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+			<tableHeading>Original/incorrect Accounting XLA_EVENTS</tableHeading>
+			</sql>
+  
+  			<sql name="SQL_AP_ORIGINAL_HEADERS">
+  				<statement>
+				  select distinct xeh.* 
+				  from xla_distribution_links xdl, 
+				  xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				  ap_undo_event_log undo 
+				  where xe.application_id = 200
+				  and xeh.application_id = 200
+				  and xel.application_id = 200
+				  and xdl.application_id = 200
+				  and xe.event_id = undo.e3
+				  and xel.ae_header_id = xeh.ae_header_id 
+				  and xe.event_id = xeh.event_id 
+				  and xdl.ae_header_id = xeh.ae_header_id
+				  and xdl.event_id = xe.event_id
+				  and (invoice_id = :1
+				  OR check_id in (select x.check_id 
+				  from ap_invoice_payments_all x
+				  where x.invoice_id = :2)
+				  )
+				  order by xeh.ae_header_id
+				  </statement>
+  			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+  			<tableHeading>Original/Incorrect Accounting XLA_AE_HEADERS</tableHeading>
+			</sql>
+  
+  			<sql name="SQL_AP_ORIGINAL_LINES">
+    				<statement>
+				  select distinct xel.* 
+				  from xla_distribution_links xdl, 
+				  xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				  ap_undo_event_log undo 
+				  where xe.application_id = 200
+				  and xeh.application_id = 200
+				  and xel.application_id = 200
+				  and xdl.application_id = 200
+				  and xe.event_id = undo.e3
+				  and xel.ae_header_id = xeh.ae_header_id 
+				  and xe.event_id = xeh.event_id 
+				  and xdl.ae_header_id = xeh.ae_header_id
+				  and xdl.event_id = xe.event_id
+				  and (invoice_id = :1
+				  OR check_id in (select x.check_id 
+				  from ap_invoice_payments_all x
+				  where x.invoice_id = :2)
+				  )
+				  order by xel.ae_header_id
+				 </statement>
+    			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+    			<tableHeading>Original/Incorrect Accounting XLA_AE_LINES</tableHeading>
+			</sql>
+			
+			<sql name="SQL_AP_ORIGINAL_LINKS">
+				<statement>
+				select distinct xdl.* 
+				  from xla_distribution_links xdl, 
+				  xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				  ap_undo_event_log undo 
+				  where xe.application_id = 200
+				  and xeh.application_id = 200
+				  and xel.application_id = 200
+				  and xdl.application_id = 200
+				  and xe.event_id = undo.e3
+				  and xel.ae_header_id = xeh.ae_header_id 
+				  and xe.event_id = xeh.event_id 
+				  and xdl.ae_header_id = xeh.ae_header_id
+				  and xdl.event_id = xe.event_id
+				  and (invoice_id = :1
+				  OR check_id in (select x.check_id 
+				  from ap_invoice_payments_all x
+				  where x.invoice_id = :2)
+				  )
+				  order by xdl.ae_header_id		 
+				  </statement>
+			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+			<tableHeading>Original/Incorrect Accounting XLA_DISTRIBUTION_LINKS</tableHeading>
+			</sql>
+
+			<sql name="SQL_AP_REVERSAL_EVENTS">
+				<statement>
+				  select distinct xe.* 
+				    from xla_distribution_links xdl, 
+				    xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				    ap_undo_event_log undo 
+				    where xe.application_id = 200
+				    and xeh.application_id = 200
+				    and xel.application_id = 200
+				    and xdl.application_id = 200
+				    and xe.event_id = undo.e2
+				    and xel.ae_header_id = xeh.ae_header_id 
+				    and xe.event_id = xeh.event_id 
+				    and xdl.ae_header_id = xeh.ae_header_id
+				    and xdl.event_id = xe.event_id
+				    and (invoice_id = :1
+				    OR check_id in (select x.check_id 
+				    from ap_invoice_payments_all x
+				    where x.invoice_id = :2)
+				    )
+				    order by xe.event_id;
+				</statement>
+			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+			<tableHeading>Reversal Accounting XLA_EVENTS</tableHeading>
+			</sql>
+  
+  			<sql name="SQL_AP_REVERSAL_HEADERS">
+  				<statement>
+				  select distinct xeh.* 
+				  from xla_distribution_links xdl, 
+				  xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				  ap_undo_event_log undo 
+				  where xe.application_id = 200
+				  and xeh.application_id = 200
+				  and xel.application_id = 200
+				  and xdl.application_id = 200
+				  and xe.event_id = undo.e2
+				  and xel.ae_header_id = xeh.ae_header_id 
+				  and xe.event_id = xeh.event_id 
+				  and xdl.ae_header_id = xeh.ae_header_id
+				  and xdl.event_id = xe.event_id
+				  and (invoice_id = :1
+				  OR check_id in (select x.check_id 
+				  from ap_invoice_payments_all x
+				  where x.invoice_id = :2)
+				  )
+				  order by xeh.ae_header_id
+				  </statement>
+  			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+  			<tableHeading>Reversal Accounting XLA_AE_HEADERS</tableHeading>
+			</sql>
+  
+  			<sql name="SQL_AP_REVERSAL_LINES">
+    				<statement>
+				  select distinct xel.* 
+				  from xla_distribution_links xdl, 
+				  xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				  ap_undo_event_log undo 
+				  where xe.application_id = 200
+				  and xeh.application_id = 200
+				  and xel.application_id = 200
+				  and xdl.application_id = 200
+				  and xe.event_id = undo.e2
+				  and xel.ae_header_id = xeh.ae_header_id 
+				  and xe.event_id = xeh.event_id 
+				  and xdl.ae_header_id = xeh.ae_header_id
+				  and xdl.event_id = xe.event_id
+				  and (invoice_id = :1
+				  OR check_id in (select x.check_id 
+				  from ap_invoice_payments_all x
+				  where x.invoice_id = :2)
+				  )
+				  order by xel.ae_header_id
+				 </statement>
+    			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+    			<tableHeading>Reversal Accounting XLA_AE_LINES</tableHeading>
+			</sql>
+			
+			<sql name="SQL_AP_REVERSAL_LINKS">
+				<statement>
+				select distinct xdl.* 
+				  from xla_distribution_links xdl, 
+				  xla_ae_lines xel, xla_ae_headers xeh, xla_events xe,
+				  ap_undo_event_log undo 
+				  where xe.application_id = 200
+				  and xeh.application_id = 200
+				  and xel.application_id = 200
+				  and xdl.application_id = 200
+				  and xe.event_id = undo.e2
+				  and xel.ae_header_id = xeh.ae_header_id 
+				  and xe.event_id = xeh.event_id 
+				  and xdl.ae_header_id = xeh.ae_header_id
+				  and xdl.event_id = xe.event_id
+				  and (invoice_id = :1
+				  OR check_id in (select x.check_id 
+				  from ap_invoice_payments_all x
+				  where x.invoice_id = :2)
+				  )
+				  order by xdl.ae_header_id			 
+				  </statement>
+			<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			<sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+			<tableHeading>Reversal Accounting XLA_DISTRIBUTION_LINKS</tableHeading>
+			</sql>			
+	</section>
+      </then>
+    </if>
+   </then>
+  </if>
+  
+
+  <if test="$includeGLTables = 'Yes'">
+    <then>
+      <section title="General Ledger">
+        <sql name="SQL_GL_JE_BATCHES_INVOICE" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gjb.* 
+            FROM     GL_IMPORT_REFERENCES gir, 
+                     GL_JE_BATCHES gjb, 
+                     XLA_AE_LINES  ael, 
+                     XLA_AE_HEADERS   aeh,     
+                     XLA_EVENTS    aea 
+            WHERE    aea.event_id IN     
+                   ( SELECT  aid.accounting_event_id 
+                     FROM    AP_INVOICE_DISTRIBUTIONS_ALL aid 
+                     WHERE   aid.invoice_id = :1 )   
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id    
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL') 
+            AND      aea.application_id = 200 
+            and      aeh.application_id = 200
+            AND      aea.event_id = aeh.event_id    
+            AND      aeh.ae_header_id = ael.ae_header_id 
+            AND      gjb.je_batch_id = gir.je_batch_id
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_JE_BATCHES (Invoice)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_JE_HEADERS_INVOICE" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gjh.* 
+            FROM     GL_IMPORT_REFERENCES gir,   
+                     GL_JE_HEADERS gjh, 
+                     XLA_AE_LINES  ael, 
+                     XLA_AE_HEADERS   aeh, 
+                     XLA_EVENTS    aea 
+            WHERE    aea.event_id IN 
+                   ( SELECT  aid.accounting_event_id 
+                     FROM    AP_INVOICE_DISTRIBUTIONS_ALL aid 
+                     WHERE   aid.invoice_id = :1 ) 
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id 
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL')  
+            AND      aea.application_id = 200 
+            and      aeh.application_id = 200
+            AND      aea.event_id = aeh.event_id 
+            AND      aeh.ae_header_id = ael.ae_header_id 
+            AND      gjh.je_header_id = gir.je_header_id
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_JE_HEADERS (Invoice)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_JE_LINES_INVOICE" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gll.*         
+            FROM     GL_IMPORT_REFERENCES gir,           
+                     GL_JE_LINES   gll,         
+                     XLA_AE_LINES  ael,         
+                     XLA_AE_HEADERS   aeh,         
+                     XLA_EVENTS    aea         
+            WHERE    aea.event_id IN         
+                   ( SELECT  aid.accounting_event_id         
+                     FROM    AP_INVOICE_DISTRIBUTIONS_ALL aid         
+                     WHERE   aid.invoice_id = :1 )         
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id         
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL')          
+            AND      aea.application_id = 200         
+            and      aeh.application_id = 200
+            AND      aea.event_id = aeh.event_id         
+            AND      aeh.ae_header_id = ael.ae_header_id         
+            AND      gll.je_header_id = gir.je_header_id         
+            AND      gll.je_line_num  = gir.je_line_num
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_JE_LINES (Invoice)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_IMPORT_REFERENCES_INVOICE" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gir.*         
+            FROM     GL_IMPORT_REFERENCES gir,         
+                     XLA_AE_LINES  ael,         
+                     XLA_AE_HEADERS   aeh,         
+                     XLA_EVENTS    aea         
+            WHERE    aea.event_id IN         
+                   ( SELECT  aid.accounting_event_id         
+                     FROM    AP_INVOICE_DISTRIBUTIONS_ALL aid         
+                     WHERE   aid.invoice_id = :1 )         
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id         
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL')             
+            AND      aea.application_id = 200         
+            and      aeh.application_id = 200
+            AND      aea.event_id = aeh.event_id         
+            AND      aeh.ae_header_id = ael.ae_header_id
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_IMPORT_REFERENCES (Invoice)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_JE_BATCHES_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gjb.*         
+            FROM     GL_IMPORT_REFERENCES gir,         
+                     GL_JE_BATCHES gjb,         
+                     XLA_AE_LINES  ael,         
+                     XLA_AE_HEADERS   aeh,         
+                     XLA_EVENTS    aea         
+            WHERE    aea.event_id IN         
+                   ( SELECT   aip.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip         
+                     WHERE    aip.invoice_id = :1         
+                      UNION         
+                     SELECT   distinct aph.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip,         
+                              AP_PAYMENT_HISTORY_ALL aph         
+                     WHERE    aph.check_id = aip.check_id         
+                     AND      aip.invoice_id = :2 )         
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id          
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL')         
+            AND      aea.application_id = 200  
+            and      aeh.application_id = 200
+            AND      aea.event_id = aeh.event_id         
+            AND      aeh.ae_header_id = ael.ae_header_id           
+            AND      gjb.je_batch_id = gir.je_batch_id
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_JE_BATCHES (Payment)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_JE_HEADERS_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gjh.*         
+            FROM     GL_IMPORT_REFERENCES gir,         
+                     GL_JE_HEADERS gjh,         
+                     XLA_AE_LINES  ael,         
+                     XLA_AE_HEADERS   aeh,         
+                     XLA_EVENTS    aea         
+            WHERE    aea.event_id IN         
+                   ( SELECT   aip.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip         
+                     WHERE    aip.invoice_id = :1         
+                      UNION         
+                     SELECT   distinct aph.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip,         
+                              AP_PAYMENT_HISTORY_ALL aph         
+                     WHERE    aph.check_id = aip.check_id         
+                     AND      aip.invoice_id = :2 )         
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id          
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL')          
+            AND      aea.application_id = 200         
+            and      aeh.application_id = 200
+            AND      aea.event_id = aeh.event_id         
+            AND      aeh.ae_header_id = ael.ae_header_id           
+            AND      gjh.je_header_id = gir.je_header_id
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_JE_HEADERS (Payment)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_JE_LINES_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gll.*         
+            FROM     GL_IMPORT_REFERENCES gir,         
+                     GL_JE_LINES   gll,         
+                     XLA_AE_LINES  ael,         
+                     XLA_AE_HEADERS   aeh,         
+                     XLA_EVENTS    aea         
+            WHERE    aea.event_id IN         
+                   ( SELECT   aip.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip         
+                     WHERE    aip.invoice_id = :1         
+                      UNION         
+                     SELECT   distinct aph.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip,         
+                              AP_PAYMENT_HISTORY_ALL aph         
+                     WHERE    aph.check_id = aip.check_id         
+                     AND      aip.invoice_id = :2 )         
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id          
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL')          
+            AND      aea.application_id = 200         
+            and      ael.application_id = 200
+            and      aeh.application_id = 200
+            AND      aea.event_id = aeh.event_id         
+            AND      aeh.ae_header_id = ael.ae_header_id           
+            AND      gll.je_header_id = gir.je_header_id         
+            AND      gll.je_line_num  = gir.je_line_num
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_JE_LINES (Payment)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_IMPORT_REFERENCES_PAYMENT" maxDisplayRows="$maxRowsDisplay">
+          <statement>
+            SELECT   distinct gir.*         
+            FROM     GL_IMPORT_REFERENCES gir,          
+                     XLA_AE_LINES  ael,         
+                     XLA_AE_HEADERS   aeh,         
+                     XLA_EVENTS    aea         
+            WHERE    aea.event_id IN         
+                   ( SELECT   aip.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip         
+                     WHERE    aip.invoice_id = :1         
+                     UNION         
+                     SELECT   distinct aph.accounting_event_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL aip,         
+                              AP_PAYMENT_HISTORY_ALL aph         
+                     WHERE    aph.check_id = aip.check_id         
+                     AND      aip.invoice_id = :2 )         
+            AND      ael.gl_sl_link_id = gir.gl_sl_link_id          
+            AND      gir.gl_sl_link_table in ('APECL', 'XLAJEL')         
+            AND      aea.application_id = 200         
+            and      aeh.application_id = 200
+            and      ael.application_id = 200
+            AND      aea.event_id = aeh.event_id         
+            AND      aeh.ae_header_id = ael.ae_header_id
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_IMPORT_REFERENCES (Payment)</tableHeading>
+        </sql>
+
+        <sql name="SQL_GL_PERIOD_STATUSES">
+          <statement>
+            SELECT   distinct gps.*         
+            FROM     GL_PERIOD_STATUSES gps,         
+                   ( SELECT   distinct accounting_date, set_of_books_id         
+                     FROM     AP_INVOICE_DISTRIBUTIONS_ALL         
+                     WHERE    invoice_id = :1         
+                     UNION         
+                     SELECT   distinct accounting_date,  set_of_books_id         
+                     FROM     AP_INVOICE_PAYMENTS_ALL         
+                     WHERE    invoice_id = :2         
+                     UNION         
+                     SELECT   distinct accounting_date, -1         
+                     FROM     AP_PAYMENT_HISTORY_ALL         
+                     WHERE    check_id IN         
+                            ( SELECT   check_id         
+                              FROM     AP_INVOICE_PAYMENTS_ALL         
+                              WHERE    invoice_id = :3 ) ) atg_date         
+            WHERE   atg_date.accounting_date between gps.start_date and gps.end_date         
+            AND     gps.application_id in (101,200)         
+            AND     gps.set_of_books_id = atg_date.set_of_books_id
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+          <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>GL_PERIOD_STATUSES</tableHeading>
+        </sql>
+        <sql name="SQL_GL_CODE_COMBINATIONS">
+	          <statement>
+	          select distinct gcc.*
+		  	from gl_code_combinations gcc
+		  	where gcc.code_combination_id in (
+		  	select distinct xel.code_combination_id
+		  	 from xla_ae_lines xel, xla_ae_headers xeh, ap_invoices_all ai, 
+		  	 xla.xla_transaction_entities xte 
+		  	 where xte.application_id = 200 
+		  	 and xeh.application_id = 200
+		  	 and xel.application_id = 200
+		  	 and ai.invoice_id = :1 
+		  	 and xel.ae_header_id = xeh.ae_header_id 
+		  	 and xte.entity_code = 'AP_INVOICES' 
+		  	 and nvl(xte.source_id_int_1, -99) = ai.invoice_id 
+		  	 and xte.entity_id = xeh.entity_id
+		  	UNION
+		  	select distinct xel.code_combination_id
+		  	 from xla_ae_lines xel, xla_ae_headers xeh, ap_invoice_payments_all aip, 
+		  	 xla.xla_transaction_entities xte 
+		  	 where xte.application_id = 200 
+		  	 and xel.application_id = 200
+		  	 and xeh.application_id = 200
+		  	 and aip.invoice_id = :2 
+		  	 and xel.ae_header_id = xeh.ae_header_id 
+		  	 and xte.entity_code = 'AP_PAYMENTS' 
+		  	 and nvl(xte.source_id_int_1, -99) = aip.check_id 
+		  	 and xte.entity_id = xeh.entity_id
+		  	UNION
+		  	SELECT   distinct po.code_combination_id
+		  	        FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid,         
+		  	                 PO_DISTRIBUTIONS_ALL po         
+		  	        WHERE    aid.invoice_id = :3
+		  	        AND      aid.po_distribution_id is not null         
+		  	        AND      po.po_distribution_id = aid.po_distribution_id)
+	          </statement>
+	          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	          <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+	          <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+	          <tableHeading>GL_CODE_COMBINATIONS</tableHeading>
+	        </sql>
+      </section>
+    </then>
+  </if>
+
+  <api name="API_VALID_OBJECT_MC_INV">
+    <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getObjectExists</method>
+    <apiParam dataType="Report" paramNumber="1">report</apiParam>
+    <apiParam dataType="String" paramNumber="2">AP_MC_INVOICES</apiParam>
+  </api>
+  <if test="$API_VALID_OBJECT_MC_INV">
+    <then>
+      <sql name="SQL_115_MRC" actionType="storeOnly" saveAllColumns="true">
+      <statement>
+        SELECT   1 
+        FROM     AP_MC_INVOICES 
+        WHERE    invoice_id = :1 
+        UNION  
+        SELECT   1 
+        FROM     AP_MC_CHECKS mc, 
+                 AP_CHECKS_ALL aca 
+        WHERE    aca.check_id IN 
+               ( SELECT   distinct aa.check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL aa 
+                 WHERE    aa.invoice_id = :2 )  
+        AND      mc.check_id = aca.check_id 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+    </sql>
+    <if test="$SQL_115_MRC._RowCount > 0">
+      <then>
+        <section title="11.5 MRC">
+          <sql name="SQL_AP_MC_INVOICES" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   *         
+              FROM     AP_MC_INVOICES         
+              WHERE    invoice_id = :1 
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_MC_INVOICES</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_MC_CHECKS" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   mc.*         
+              FROM     AP_MC_CHECKS mc,         
+                       AP_CHECKS_ALL aca         
+              WHERE    aca.check_id IN         
+                     ( SELECT   distinct aa.check_id         
+                       FROM     AP_INVOICE_PAYMENTS_ALL aa         
+                       WHERE    aa.invoice_id = :1 )          
+              AND      mc.check_id = aca.check_id
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_MC_CHECKS</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_MC_INVOICE_DISTS" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   mc.* 
+              FROM     AP_MC_INVOICE_DISTS mc, 
+                       AP_INVOICE_DISTRIBUTIONS_ALL a         
+              WHERE    a.invoice_id = :1          
+              AND      a.invoice_distribution_id = mc.invoice_distribution_id         
+              AND      a.invoice_id = mc.invoice_id
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_MC_INVOICE_DISTS</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_MC_INVOICE_PAYMENTS" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   mc.*         
+              FROM     AP_MC_INVOICE_PAYMENTS mc,         
+                       AP_INVOICE_PAYMENTS_ALL a         
+              WHERE    a.invoice_id = :1          
+              AND      mc.invoice_payment_id = a.invoice_payment_id
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_MC_INVOICE_PAYMENTS</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_MC_PAYMENT_DISTS_ALL" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   distinct mc.*         
+              FROM     AP_MC_PAYMENT_DISTS_ALL mc,         
+                       AP_INVOICE_PAYMENTS_ALL a         
+              WHERE    a.invoice_id = :1         
+              AND      mc.invoice_payment_id = a.invoice_payment_id
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_MC_PAYMENT_DISTS_ALL</tableHeading>
+          </sql>
+
+          <sql name="SQL_AP_MC_PAYMENT_HISTORY" maxDisplayRows="$maxRowsDisplay">
+            <statement>
+              SELECT   mc.*         
+              FROM     AP_MC_PAYMENT_HISTORY mc,         
+                       AP_PAYMENT_HISTORY_ALL aph         
+              WHERE    aph.check_id IN         
+                     ( SELECT   distinct aa.check_id         
+                       FROM     AP_INVOICE_PAYMENTS_ALL aa         
+                       WHERE    aa.invoice_id = :1 )         
+              AND      mc.payment_history_id = aph.payment_history_id 
+              ORDER BY aph.accounting_event_id asc
+            </statement>
+            <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+            <tableHeading>AP_MC_PAYMENT_HISTORY</tableHeading>
+          </sql>
+        </section>
+      </then>
+    </if>
+   </then>
+  </if>
+
+  <section title="Supplier">
+    <sql name="SQL_AP_SUPPLIERS">
+      <statement>
+        SELECT   * 
+        FROM     AP_SUPPLIERS 
+        WHERE    vendor_id IN 
+               ( SELECT   vendor_id 
+                 FROM     AP_INVOICES_ALL 
+                 WHERE    invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_SUPPLIERS</tableHeading>
+    </sql>
+
+<api name="API_VALID_OBJECT_PO_VENDOR">
+      <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getObjectExists</method>
+      <apiParam dataType="Report" paramNumber="1">report</apiParam>
+      <apiParam dataType="String" paramNumber="2">PO_VENDORS_OBS</apiParam>
+      <apiParam dataType="String" paramNumber="3">PO</apiParam>
+</api>
+<if test="$API_VALID_OBJECT_PO_VENDOR">
+	<then>
+	  <sql name="SQL_PO_VENDOR_COUNT" actionType="storeOnly" saveAllColumns="true">
+		<statement>
+			SELECT   count(*) count
+			FROM     po_vendors_obs obs, ap_invoices_all ai
+			where obs.vendor_id = ai.vendor_id
+			and invoice_id = :1;	
+		</statement>
+		<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	      </sql>
+
+		<if test="$SQL_PO_VENDOR_COUNT.count > 0">
+		        <then>
+			    <sql name="SQL_PO_VENDORS" maxDisplayRows="$maxRowsDisplay">
+			      <statement>
+
+					SELECT   distinct obs.* 
+					FROM     po_vendors_obs obs, ap_invoices_all ai
+					where obs.vendor_id = ai.vendor_id
+					and invoice_id = :1
+					
+					
+			      </statement>
+				      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			      <tableHeading>PO_VENDORS_OBS</tableHeading>
+			    </sql>
+			</then>
+		</if>
+	</then>
+</if>
+
+<api name="API_VALID_OBJECT_PO_VENDOR_SITES">
+      <method>oracle.apps.jtf.regress.qatool.base.DBUtility.getObjectExists</method>
+      <apiParam dataType="Report" paramNumber="1">report</apiParam>
+      <apiParam dataType="String" paramNumber="2">PO_VENDOR_SITES_OBS</apiParam>
+      <apiParam dataType="String" paramNumber="3">PO</apiParam>
+</api>
+<if test="$API_VALID_OBJECT_PO_VENDOR_SITES">
+	<then>
+	  <sql name="SQL_PO_VENDOR_SITES_COUNT" actionType="storeOnly" saveAllColumns="true">
+		<statement>
+			SELECT   count(*) count
+			FROM     po_vendor_sites_obs obs, ap_invoices_all ai
+			where obs.vendor_id = ai.vendor_id
+			and obs.vendor_site_id = ai.vendor_site_id
+			and invoice_id = :1;
+		</statement>
+		<sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	      </sql>
+
+		<if test="$SQL_PO_VENDOR_SITES_COUNT.count > 0">
+		        <then>
+			    <sql name="SQL_PO_VENDOR_SITES" maxDisplayRows="$maxRowsDisplay">
+			      <statement>
+
+				SELECT   distinct obs.* 
+				FROM     po_vendor_sites_obs obs, ap_invoices_all ai
+				where obs.vendor_id = ai.vendor_id
+				and obs.vendor_site_id = ai.vendor_site_id
+				and invoice_id = :1;
+
+					
+			      </statement>
+				      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+			      <tableHeading>PO_VENDOR_SITES_OBS</tableHeading>
+			    </sql>
+			</then>
+		</if>
+	</then>
+</if>
+
+    <sql name="SQL_AP_SUPPLIER_SITES_ALL">
+      <statement>
+        SELECT   * 
+        FROM     AP_SUPPLIER_SITES_ALL 
+        WHERE    vendor_site_id IN 
+               ( SELECT   vendor_site_id 
+                 FROM     AP_INVOICES_ALL 
+                 WHERE    invoice_id = :1 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_SUPPLIER_SITES_ALL</tableHeading>
+    </sql>
+    
+    
+    SELECT   distinct obs.* 
+    FROM     po_vendor_sites_obs obs, ap_invoices_all ai
+    where obs.vendor_id = ai.vendor_id
+    and obs.vendor_site_id = ai.vendor_site_id
+    and invoice_id = :1;
+
+    
+    <sql name="SQL_HZ_PARTIES">
+      <statement>
+        SELECT   DISTINCT HZP.*
+        FROM     AP_INVOICES_ALL AI,
+                 HZ_PARTIES HZP
+        WHERE    AI.PARTY_ID = HZP.PARTY_ID 
+                 AND AI.INVOICE_ID = :1
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>HZ_PARTIES</tableHeading>
+    </sql>
+
+    <sql name="SQL_HZ_PARTY_SITES">
+      <statement>
+        SELECT   DISTINCT HZPS.*
+        FROM     AP_INVOICES_ALL AI,
+                 HZ_PARTY_SITES HZPS
+        WHERE    AI.PARTY_ID = HZPS.PARTY_ID
+                 AND AI.PARTY_SITE_ID = HZPS.PARTY_SITE_ID
+                 AND AI.INVOICE_ID = :1
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>HZ_PARTY_SITES</tableHeading>
+    </sql>
+    
+    <sql name="SQL_IBY_EXTERNAL_PAYEES_ALL">
+              <statement>
+              
+    	    SELECT   distinct extp.*
+    	    FROM     AP_SUPPLIER_SITES_ALL sites, iby_external_payees_all extp, ap_suppliers supp,
+    	    IBY_PMT_INSTR_USES_ALL ibyu, IBY_EXT_BANK_ACCOUNTS extb, iby_account_owners ow, ap_invoices_all ai
+    	    where extp.payee_party_id = supp.party_id
+    	    and extp.party_site_id = sites.party_site_id
+    	    and supp.vendor_id = sites.vendor_id
+    	    and ibyu.instrument_id = extb.ext_bank_account_id 
+    	    and ai.vendor_site_id = sites.vendor_site_id
+    	    and extb.ext_bank_account_id = ow.ext_bank_account_id(+)
+    	    AND ibyu.ext_pmt_party_id = extp.ext_payee_id 
+    	    and ai.invoice_id = :1
+    
+                     
+    	    </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>IBY_EXTERNAL_PAYEES_ALL</tableHeading>
+    </sql>
+    
+    <sql name="SQL_IBY_ACCOUNT_OWNERS">
+              <statement>
+              
+    	    SELECT   distinct ow.*
+    	    FROM     AP_SUPPLIER_SITES_ALL sites, iby_external_payees_all extp, ap_suppliers supp,
+    	    IBY_PMT_INSTR_USES_ALL ibyu, IBY_EXT_BANK_ACCOUNTS extb, iby_account_owners ow, ap_invoices_all ai
+    	    where extp.payee_party_id = supp.party_id
+    	    and extp.party_site_id = sites.party_site_id
+    	    and supp.vendor_id = sites.vendor_id
+    	    and ibyu.instrument_id = extb.ext_bank_account_id 
+    	    and ai.vendor_site_id = sites.vendor_site_id
+    	    and extb.ext_bank_account_id = ow.ext_bank_account_id(+)
+    	    AND ibyu.ext_pmt_party_id = extp.ext_payee_id 
+    	    and ai.invoice_id = :1
+    
+                     
+    	    </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>IBY_ACCOUNT_OWNERS</tableHeading>
+    </sql>
+    
+    <sql name="SQL_IBY_PMT_INSTR_USES_ALL">
+                  <statement>
+                  
+        	    SELECT   distinct ibyu.*
+        	    FROM     AP_SUPPLIER_SITES_ALL sites, iby_external_payees_all extp, ap_suppliers supp,
+        	    IBY_PMT_INSTR_USES_ALL ibyu, IBY_EXT_BANK_ACCOUNTS extb, iby_account_owners ow, ap_invoices_all ai
+        	    where extp.payee_party_id = supp.party_id
+        	    and extp.party_site_id = sites.party_site_id
+        	    and supp.vendor_id = sites.vendor_id
+        	    and ibyu.instrument_id = extb.ext_bank_account_id 
+        	    and ai.vendor_site_id = sites.vendor_site_id
+        	    and extb.ext_bank_account_id = ow.ext_bank_account_id(+)
+        	    AND ibyu.ext_pmt_party_id = extp.ext_payee_id 
+        	    and ai.invoice_id = :1
+        
+                         
+        	    </statement>
+                  <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+                  <tableHeading>IBY_PMT_INSTR_USES_ALL</tableHeading>
+    </sql>
+    
+    <sql name="SQL_IBY_EXT_BANK_ACCOUNTS">
+              <statement>
+              
+    	    SELECT   distinct extb.*
+    	    FROM     AP_SUPPLIER_SITES_ALL sites, iby_external_payees_all extp, ap_suppliers supp,
+    	    IBY_PMT_INSTR_USES_ALL ibyu, IBY_EXT_BANK_ACCOUNTS extb, iby_account_owners ow, ap_invoices_all ai
+    	    where extp.payee_party_id = supp.party_id
+    	    and extp.party_site_id = sites.party_site_id
+    	    and supp.vendor_id = sites.vendor_id
+    	    and ibyu.instrument_id = extb.ext_bank_account_id 
+    	    and ai.vendor_site_id = sites.vendor_site_id
+    	    and extb.ext_bank_account_id = ow.ext_bank_account_id(+)
+    	    AND ibyu.ext_pmt_party_id = extp.ext_payee_id 
+    	    and ai.invoice_id = :1
+    
+                     
+    	    </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>IBY_EXT_BANK_ACCOUNTS</tableHeading>
+    </sql>
+    
+    
+  </section>
+
+  <section title="Purchasing">
+    <sql name="SQL_PO_HEADERS_ALL">
+      <statement>
+        SELECT   distinct poh.*         
+        FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid,         
+                 PO_DISTRIBUTIONS_ALL po,         
+                 PO_HEADERS_ALL poh          
+        WHERE    aid.invoice_id = :1         
+        AND      aid.po_distribution_id is not null         
+        AND      po.po_distribution_id = aid.po_distribution_id         
+        AND      poh.po_header_id = po.po_header_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>PO_HEADERS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_PO_DISTRIBUTIONS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   distinct po.*         
+        FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid,         
+                 PO_DISTRIBUTIONS_ALL po         
+        WHERE    aid.invoice_id = :1         
+        AND      aid.po_distribution_id is not null         
+        AND      po.po_distribution_id = aid.po_distribution_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>PO_DISTRIBUTIONS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_PO_LINES_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   distinct pl.*         
+        FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid,         
+                 PO_DISTRIBUTIONS_ALL po,         
+                 PO_LINES_ALL pl         
+        WHERE    aid.invoice_id = :1         
+        AND      aid.po_distribution_id is not null         
+        AND      po.po_distribution_id = aid.po_distribution_id         
+        AND      pl.po_header_id = po.po_header_id         
+        AND      pl.po_line_id = po.po_line_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>PO_LINES_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_PO_LINE_LOCATIONS_ALL" maxDisplayRows="$maxRowsDisplay">
+      <statement>
+        SELECT   distinct pll.*         
+        FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid,         
+                 PO_DISTRIBUTIONS_ALL po,         
+                 PO_LINE_LOCATIONS_ALL pll         
+        WHERE    aid.invoice_id = :1         
+        AND      aid.po_distribution_id is not null         
+        AND      po.po_distribution_id = aid.po_distribution_id         
+        AND      pll.po_header_id = po.po_header_id         
+        AND      pll.po_line_id = po.po_line_id         
+        AND      pll.line_location_id = po.line_location_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>PO_LINE_LOCATIONS_ALL</tableHeading>
+    </sql>
+    
+    <if test="$API_VALID_OBJECT_MC_INV">
+      <then>
+        <if test="$SQL_115_MRC._RowCount > 0">
+          <then>
+            <sql name="SQL_PO_MC_HEADERS" maxDisplayRows="$maxRowsDisplay">
+              <statement>
+                SELECT    *         
+                FROM     PO_MC_HEADERS          
+                WHERE    po_header_id IN         
+                       ( SELECT   po.po_header_id         
+                         FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid,         
+                                  PO_DISTRIBUTIONS_ALL po         
+                         WHERE    aid.invoice_id = :1         
+                         AND      aid.po_distribution_id is not null         
+                         AND      po.po_distribution_id = aid.po_distribution_id )
+              </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>PO_MC_HEADERS</tableHeading>
+            </sql>
+
+            <sql name="SQL_PO_MC_DISTRIBUTIONS" maxDisplayRows="$maxRowsDisplay">
+              <statement>
+                SELECT   mcd.*         
+                FROM     PO_MC_DISTRIBUTIONS mcd,         
+                         PO_DISTRIBUTIONS_ALL pd         
+                WHERE    pd.po_distribution_id IN         
+                       ( SELECT   po.po_distribution_id          
+                         FROM     AP_INVOICE_DISTRIBUTIONS_ALL aid,         
+                                  PO_DISTRIBUTIONS_ALL po         
+                         WHERE    aid.invoice_id = :1         
+                         AND      aid.po_distribution_id is not null         
+                         AND      po.po_distribution_id = aid.po_distribution_id )                      
+                AND      pd.po_distribution_id = mcd.po_distribution_id
+              </statement>
+              <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+              <tableHeading>PO_MC_DISTRIBUTIONS</tableHeading>
+            </sql>
+          </then>
+        </if>
+      </then>  
+    </if>
+  </section>
+
+  <section title="Encumbrance">
+    <sql name="SQL_GL_BC_PACKETS">
+      <statement>
+        SELECT   * 
+        FROM     GL_BC_PACKETS  
+        WHERE    je_source_name = 'Payables' 
+        AND      reference2 = TO_CHAR(:1) 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>GL_BC_PACKETS</tableHeading>
+    </sql>
+  </section>
+
+  <section title="Prepayment">
+    <sql name="SQL_AP_PREPAY_HISTORY_ALL">
+      <statement>
+        SELECT   aph.*         
+        FROM     AP_PREPAY_HISTORY_ALL aph
+        WHERE    aph.invoice_id = :1         
+          OR     aph.prepay_invoice_id = :2
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PREPAY_HISTORY_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_PREPAY_APP_DISTS">
+      <statement>
+        SELECT   apad.*         
+        FROM     AP_PREPAY_APP_DISTS apad,         
+                 AP_INVOICE_DISTRIBUTIONS_ALL aid         
+        WHERE    aid.invoice_id = :1         
+        AND      apad.invoice_distribution_id = aid.invoice_distribution_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PREPAY_APP_DISTS</tableHeading>
+    </sql>
+
+    <sql name="SQL_COUNT_PREPAYMENT" actionType="storeOnly" saveAllColumns="true">
+      <statement>
+        SELECT   count(*) count       
+        FROM     AP_INVOICES_ALL         
+        WHERE    invoice_type_lookup_code = 'PREPAYMENT'         
+        AND      invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+    </sql>
+
+    <if test="$SQL_COUNT_PREPAYMENT.count > 0">
+      <then>
+        <sql name="SQL_PREPAYMENT_APPLIED_TO_INVOICES">
+          <statement>
+            SELECT  pv.vendor_name        "Vendor Name",          
+                    ai.invoice_num        "Invoice Number",         
+                    ai.invoice_id         "Invoice Id",         
+                    ai.invoice_amount     "Invoice Amount",          
+                    ail.line_number       "Invoice Line Num",                 
+                    ail.prepay_invoice_id "Prepay Invoice Id",         
+                    ai2.invoice_num       "Prepay Invoice Num",         
+                    ail.prepay_line_number         "Prepay Invoice Line Num",             
+                    (-1)*(ail.amount - NVL(ail.included_tax_amount,0)) "Prepay Amount Applied",         
+                    NULLIF((-1)*(NVL(ail.total_rec_tax_amount, 0) + NVL(ail.total_nrec_tax_amount, 0)), 0) "Tax Amount Applied"         
+            FROM    AP_INVOICES_ALL ai,         
+                    AP_INVOICES_ALL ai2,        
+                    AP_INVOICE_LINES_ALL ail,         
+                    AP_SUPPLIERS pv          
+            WHERE   ai.invoice_id = ail.invoice_id          
+            AND     ai2.invoice_id = ail.prepay_invoice_id         
+            AND     ail.amount &lt; 0         
+            AND     NVL(ail.discarded_flag,'N') != 'Y'          
+            AND     ail.line_type_lookup_code = 'PREPAY'         
+            AND     ai.vendor_id = pv.vendor_id         
+            AND     ai.invoice_type_lookup_code NOT IN ('PREPAYMENT', 'CREDIT','DEBIT')         
+            AND     ail.prepay_invoice_id = :1 
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>Invoices Prepayment Invoice Has Been Applied To</tableHeading>
+        </sql>
+      </then>
+      <else>
+        <sql name="SQL_PREPAYMENTS_APPLIED_ON_INVOICE">
+          <statement>
+            SELECT   pv.vendor_name       "Vendor Name",          
+                     ai.invoice_num       "Invoice Num",             
+                     ai.invoice_id        "Invoice Id",         
+                     ai.invoice_amount    "Invoice amount",         
+                     ail.line_number      "Invoice Line Num",             
+                     ai2.invoice_id       "Prepay Invoice Id",          
+                     ai2.invoice_num      "Prepay Invoice Num",          
+                     ail.prepay_line_number        "Prepay Invoice Line Num",         
+                     (-1)*(ail.amount - NVL(ail.included_tax_amount,0)) "Prepay Amount Applied",          
+                     NULLIF((-1)*(NVL(ail.total_rec_tax_amount, 0) + NVL(ail.total_nrec_tax_amount, 0)), 0)  "Tax amount Applied"            
+            FROM     AP_INVOICES_ALL ai,         
+                     AP_INVOICES_ALL ai2,         
+                     AP_INVOICE_LINES_ALL ail,          
+                     AP_SUPPLIERS pv         
+            WHERE    ai.invoice_id = ail.invoice_id         
+            AND      ai2.invoice_id = ail.prepay_invoice_id         
+            AND      ail.amount &lt; 0         
+            AND      NVL(ail.discarded_flag,'N') &lt;> 'Y'         
+            AND      ail.line_type_lookup_code = 'PREPAY'         
+            AND      ai.vendor_id = pv.vendor_id         
+            AND      ai.invoice_type_lookup_code NOT IN ('PREPAYMENT', 'CREDIT','DEBIT')         
+            AND      ai.invoice_id = :1 
+          </statement>
+          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>Prepayment Invoices Applied to Invoice</tableHeading>
+        </sql>
+      </else>
+    </if>
+  </section>
+
+
+  <section title="R11i Payment Document and Bank Details">
+    <sql name="SQL_AP_BANK_BRANCHES">
+      <statement>
+        SELECT   abb.* 
+        FROM     AP_BANK_ACCOUNTS_ALL aba, 
+                 AP_CHECK_STOCKS_ALL acs, 
+                 AP_BANK_BRANCHES abb 
+        WHERE    acs.check_stock_id IN 
+               ( SELECT   check_stock_id 
+                 FROM     AP_CHECKS_ALL 
+                 WHERE    check_id IN 
+               ( SELECT   distinct check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :1 ) ) 
+        AND      acs.bank_account_id = aba.bank_account_id 
+        AND      abb.bank_branch_id = aba.bank_branch_id 
+        ORDER BY abb.bank_name
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_BANK_BRANCHES</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_BANK_ACCOUNTS_ALL">
+      <statement>
+        SELECT   aba.*, 
+                 fnd_flex_ext.get_segs('SQLGL','GL#', :1 , aba.asset_code_combination_id) "Asset Account",
+                 fnd_flex_ext.get_segs('SQLGL','GL#', :2 , aba.cash_clearing_ccid)        "Cash Clearing Account" 
+        FROM     AP_BANK_ACCOUNTS_ALL aba, 
+                 AP_CHECK_STOCKS_ALL acs, 
+                 AP_BANK_BRANCHES abb 
+        WHERE    acs.check_stock_id IN 
+               ( SELECT   check_stock_id 
+                 FROM     AP_CHECKS_ALL 
+                 WHERE    check_id IN 
+               ( SELECT   distinct check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :3 ) ) 
+        AND      acs.bank_account_id = aba.bank_account_id 
+        AND      abb.bank_branch_id = aba.bank_branch_id 
+        ORDER BY aba.bank_account_name
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+      <sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_BANK_ACCOUNTS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_CHECK_STOCKS_ALL">
+      <statement>
+        SELECT   acs.* 
+        FROM     AP_BANK_ACCOUNTS_ALL aba, 
+                 AP_CHECK_STOCKS_ALL acs, 
+                 AP_BANK_BRANCHES abb 
+        WHERE    acs.check_stock_id IN 
+               ( SELECT   check_stock_id 
+                 FROM     AP_CHECKS_ALL 
+                 WHERE    check_id IN 
+               ( SELECT   distinct check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :1 ) ) 
+        AND      acs.bank_account_id = aba.bank_account_id 
+        AND      abb.bank_branch_id = aba.bank_branch_id 
+        ORDER BY acs.name
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_CHECK_STOCKS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_CHECK_FORMATS">
+      <statement>
+        SELECT   acf.* 
+        FROM     AP_PAYMENT_PROGRAMS app, 
+                 AP_CHECK_STOCKS_ALL acs, 
+                 AP_CHECK_FORMATS    acf, 
+                 AP_PAYMENT_PROGRAMS app2, 
+                 AP_PAYMENT_PROGRAMS app3 
+        WHERE    acs.check_stock_id IN 
+               ( SELECT   check_stock_id 
+                 FROM     AP_CHECKS_ALL 
+                 WHERE    check_id IN 
+               ( SELECT   distinct check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :1 ) )   
+        AND      acs.check_format_id = acf.check_format_id 
+        AND      app.program_id = acf.format_payments_program_id 
+        AND      acf.build_payments_program_id = app2.program_id 
+        AND      acf.remittance_advice_program_id = app3.program_id(+) 
+        ORDER BY acf.name
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_CHECK_FORMATS</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_PAYMENT_PROGRAMS">
+      <statement>
+        SELECT   app.* 
+        FROM     AP_PAYMENT_PROGRAMS app, 
+                 AP_CHECK_STOCKS_ALL acs, 
+                 AP_CHECK_FORMATS    acf, 
+                 AP_PAYMENT_PROGRAMS app2, 
+                 AP_PAYMENT_PROGRAMS app3 
+        WHERE    acs.check_stock_id IN 
+               ( SELECT   check_stock_id 
+                 FROM     AP_CHECKS_ALL 
+                 WHERE    check_id IN 
+               ( SELECT   distinct check_id 
+                 FROM     AP_INVOICE_PAYMENTS_ALL 
+                 WHERE    invoice_id = :1 ) )   
+        AND      acs.check_format_id = acf.check_format_id 
+        AND      app.program_id = acf.format_payments_program_id 
+        AND      acf.build_payments_program_id = app2.program_id 
+        AND      acf.remittance_advice_program_id = app3.program_id(+) 
+        ORDER BY app.program_name
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_PAYMENT_PROGRAMS</tableHeading>
+    </sql>
+  </section>
+
+
+<section title="R12 Payment Document and Bank Details">
+    
+            <sql name="SQL_HZ_BANK">
+	          <statement>
+		    Select  distinct BankParty.PARTY_ID  BankId,
+			    BankParty.PARTY_NAME        BankName,
+			    BankParty.ORGANIZATION_NAME_PHONETIC        AltBankName,
+			    BankParty.KNOWN_AS  ShortBankName,
+			    BankOrgProfile.BANK_OR_BRANCH_NUMBER        BankNumber,
+			    FndTerritory.territory_short_name    BankCountry,
+			    BankCA.class_code AS institution_type_code,
+			    bankca.end_date_active
+		    From    HZ_PARTIES      BankParty,
+			     ap_invoice_payments_all aip, ap_checks_all ac,
+			      ce_bank_acct_uses_all uses,
+			      ce_bank_accounts cba,
+					CE_GL_ACCOUNTS_CCID cegl,
+				    HZ_ORGANIZATION_PROFILES        BankOrgProfile,
+			    HZ_CODE_ASSIGNMENTS   BankCA,
+			    FND_TERRITORIES_VL    FndTerritory
+		    Where   BankParty.PARTY_TYPE = 'ORGANIZATION'
+		    and     cba.bank_id = BankParty.PARTY_ID 
+		    and     cba.bank_account_id = uses.bank_account_id
+		    and     uses.bank_acct_use_id = cegl.bank_acct_use_id
+		    and     aip.check_id = ac.check_id
+		    and     aip.invoice_id = :1
+		    and     ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+		    And     BankParty.status = 'A'
+		    And     BankParty.PARTY_ID = BankOrgProfile.PARTY_ID
+		    And     SYSDATE between TRUNC(BankOrgProfile.effective_start_date)
+			    and NVL(TRUNC(BankOrgProfile.effective_end_date), SYSDATE+1)
+		    And     BankCA.CLASS_CATEGORY = 'BANK_INSTITUTION_TYPE'
+		    And     BankCA.CLASS_CODE in ('BANK', 'CLEARINGHOUSE')
+		    And     BankCA.OWNER_TABLE_NAME = 'HZ_PARTIES'
+		    And     BankCA.OWNER_TABLE_ID = BankParty.PARTY_ID
+		    And     NVL(BankCA.STATUS, 'A') = 'A'
+		    And     BankOrgProfile.HOME_COUNTRY = FndTerritory.territory_code
+	
+		  </statement>
+	          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	          <tableHeading>HZ BANK INFO</tableHeading>
+	        </sql>
+	
+	
+	    <sql name="SQL_HZ_BRANCH">
+	          <statement>
+		    
+		    Select  distinct BankParty.PARTY_ID  BankId,
+		            BankParty.PARTY_NAME        BankName,
+		            BankParty.ORGANIZATION_NAME_PHONETIC        AltBankName,
+		            BankParty.KNOWN_AS  ShortBankName,
+		            BankOrgProfile.BANK_OR_BRANCH_NUMBER        BankNumber,
+		            FndTerritory.territory_short_name    BankCountry,
+		            BranchParty.PARTY_ID   BranchId,
+		            BranchParty.PARTY_NAME    BranchName,
+		            BranchParty.ORGANIZATION_NAME_PHONETIC      AltBranchName,
+		            BranchOrgProfile.BANK_OR_BRANCH_NUMBER      BranchNumber,
+		            BankCA.class_code    Bank_institution_type,
+		            BranchCPEdi.edi_ece_tp_location_code EdiLocation,
+		            bankca.end_date_active BANKCA_END_DATE, branchca.end_date_active BRANCHCA_END_DATE
+		    From    HZ_PARTIES      BankParty,
+		        ap_invoice_payments_all aip, ap_checks_all ac,
+		    		ce_bank_acct_uses_all uses,
+		    		ce_bank_accounts cba,
+		    		CE_GL_ACCOUNTS_CCID cegl,
+		    		    HZ_ORGANIZATION_PROFILES        BankOrgProfile,
+		            HZ_CODE_ASSIGNMENTS   BankCA,
+		            HZ_PARTIES      BranchParty,
+		            HZ_ORGANIZATION_PROFILES        BranchOrgProfile,
+		            HZ_CODE_ASSIGNMENTS   BranchCA,
+		            HZ_CONTACT_POINTS  BranchCPEdi,
+		            HZ_RELATIONSHIPS        BRRel,
+		            FND_TERRITORIES_VL    FndTerritory
+		    Where   BankParty.PARTY_TYPE = 'ORGANIZATION'
+		    and     cba.bank_account_id = uses.bank_account_id
+		    and     uses.bank_acct_use_id = cegl.bank_acct_use_id
+		    and     aip.check_id = ac.check_id
+		    and     aip.invoice_id = :1
+		    and     ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+		    and     BankParty.PARTY_ID = cba.bank_id
+		    and     cba.bank_branch_id = BranchParty.PARTY_ID
+		    And     BankParty.status = 'A'
+		    And     BankParty.PARTY_ID = BankOrgProfile.PARTY_ID
+		    And     SYSDATE between TRUNC(BankOrgProfile.effective_start_date)
+		            and NVL(TRUNC(BankOrgProfile.effective_end_date), SYSDATE+1)
+		    And     BankCA.CLASS_CATEGORY = 'BANK_INSTITUTION_TYPE'
+		    And     BankCA.CLASS_CODE in ('BANK', 'CLEARINGHOUSE')
+		    And     BankCA.OWNER_TABLE_NAME = 'HZ_PARTIES'
+		    And     BankCA.OWNER_TABLE_ID = BankParty.PARTY_ID
+		    And     NVL(BankCA.STATUS, 'A') = 'A'
+		    And     BranchParty.PARTY_TYPE = 'ORGANIZATION'
+		    And     BranchParty.status = 'A'
+		    And     BranchOrgProfile.PARTY_ID = BranchParty.PARTY_ID
+		    And     SYSDATE between TRUNC(BranchOrgProfile.effective_start_date)
+		            and NVL(TRUNC(BranchOrgProfile.effective_end_date), SYSDATE+1)
+		    And     BranchCA.CLASS_CATEGORY = 'BANK_INSTITUTION_TYPE'
+		    And     BranchCA.CLASS_CODE in ('BANK_BRANCH', 'CLEARINGHOUSE_BRANCH')
+		    And     BranchCA.OWNER_TABLE_NAME = 'HZ_PARTIES'
+		    And     BranchCA.OWNER_TABLE_ID = BranchParty.PARTY_ID
+		    And     NVL(BranchCA.STATUS, 'A') = 'A'
+		    And    BranchCPEdi.OWNER_TABLE_NAME(+) = 'HZ_PARTIES'
+		    And    BranchCPEdi.OWNER_TABLE_ID(+) = BranchParty.PARTY_ID
+		    And    BranchCPEdi.CONTACT_POINT_TYPE(+) = 'EDI'
+		    And    BranchCPEdi.STATUS(+) = 'A'
+		    And     BRRel.OBJECT_ID = BankParty.PARTY_ID
+		    And     BranchParty.PARTY_ID = BRRel.SUBJECT_ID
+		    And     BRRel.RELATIONSHIP_TYPE = 'BANK_AND_BRANCH'
+		    And     BRRel.RELATIONSHIP_CODE = 'BRANCH_OF'
+		    And     BRRel.STATUS = 'A'
+		    And     BRRel.SUBJECT_TABLE_NAME = 'HZ_PARTIES'
+		    And     BRRel.SUBJECT_TYPE =  'ORGANIZATION'
+		    And     BRRel.OBJECT_TABLE_NAME = 'HZ_PARTIES'
+		    And     BRRel.OBJECT_TYPE = 'ORGANIZATION'
+		    And     BankOrgProfile.home_country = FndTerritory.territory_code
+	
+		  </statement>
+	          <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+	          <tableHeading>HZ BRANCH INFO</tableHeading>
+	        </sql>
+
+    
+    
+    <sql name="SQL_CE_BANK_ACCOUNTS">
+      <statement>
+		select distinct cba.*
+		from ap_invoice_payments_all aip, ap_checks_all ac,
+		ce_bank_acct_uses_all uses,
+		ce_bank_accounts cba,
+		CE_GL_ACCOUNTS_CCID cegl
+		where cba.bank_account_id = uses.bank_account_id
+		and uses.bank_acct_use_id = cegl.bank_acct_use_id
+		and     aip.check_id = ac.check_id
+		and     aip.invoice_id = :1
+		and     ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>CE_BANK_ACCOUNTS</tableHeading>
+    </sql>
+
+
+    <sql name="SQL_CE_BANK_ACCT_USES_ALL">
+      <statement>
+		select distinct uses.*
+		from ap_invoice_payments_all aip, ap_checks_all ac,
+		ce_bank_acct_uses_all uses,
+		ce_bank_accounts cba,
+		CE_GL_ACCOUNTS_CCID cegl
+		where cba.bank_account_id = uses.bank_account_id
+		and uses.bank_acct_use_id = cegl.bank_acct_use_id
+		and     aip.check_id = ac.check_id
+		and     aip.invoice_id = :1
+		and     ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>CE_BANK_ACCT_USES_ALL</tableHeading>
+    </sql>
+
+<sql name="SQL_CE_GL_ACCOUNTS_CCID">
+      <statement>
+		
+		select distinct cegl.*,
+		fnd_flex_ext.get_segs('SQLGL','GL#', :1 , cegl.cash_clearing_ccid) "CASH CLEARING ACCOUNT", 
+		fnd_flex_ext.get_segs('SQLGL','GL#', :2 , cegl.AP_ASSET_CCID) "CASH ACCOUNT"   
+		from ap_invoice_payments_all aip, ap_checks_all ac,
+		ce_bank_acct_uses_all uses,
+		ce_bank_accounts cba,
+		CE_GL_ACCOUNTS_CCID cegl
+		where cba.bank_account_id = uses.bank_account_id
+		and uses.bank_acct_use_id = cegl.bank_acct_use_id
+		and     aip.check_id = ac.check_id
+		and     aip.invoice_id = :3
+		and     ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+
+      </statement>
+		<sqlParam bindTo="1" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+		<sqlParam bindTo="2" dataType="BigDecimal" value="$SQL_COA.chart_of_accounts_id"/>
+		<sqlParam bindTo="3" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>CE_GL_ACCOUNTS_CCID</tableHeading>
+    </sql>
+
+  </section>
+
+
+  <section title="Cash Management">
+    <sql name="SQL_CE_STATEMENT_RECONCILS_ALL">
+      <statement>
+        SELECT   distinct csr.* 
+        FROM     CE_STATEMENT_LINES cel,  
+                 CE_STATEMENT_HEADERS ceh, 
+                 CE_STATEMENT_RECONCILS_ALL csr, 
+                 AP_INVOICE_PAYMENTS_ALL aip, 
+                 AP_CHECKS_ALL ac 
+        WHERE    cel.statement_header_id = ceh.statement_header_id 
+        AND      ac.check_id = aip.check_id  
+        AND      aip.invoice_id = :1 
+        AND      aip.check_id = ac.check_id 
+        AND      ac.bank_account_id = ceh.bank_account_id 
+        AND      to_char(ac.check_number) = cel.bank_trx_number 
+        AND      csr.statement_line_id = cel.statement_line_id
+        UNION
+        SELECT   distinct csr.* 
+	FROM     CE_STATEMENT_LINES cel,  
+		 CE_STATEMENT_HEADERS ceh, 
+		 CE_STATEMENT_RECONCILS_ALL csr, 
+		 AP_INVOICE_PAYMENTS_ALL aip, 
+		 AP_CHECKS_ALL ac,
+		 ce_bank_acct_uses_all uses
+	WHERE    cel.statement_header_id = ceh.statement_header_id 
+	AND      ac.check_id = aip.check_id  
+	AND      aip.invoice_id = :2
+	AND      aip.check_id = ac.check_id 
+	AND      uses.bank_account_id = ceh.bank_account_id 
+	AND      to_char(ac.check_number) = cel.bank_trx_number 
+	AND      csr.statement_line_id = cel.statement_line_id
+	and      ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>CE_STATEMENT_RECONCILS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_CE_STATEMENT_HEADERS_ALL">
+      <statement>
+        SELECT   distinct ceh.* 
+        FROM     CE_STATEMENT_LINES cel,  
+                 CE_STATEMENT_HEADERS ceh, 
+                 CE_STATEMENT_RECONCILS_ALL csr,
+                 AP_INVOICE_PAYMENTS_ALL aip, 
+                 AP_CHECKS_ALL ac     
+        WHERE    cel.statement_header_id = ceh.statement_header_id 
+        AND      ac.check_id = aip.check_id 
+        AND      aip.invoice_id = :1 
+        AND      aip.check_id = ac.check_id 
+        AND      ac.bank_account_id = ceh.bank_account_id 
+        AND      to_char(ac.check_number) = cel.bank_trx_number 
+        AND      csr.statement_line_id = cel.statement_line_id
+        UNION
+	SELECT   distinct ceh.* 
+	FROM     CE_STATEMENT_LINES cel,  
+		 CE_STATEMENT_HEADERS ceh, 
+		 CE_STATEMENT_RECONCILS_ALL csr, 
+		 AP_INVOICE_PAYMENTS_ALL aip, 
+		 AP_CHECKS_ALL ac,
+		 ce_bank_acct_uses_all uses
+	WHERE    cel.statement_header_id = ceh.statement_header_id 
+	AND      ac.check_id = aip.check_id  
+	AND      aip.invoice_id = :2
+	AND      aip.check_id = ac.check_id 
+	AND      uses.bank_account_id = ceh.bank_account_id 
+	AND      to_char(ac.check_number) = cel.bank_trx_number 
+	AND      csr.statement_line_id = cel.statement_line_id
+	and      ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>CE_STATEMENT_HEADERS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_CE_STATEMENT_LINES_ALL">
+      <statement>
+        SELECT   distinct cel.* 
+        FROM     CE_STATEMENT_LINES cel,  
+                 CE_STATEMENT_HEADERS ceh, 
+                 CE_STATEMENT_RECONCILS_ALL csr,
+                 AP_INVOICE_PAYMENTS_ALL aip, 
+                 AP_CHECKS_ALL ac     
+        WHERE    cel.statement_header_id = ceh.statement_header_id 
+        AND      ac.check_id = aip.check_id 
+        AND      aip.invoice_id = :1 
+        AND      aip.check_id = ac.check_id 
+        AND      ac.bank_account_id = ceh.bank_account_id 
+        AND      to_char(ac.check_number) = cel.bank_trx_number 
+        AND      csr.statement_line_id = cel.statement_line_id
+        UNION
+	SELECT   distinct cel.* 
+	FROM     CE_STATEMENT_LINES cel,  
+		 CE_STATEMENT_HEADERS ceh, 
+		 CE_STATEMENT_RECONCILS_ALL csr, 
+		 AP_INVOICE_PAYMENTS_ALL aip, 
+		 AP_CHECKS_ALL ac,
+		 ce_bank_acct_uses_all uses
+	WHERE    cel.statement_header_id = ceh.statement_header_id 
+	AND      ac.check_id = aip.check_id  
+	AND      aip.invoice_id = :2
+	AND      aip.check_id = ac.check_id 
+	AND      uses.bank_account_id = ceh.bank_account_id 
+	AND      to_char(ac.check_number) = cel.bank_trx_number 
+	AND      csr.statement_line_id = cel.statement_line_id
+	and      ac.ce_bank_acct_use_id = uses.bank_acct_use_id
+
+	      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+<tableHeading>CE_STATEMENT_LINES_ALL</tableHeading>
+    </sql>
+  </section>
+
+<section title="Expense Report Details">
+    <sql name="SQL_AP_EXPENSE_REPORT_HEADERS_ALL">
+      <statement>
+	select distinct erh.*
+	from ap_exp_report_dists_all erd,
+	ap_expense_report_lines_all erl,
+	ap_invoices_all ai,
+	ap_expense_report_headers_all erh
+	where ai.invoice_id = erh.vouchno
+	and erd.report_header_id(+) = erh.report_header_id
+	and erl.report_header_id(+) = erh.report_header_id
+	and ai.invoice_id = :1
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_EXPENSE_REPORT_HEADERS_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_EXPENSE_REPORT_LINES_ALL">
+      <statement>
+        
+	select distinct erl.*
+	from ap_exp_report_dists_all erd,
+	ap_expense_report_lines_all erl,
+	ap_invoices_all ai,
+	ap_expense_report_headers_all erh
+	where ai.invoice_id = erh.vouchno
+	and erd.report_header_id(+) = erh.report_header_id
+	and erl.report_header_id(+) = erh.report_header_id
+	and ai.invoice_id = :1
+
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_EXPENSE_REPORT_LINES_ALL</tableHeading>
+    </sql>
+
+    <sql name="SQL_AP_EXP_REPORT_DISTS_ALL">
+      <statement>
+
+	select distinct erd.*
+	from ap_exp_report_dists_all erd,
+	ap_expense_report_lines_all erl,
+	ap_invoices_all ai,
+	ap_expense_report_headers_all erh
+	where ai.invoice_id = erh.vouchno
+	and erd.report_header_id(+) = erh.report_header_id
+	and erl.report_header_id(+) = erh.report_header_id
+	and ai.invoice_id = :1
+	
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>AP_EXP_REPORT_DISTS_ALL</tableHeading>
+    </sql>
+  </section>
+
+  <section title="Treasury Confirmation">
+    <sql name="SQL_FV_TREASURY_CONFIRMATIONS_ALL">
+      <statement>
+        SELECT   distinct tc.* 
+        FROM     AP_INVOICE_PAYMENTS_ALL aip, 
+                 AP_CHECKS_ALL ac, 
+                 FV_TREASURY_CONFIRMATIONS_ALL tc 
+        WHERE    ac.checkrun_name = tc.checkrun_name 
+        AND      ac.check_id = aip.check_id 
+        AND      aip.invoice_id = :1 
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <tableHeading>FV_TREASURY_CONFIRMATIONS_ALL</tableHeading>
+    </sql>
+  </section>
+
+  <section title="Currency">
+    <sql name="SQL_FND_CURRENCIES">
+      <statement>
+        SELECT   * 
+        FROM     FND_CURRENCIES 
+        WHERE    currency_code IN 
+               ( SELECT   a.invoice_currency_code 
+                 FROM     AP_INVOICES_ALL a 
+                 WHERE    a.invoice_id = :1 
+                 UNION 
+                 SELECT   b.payment_currency_code 
+                 FROM     AP_INVOICES_ALL b 
+                 WHERE    b.invoice_id = :2 
+                 UNION 
+                 SELECT   c.base_currency_code 
+                 FROM     AP_SYSTEM_PARAMETERS_ALL c 
+                 WHERE    nvl(c.org_id, -99) = :3 )
+      </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="2" dataType="BigDecimal" value="$invoiceId"/>
+      <sqlParam bindTo="3" dataType="BigDecimal" value="$SQL_INVOICE_ORG.org_id"/>
+      <tableHeading>FND_CURRENCIES</tableHeading>
+    </sql>
+  </section>
+
+  <sql name="SQL_ARGENTINA_LOCALIZATIONS" actionType="storeOnly" saveAllColumns="true">
+    <statement>
+      SELECT   count(*) count
+      FROM     AP_INVOICES_ALL 
+      WHERE    global_attribute_category = 'JL.AR.APXINWKB.INVOICES' 
+      AND      invoice_id = :1 
+    </statement>
+    <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+  </sql>
+  
+  <if test="$SQL_ARGENTINA_LOCALIZATIONS.count > 0">
+    <then>
+      <section title="Argentina Localizations">
+        <sql name="SQL_JL_AR_AP_AWT_CERTIF_ALL">
+          <statement>
+            SELECT   jl.* 
+            FROM     JL_AR_AP_AWT_CERTIF_ALL jl, 
+                     AP_CHECKS_ALL ac, 
+                     AP_INVOICE_PAYMENTS_ALL aip 
+            WHERE    aip.check_id = ac.check_id 
+            AND      aip.invoice_id =  :1 
+            AND      jl.check_number = ac.check_number 
+            AND      jl.checkrun_name = ac.checkrun_name
+          </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>JL_AR_AP_AWT_CERTIF_ALL</tableHeading>
+        </sql>
+
+        <sql name="SQL_JL_ZZ_AP_INV_DIS_WH_ALL">
+          <statement>
+            SELECT   * 
+            FROM     JL_ZZ_AP_INV_DIS_WH_ALL 
+            WHERE    invoice_id = :1 
+          </statement>
+      <sqlParam bindTo="1" dataType="BigDecimal" value="$invoiceId"/>
+          <tableHeading>JL_ZZ_AP_INV_DIS_WH_ALL</tableHeading>
+        </sql>
+      </section>
+    </then>
+  </if>
+
+  <section title="References">
+     <message>None at present</message>
+  </section>
+
+</XMLTest>

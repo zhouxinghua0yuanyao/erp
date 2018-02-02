@@ -1,0 +1,9 @@
+select unit.NAME, item.SEGMENT1, item.DESCRIPTION
+  from mtl_system_items_b item, hr_all_organization_units unit
+ where item.ORGANIZATION_ID = unit.ORGANIZATION_ID and item.ORGANIZATION_ID<>98
+      
+   and not exists
+ (select 1
+          from MTL_ITEM_CATEGORIES_V cate
+         where cate.INVENTORY_ITEM_ID = item.INVENTORY_ITEM_ID
+           and cate.ORGANIZATION_ID = item.ORGANIZATION_ID and cate.CATEGORY_SET_ID=1100000041 )

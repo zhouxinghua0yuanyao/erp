@@ -1,0 +1,166 @@
+################################################################# 
+# $Header: gmefile.drv 120.11.12020000.3 2015/04/30 07:53:08 jjgao ship $
+# ============================================================ 
+# Copyright (c) 1999,2015 Oracle Corporation  All Rights Reserved. 
+# ============================================================ 
+ 
+# ============================================================ 
+# FILENAME 
+#     gmefile.drv 
+# 
+# DESCRIPTION 
+#     Product-level source code and executable driver file for  
+#     Oracle Process Manufacturing gme Module 
+# HISTORY
+#    Shikha Nagar 12/15/99 - Added empty directories for log,out &mesg
+#									  required for Autoinstall 
+#    Shikha Nagar 01/12/00 - Added code to install NLADD & NLINS files
+#                            in admin tier.
+#    Shikha Nagar 09/02/00 - Replaced pmcommon.h and pccommon.h by 
+#                            pmapi.h and pcapi.h 
+#    Shikha Nagar 02/16/00 - Added new file PMEFFED under installation
+#									  type "forms" & "formsdev"- Bug 582468
+#    Shikha Nagar 11/30/00 - Added new file GMEWKBNCH,GMEPMSUM,GMEPCSUM,GMESUMM
+#									  under installation type "forms" & "formsdev"
+#	  E. Chen		12/19/00 - Changed name to GMEWBNCH.
+#	  E. Chen	 	12/29/00 - B1562932 Added file PMCRTAPI under 
+#  								  installation type forms and formsdev. 
+
+#    Bill Stearns 04/24/01 - Added GMEPWBSC.fmb - GANTT Chart
+#    Shrikant Nene 05/10/2001 - Added java files for Gantt Chart
+#    Shrikant Nene 05/26/2001 - Added all new files for Minipack H
+#    A. Newbury	05/03/2001 - B1863426 - removed reference to PMCRTAPI.  This
+#	was the orig name for the form... was later renamed
+#	so that PMCRTAPI is not in the patchset.
+#    A. Newbury	07/05/01	- B1868015 - remove reference to GMEPWBSC.fmb 
+#       GANTT chart was removed for now.
+#    Shrikant Nene - 11/30/2001 Added Minipack I files including Gantt Chart
+#    Shrikant Nene - 04/11/2002 Added GMEPWBSH to the file
+#    Shrikant Nene - 09/25/2002 Added include entry for gmeeres.drv
+#                    for ERES related files.
+#    Shrikant Nene - 06/08/2005 Added new files for R12
+#    Shrikant Nene - 07/01/2005 Changed refernce GMEPSCED to GMEPSCSM
+#    Tim Abbott    - 09/21/2005 Removed files GMEUNISM.fmb & GMEBCHED.fmb
+#                               As per bug# 4577358
+#    Tim Abbott    - 09/23/2005 Removed files GMEUNISM.fmx & GMEBCHED.fmx
+#    Rich Tardio   - 03/30/2006 Added gmo5115227.drv for GMO in GMD,GME,GMO (see#           bug 5115227) for library dependency.
+#    Archana Mundhe - 12/12/2007 Bug 6677319 Added from GMEMSBCH
+################################################################# 
+
+
+# include common shared install files
+#include gme admin/driver gmeeres.drv
+#include gme admin/driver gmer12upg.drv
+#include gmo admin/driver gmo5115227.drv
+#include gme admin/driver gme16974953.drv
+#include gme admin/driver gme20986335.drv
+ 
+# Oracle Forms executables
+if installation-type forms
+    gme     forms/<LANG>     GMEBOWED.fmx
+    gme     forms/<LANG>     GMEBSVSM.fmx
+    gme     forms/<LANG>     GMECBTCH.fmx
+    gme     forms/<LANG>     GMEMATED.fmx
+    gme     forms/<LANG>     GMEMVRSM.fmx
+    gme     forms/<LANG>     GMEPMSM.fmx
+    gme     forms/<LANG>     GMEPOCSM.fmx
+    gme     forms/<LANG>     GMEPSCSM.fmx
+    gme     forms/<LANG>     GMERVRSM.fmx
+    gme     forms/<LANG>     GMESDPED.fmx
+    gme     forms/<LANG>     GMESMAED.fmx
+    gme     forms/<LANG>     GMESTPED.fmx
+    gme     forms/<LANG>     GMEWIPSM.fmx
+    gme     forms/<LANG>     GMEWKBCH.fmx
+    gme     forms/<LANG>     GMEPWBSC.fmx
+    gme     forms/<LANG>     GMEBDTED.fmx
+    gme     forms/<LANG>     GMEPRMED.fmx
+    gme     forms/<LANG>     GMEIBFED.fmx
+    gme     forms/<LANG>     GMEINPSM.fmx
+    gme     forms/<LANG>     GMEINVSM.fmx
+    gme     forms/<LANG>     GMETTMTX.fmx
+    gme     forms/<LANG>     GMEMSBCH.fmx
+    gme     forms/<LANG>     GMEMTORL.fmx
+    gme     resource     GMECOM.plx plx au resource 
+
+endif
+# end of installation type forms
+#
+#
+if installation-type formsdev
+    gme     forms/<LANG>     GMEBOWED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEBSVSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMECBTCH.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEMATED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEMVRSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEPMSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEPOCSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEPSCSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMERVRSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMESDPED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMESMAED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMESTPED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEWIPSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEWKBCH.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEPWBSC.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEBDTED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEPRMED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEIBFED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEINPSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEINVSM.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMETTMTX.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEMSBCH.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEMTORL.fmb   fmb au forms/<LANG>
+    gme     resource     GMECOM.pll   formpll au resource 
+endif
+#
+# Product files needed on admin tier 
+#
+if installation-type admin 
+# None.
+endif
+#
+# Files needed on a server
+#
+if installation-type node 
+    #
+    # Oracle Reports files
+    #
+    gme     reports/<LANG>     GMEBCHPL.rdf 
+    gme     reports/<LANG>     GMEBCHTK.rdf 
+    gme     reports/<LANG>     GMEBCHYV.rdf 
+    gme     reports/<LANG>     GMEMUSBV.rdf 
+    gme     reports/<LANG>     GMEPRACT.rdf 
+
+
+	# Report files of other products
+	# Nothing yet.
+	# section of if WIN_NT 
+
+endif  
+# Server side files
+# --------------------------------------------------------  
+# Message files
+# --------------------------------------------------------
+ 
+if installation-type forms node web
+    gme     mesg    <LANG>.msb
+endif
+if installation-type admin node nodedev forms formsdev web webdev
+# Empty directory needed for AutoInstall
+  gme           log             directory
+  gme           out             directory
+  gme           mesg            directory
+endif
+if installation-type admin
+# Files for MLS
+    gme     sql         GMENLINS.sql
+endif
+
+if installation-type web webdev
+
+    gme java/make gmejar.dep dep
+
+    gme java/jar gmegantt.jar java     java    oracle/apps/gme/jar
+
+endif
+

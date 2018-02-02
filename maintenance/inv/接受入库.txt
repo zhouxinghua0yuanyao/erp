@@ -1,0 +1,23 @@
+接收事务处理
+
+CUX_DIS_APPLICATION_TYPES
+CUX_DIS_REQ_NUMBERS
+CUX_DIS_REQ_LINE_NUMBERS_ALL
+
+
+WHERE rh.req_status = 'APPROVED'
+   AND ((((:SYSTEM.CURRENT_FORM IN
+             ('RCVRCERC', 'RCVTXERT') AND cux_dis_req_common_utl.get_req_exec_status(rh.header_id) <>
+             'EXECUTED') OR (:SYSTEM.CURRENT_FORM in( 'RCVTXECO', 'RCVTXERE'))) 
+   AND ((:global.p_po_line_id:NULL IS NOT NULL AND EXISTS
+        (SELECT 1
+            FROM cux_dis_req_line_po_all rlp
+           WHERE rh.header_id = rlp.header_id
+             AND rlp.po_line_id = :global.p_po_line_id:NULL)) OR :global.p_po_line_id:NULL IS NULL)
+   AND ((:global.p_oe_order_line_id:null IS NOT NULL AND EXISTS
+        (SELECT 1
+            FROM cux_dis_req_line_so_all rls
+           WHERE rh.header_id = rls.header_id
+             AND rls.so_line_id = :global.p_oe_order_line_id:null)) OR
+       :global.p_oe_order_line_id:null IS NULL)) OR :SYSTEM.CURRENT_FORM IN ('RCVRCVRC','RCVTXVTX'))
+   AND rh.req_type = :$FLEX$.CUX_DIS_APPLICATION_TYPES

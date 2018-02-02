@@ -1,0 +1,8 @@
+invoice id
+36295
+Output file: /ebs01/prod/temp/AP-GDF-2016-09-08-111049.html
+Log file:    /ebs01/prod/temp/AP-GDF-2016-09-08-111049.log
+36300
+Output file: /ebs01/prod/temp/AP-GDF-2016-09-08-111243.html
+Log file:    /ebs01/prod/temp/AP-GDF-2016-09-08-111243.log
+36407

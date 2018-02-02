@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- $Header: txk_R1220_GRID_base_bugs.xml 120.0.12020000.2 2017/05/02 15:42:34 skaushal noship $ -->
+<!--
+# +======================================================================+
+# |            Copyright (c) 2013, 2017 Oracle and/or its affiliates.                                                
+# |                         All rights reserved.                                                                                    
+# |                           Version 12.0.0                                                                                          
+# +======================================================================+
+-->
+<EBS release="R1220">
+  <Technology name="GRID_HOME" version="12.1.0.2">
+    <platform id="226" name="LINUX_X86-64">
+      <base_bugs>20734332,20766180,21210985,21430567,21550724,21692274,25221056,24309560</base_bugs>
+	  <bugs_rollback/>
+      <bugs_mandatory/>
+    </platform>
+    <platform id="23" name="Solaris_sparc">
+      <base_bugs>20734332,20766180,21210985,21430567,21550724,21692274,25221056,24309560</base_bugs>
+      <bugs_rollback/>
+      <bugs_mandatory/>
+    </platform>
+    <platform id="212" name="IBM_AIX">
+      <base_bugs>20734332,20766180,21210985,21430567,21550724,21692274,25221056,24309560</base_bugs>
+      <bugs_rollback/>
+      <bugs_mandatory/>
+    </platform>
+    <platform id="197" name="HP_UX_IA64">
+      <base_bugs>20734332,20766180,21210985,21430567,21550724,21692274,25221056,24309560</base_bugs>
+      <bugs_rollback/>
+      <bugs_mandatory/>
+    </platform>
+    <platform id="267" name="Solaris_x86-64">
+      <base_bugs>20734332,20766180,21210985,21430567,21550724,21692274,25221056,24309560</base_bugs>
+      <bugs_rollback/>
+      <bugs_mandatory/>
+    </platform>
+    <platform id="209" name="LINUX_ZSER">
+      <base_bugs>20734332,20766180,21210985,21430567,21550724,21692274,25221056,24309560</base_bugs>
+      <bugs_rollback/>
+      <bugs_mandatory/>
+    </platform>
+  </Technology>
+</EBS>

@@ -1,0 +1,1410 @@
+CREATE OR REPLACE PACKAGE cux_dis_receivable_jili_new IS
+  /*==================================================
+  Copyright (C) HAND-CHINA Business Consulting Services
+             AllRights Reserved
+  ==================================================*/
+  /*==================================================
+  Program Name:
+      cux_dis_receivable_detail_pkg
+  Description:
+      This program provide private API to perform:
+       DIS-027_基利报表
+  History:
+      1.00  2016-04-24  heng.zhang  Creation
+  ==================================================*/
+
+  PROCEDURE main(errbuf                 OUT VARCHAR2,
+                 retcode                OUT VARCHAR2,
+                 p_org_id               IN NUMBER,
+                 p_cust_account_id      IN NUMBER,
+                 p_district             IN VARCHAR2,
+                 p_oe_header_id         IN NUMBER,
+                 p_contract_number      IN VARCHAR2,
+                 p_date_from            IN VARCHAR2, --签订时间
+                 p_date_to              IN VARCHAR2,
+                 p_cash_date_f          IN VARCHAR2,
+                 p_cash_date_t          IN VARCHAR2,
+                 p_ar_date_f            IN VARCHAR2,
+                 p_ar_date_t            IN VARCHAR2,
+                 p_display_zero_flag    IN VARCHAR2,
+                 p_include_invaild_flag IN VARCHAR2 DEFAULT 'Y');
+
+ 
+  g_print_header0 VARCHAR2(300) := '<html>' ||
+                                   '<meta http-equiv="Content-Language" content="zh-cn">' ||
+                                   '<meta http-equiv="Content-Type" content="text/html; charset=G_CHARSET">';
+g_print_header1 CONSTANT VARCHAR2(5000) := '<title>CUX:基利分表</title>' ||
+                                             '<style type="text/css">' ||
+                                             '<-- $header: porstyl2.css 115.9 2011/02/21 09:21:42 DFLEE ship ${  }' ||
+                                             '<!--' ||
+                                             '   body         {background-color: #ffffff;}' ||
+                                             '   .subheader1  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 13pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' ||
+                                             '   .subheader2  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' ||
+                                             '   .tableheader {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 background: #E0ECF8;' ||
+                                             '                 color: #336699;' ||
+                                             '                 text-align: center;}' ||
+                                             '   .tabledata   {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 mso-number-format: "\@"}' ||
+                                             '   .tabledata2  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 color: #000000;' ||
+                                             '                 mso-number-format: "\@"}' ||
+                                             '   .tablenumber {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 text-align: right}' ||
+                                             '   .tablenum002 {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 text-align: right;' ||
+                                             '                 mso-number-format: "0\.0000";}' ||
+                                             '    .footer  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' || '-->' ||
+                                             '</style>';
+
+  g_print_header2 VARCHAR2(500) := '<body>' ||
+                                   '<TABLE border=0 cellpadding=0 cellspacing=0 width=1200>' ||
+                                   '<TR><th colspan=24 class=subheader1 align=center style="margin-top: 0"><h2>账期表2</h2> </th></TR>' ||
+                                   '</TABLE>';
+
+  g_print_header2_2 VARCHAR2(2000) := '<TABLE border=0 cellpadding=0 cellspacing=0 width=1500>' ||
+                                      '<TR><td class="tabledata2">业务实体：</td> <td align = left class="tabledata2">TEXT01</td> ' ||
+                                      '<td class="tabledata2">客户名称：</td><td align = "left" class="tabledata2">TEXT02</td>  ' ||
+                                      '<td class="tabledata2">合同签订日期从：</td><td align = "left" class="tabledata2">TEXT06</td>  ' ||
+                                      '<td class="tabledata2">合同签订日期至：</td><td align = "left" class="tabledata2">TEXT07</td>  ' ||
+                                      '</TR> ' ||
+                                      '<TR><td class="tabledata2">收款日期从：</td> <td align = left class="tabledata2">TEXT10</td> ' ||
+                                      '<td class="tabledata2">收款日期至：</td><td align = "left" class="tabledata2">TEXT11</td>  ' ||
+                                      '<td class="tabledata2">应收发票日期从：</td><td align = "left" class="tabledata2">TEXT12</td>  ' ||
+                                      '<td class="tabledata2">应收发票日期至：</td><td align = "left" class="tabledata2">TEXT13</td>  ' ||
+                                      '<td class="tabledata2">是否显示应收款项为零：</td><td align = "left" class="tabledata2">TEXT08</td>  ' ||
+                                      '<td class="tabledata2">制单日期：</td><td align = "left" class="tabledata2">TEXT09</td>  ' ||
+                                      '</TR> ' || '</TABLE>';
+
+  g_print_header3 CONSTANT VARCHAR2(5000) := '<TABLE width=800 border=1 cellpadding=3 cellspacing=1><tr>' ||
+                                             '<td class="tableheader" nowrap width="100">业务实体</td>' ||
+                                             '<td class="tableheader" nowrap width="100">客户名称</td>' ||
+                                             '<td class="tableheader" nowrap width="100">档案标准账期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">客户市场区域</td>' ||
+                                             '<td class="tableheader" nowrap width="100">销售订单编号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">业务员</td>' ||
+                                             '<td class="tableheader" nowrap width="100">部门</td>' ||
+                                             '<td class="tableheader" nowrap width="100">合同号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">签订日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">物料编码</td>' ||
+                                             '<td class="tableheader" nowrap width="100">物料说明</td>' ||
+                                             '<td class="tableheader" nowrap width="100">单位</td>' ||
+                                             '<td class="tableheader" nowrap width="100">订单原始单价</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发货/直发单号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">销售订单行号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发货通知日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发货通知数量</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发货金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">出库单号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">出库日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">出库数量</td>' ||
+                                             '<td class="tableheader" nowrap width="100">出库金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">回签单号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">回签日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">回签数量</td>' ||
+                                             '<td class="tableheader" nowrap width="100">开票数量</td>' ||
+                                             '<td class="tableheader" nowrap width="100">开票金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">执行日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">已执行金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">收款单号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">收款日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">收款金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">核销金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">收款金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">应收款项</td>' ||
+                                             '<td class="tableheader" nowrap width="100">应收余额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">账期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">产品基价（标准）</td>' ||
+                                             '<td class="tableheader" nowrap width="100">产品基价（实际）/td>' ||
+                                             '<td class="tableheader" nowrap width="100">纯利</td>' ||
+                                             '<td class="tableheader" nowrap width="100">标准损耗</td>' ||
+                                             '<td class="tableheader" nowrap width="100">标准账期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">产品价差（标准）</td>' ||
+                                             '<td class="tableheader" nowrap width="100">产品价差（实际）</td>' ||
+                                             '<td class="tableheader" nowrap width="100">其他加价</td>' ||
+                                             '<td class="tableheader" nowrap width="100">运输方式</td>' ||
+                                             '<td class="tableheader" nowrap width="100">承运商</td>' ||
+                                             '<td class="tableheader" nowrap width="100">标准运价</td>' ||
+                                             '<td class="tableheader" nowrap width="100">预估运价</td>' ||
+                                             '<td class="tableheader" nowrap width="100">实际运费</td>' ||
+                                             
+                                             '<td class="tableheader" nowrap width="100"></td></tr>';
+
+  g_print_body1 VARCHAR2(100) := '<tr>';
+  g_print_body2 VARCHAR2(100) := '<td class="tabledata">TEXT01</td>';
+  g_print_body3 VARCHAR2(100) := '<td class="tablenumber">TEXT01</td>';
+  g_print_body4 VARCHAR2(100) := '</tr>';
+
+  g_print_footer CONSTANT VARCHAR2(30) := '</body></html>';
+
+                                                          
+END cux_dis_receivable_jili_new;
+
+
+
+CREATE OR REPLACE PACKAGE BODY cux_dis_receivable_jili_new IS
+
+  /*==================================================
+  Copyright (C) Yuanyao tmd Corp.
+             AllRights Reserved
+  ==================================================*/
+  /*==================================================
+  Program Name:
+      cux_dis_receivable_jili_test
+  Description:
+      This program provide private API to perform:
+
+  History:
+      1.00  2017-10-24  xinghua.zhou  Creation
+  ==================================================*/
+
+  -- Global variable
+  g_pkg_name CONSTANT VARCHAR2(30) := 'cux_dis_receivable_jili_new';
+  g_date_format VARCHAR2(30) := 'YYYY-MM-DD';
+  -- Debug Enabled
+  --l_debug       VARCHAR2(1) := NVL(FND_PROFILE.VALUE('AFLOG_ENABLED'),'N');
+
+-- 实际价格
+  FUNCTION get_actual_price(p_header_id       IN NUMBER,
+                            p_line_id         IN NUMBER,
+                            p_price_type_code IN VARCHAR2) RETURN NUMBER IS
+    l_std_price NUMBER;
+  BEGIN
+    SELECT SUM(dps.actual_price)
+      INTO l_std_price
+      FROM cux_dis_price_structures dps
+     WHERE dps.price_type_code = p_price_type_code
+       AND dps.source_header_id = p_header_id
+       AND dps.source_line_id = p_line_id
+       AND dps.source_code = 'OE';
+
+    RETURN l_std_price;
+  EXCEPTION
+    WHEN OTHERS THEN
+      l_std_price := NULL;
+      RETURN l_std_price;
+  END get_actual_price;
+  
+  -- 标准价格
+  FUNCTION get_standard_price(p_header_id       IN NUMBER,
+                              p_line_id         IN NUMBER,
+                              p_price_type_code IN VARCHAR2) RETURN NUMBER IS
+    l_std_price NUMBER;
+  BEGIN
+    SELECT SUM(dps.standard_price)
+    /*cux_dis_price_structures_pub.get_standard_price(p_price_maintain_id   => dps.price_maintain_id,
+                                                               p_stan_part_price_id  => dps.stan_part_price_id,
+                                                               p_price_transport_id  => dps.price_transport_id,
+                                                               p_trans_part_price_id => dps.trans_part_price_id,
+                                                               p_other_line_id       => dps.other_line_id,
+                                                               p_oth_part_price_id   => dps.oth_part_price_id)*/
+
+      INTO l_std_price
+      FROM cux_dis_price_structures dps
+     WHERE dps.price_type_code = p_price_type_code
+       AND dps.source_header_id = p_header_id
+       AND dps.source_line_id = p_line_id
+       AND dps.source_code = 'OE';
+
+    RETURN l_std_price;
+  EXCEPTION
+    WHEN OTHERS THEN
+      l_std_price := NULL;
+      RETURN l_std_price;
+  END get_standard_price;
+  
+
+  PROCEDURE print_html_report_line(p_text         IN VARCHAR2,
+                                   p_old_text     IN VARCHAR2,
+                                   p_replace_text IN VARCHAR2) IS
+    l_cell_null CONSTANT VARCHAR2(10) := chr(38) || 'nbsp;';
+  BEGIN
+    cux_conc_utl.out_msg(REPLACE(p_text, p_old_text, nvl(p_replace_text, l_cell_null)));
+  END print_html_report_line;
+
+  PROCEDURE process_report(p_init_msg_list     IN VARCHAR2 DEFAULT fnd_api.g_false,
+                           p_commit            IN VARCHAR2 DEFAULT fnd_api.g_false,
+                           x_return_status     OUT NOCOPY VARCHAR2,
+                           x_msg_count         OUT NOCOPY NUMBER,
+                           x_msg_data          OUT NOCOPY VARCHAR2,
+                           p_org_id            IN NUMBER,
+                           p_cust_account_id   IN NUMBER,
+                           p_district          IN VARCHAR2,
+                           p_oe_header_id      IN NUMBER,
+                           p_contract_number   IN VARCHAR2,
+                           p_date_from         IN DATE,
+                           p_date_to           IN DATE,
+                           p_cash_date_f       IN DATE,
+                           p_cash_date_t       IN DATE,
+                           p_ar_date_f         IN DATE,
+                           p_ar_date_t         IN DATE,
+                           p_display_zero_flag IN VARCHAR2) IS
+    l_api_name CONSTANT VARCHAR2(22) := 'process_report';
+    l_api_type CONSTANT VARCHAR2(30) := '_sp1';
+    l_print_string VARCHAR2(32767);
+    l_cell_null CONSTANT VARCHAR2(10) := chr(38) || 'nbsp;';
+    l_client_charset     VARCHAR2(150);
+    l_district           VARCHAR2(2000);
+    l_order_number       VARCHAR2(2000);
+    l_operating_unit     VARCHAR2(240);
+    l_party_name         VARCHAR2(360);
+    l_acc_period         number;
+    l_current_date       date:=TRUNC(SYSDATE);
+    
+    l_cpjj_std_price  NUMBER;
+    l_cpjj_act_price  NUMBER;
+    l_bzsh_act_price  NUMBER;
+    l_cl_act_price    NUMBER;
+    l_cpjc_std_price  NUMBER;
+    l_cpjc_act_price  NUMBER;
+    l_other_price     NUMBER;
+    l_bz_yf           number;
+    l_yg_yf           number;
+    l_bzzq_act_price  number;
+    l_ysfs            varchar2(300);
+    
+
+    CURSOR c_operating_unit IS
+      SELECT hou.name FROM hr_operating_units hou WHERE hou.organization_id = p_org_id;
+
+    CURSOR c_cust IS
+      SELECT hp.party_name
+        FROM hz_cust_accounts hca, hz_parties hp
+       WHERE hca.party_id = hp.party_id
+         AND hca.cust_account_id = p_cust_account_id;
+      
+    CURSOR c_req_invoices Is --发货信息
+Select req_invoices.*
+  from (select hou.name operating_units, --业务实体
+                hp.party_name, --客户名称
+                cdct.SHIPPING_TYPE_CODE,
+                pav.VENDOR_NAME,
+                frel.real_freight_fee,
+                TRUNC(nvl(dsc.Return_date,
+                    nvl(dsh.SHIP_DATE, reh.estimate_in_out_date))) executedDate,
+                cux_dis_credit_check_utl.get_credit_value(p_check_type => 'SO',
+                                                          p_org_id     => ooh.org_id,
+                                                          p_header_id  => ooh.header_id,
+                                                          p_check_item => 'SO_SXQX') standard_limit_day,
+                cux_common_utl.get_lookup_meaning('CUX_DIS_AREA',
+                                                  ool.attribute8) district, --区域
+                to_char(ooh.order_number) order_number, --订单号
+                cux_flex_utl.get_flex_value_desc('YUANYAO_COA_COSTCENTRE',
+                                                 ooh.attribute3) costcentre, --部门
+                dct.contract_number,
+                to_char(nvl(dct.sign_date, ooh.ordered_date), 'yyyy-mm-dd') sign_date,
+                msi.segment1 item_code,
+                msi.description item_desc,
+                ool.order_quantity_uom,
+                reh.req_number,
+                to_char(ool.line_number || '.' || ool.shipment_number) line_number, --订单行
+                to_char(reh.estimate_in_out_date, 'yyyy-mm-dd') estimate_in_out_date,
+                reh.req_qty,
+                reh.req_qty * ool.unit_selling_price_per_pqty req_amount,
+                ooh.transactional_curr_code,
+                ool.line_id,
+                ool.header_id oe_header_id,
+                ool.SPLIT_FROM_LINE_ID,
+                reh.line_so_id,
+                ool.unit_selling_price,
+                ool.unit_selling_price_per_pqty,
+                ooh.org_id,
+                reh.header_id req_header_id,
+                ooh.sold_to_org_id cust_account_id,
+                reh.req_type,
+                hca.account_number,
+                arpt_sql_func_util.get_salesrep_name_number(ooh.salesrep_id,
+                                                            'NAME',
+                                                            ooh.org_id) salesrep_name, --业务员
+                dsh.SHIPMENT_NUMBER,
+                To_char(dsh.SHIP_DATE, 'yyyy-mm-dd') SHIP_DATE,
+                dsh.shipment_quantity,
+                (case
+                  when dsh.shipment_quantity is null then
+                   null
+                  else
+                   dsh.shipment_quantity * ool.unit_selling_price_per_pqty
+                end) shipmentAmt,
+                dsc.CONFIRM_NUM,
+                to_char(dsc.Return_date, 'yyyy-mm-dd') Return_date,
+                nvl(scp.price_qty * scp.time_price, 0) invoice_amt,
+                nvl(scp.price_qty, 0) invoice_qty,
+                
+                nvl(scp.price_qty * scp.time_price,
+                    nvl(dsh.shipment_quantity *
+                        ool.unit_selling_price_per_pqty,
+                        reh.req_qty * ool.unit_selling_price_per_pqty)) executedAmt
+         
+           from cux_dis_cont_time_price    tp,
+                cux_dis_ship_cfm_price_all scp,
+                cux_dis_contract_terms_all cdct,
+                
+                (select dsc_.cfm_id,
+                        dsc_.Return_date,
+                        dsc_.CONFIRM_NUM,
+                        scl_.shipment_line_id,
+                        scl_.cfm_lns_id
+                   from cux_dis_ship_cfm_all     dsc_,
+                        cux_dis_ship_cfm_lns_all scl_
+                  where dsc_.status_code IN ('SHIPPED', 'CONFIRMED')
+                    and dsc_.CFM_ID = scl_.CFM_ID) dsc,
+                
+                (select dsh_.SHIPMENT_NUMBER,
+                        dsh_.SHIP_DATE,
+                        dsl_.line_inv_id,
+                        dsl_.shipment_line_id,
+                        dsl_.shipment_quantity
+                   from cux_dis_txn_shp_lns_all dsl_, cux_dis_txn_shp_all dsh_
+                  where dsl_.shipment_id = dsh_.shipment_id
+                    AND dsh_.status_code = 'SHIPPED' --and dsl_.shipment_quantity<>0
+                    ) dsh,
+                
+                (select reh_.header_id,
+                        reh_.req_type,
+                        reh_.attribute1,
+                        reh_.req_number,
+                        reh_.estimate_in_out_date,
+                        reh_.creation_date,
+                        reh_.Req_date,
+                        rel_.so_line_id,
+                        rel_.line_inv_id,
+                        rel_.req_qty,
+                        rel_.line_so_id
+                   from cux_dis_req_headers_all reh_,cux_dis_req_line_inv_all rel_
+                 --where reh_.req_type IN ('SO_DSP', 'SO_OUT', 'SO_RTN')
+                  where rel_.header_id = reh_.header_id 
+                  and reh_.req_type IN ('SO_DSP', 'SO_OUT')
+                    AND reh_.req_status IN
+                        ('SUBMIT', 'APPROVED', 'FINAPPROVED')) reh,
+                
+                (
+                Select frel.source_line_id,sum(frel.real_freight_fee) real_freight_fee
+                from
+                cux_dis_freight_headers_all freh
+                ,cux_dis_freight_lines_all frel
+                where
+                frel.header_id=freh.header_id
+                --and freh.DOC_TYPE_CODE in ('XSZF','XSCK')
+                group by frel.source_line_id
+                ) frel,
+        
+                mtl_system_items_b msi,
+                oe_order_lines_all ool,
+                hz_parties hp,
+                hz_cust_accounts hca,
+                cux_dis_contract_terms_all dct,
+                hr_all_organization_units hou,
+                AP_SUPPLIERS PAV,
+                oe_order_headers_all ooh
+          where
+         --开票回签
+         --and 
+          scp.time_price_id = tp.TIME_PRICE_ID(+)
+          and reh.line_inv_id=frel.SOURCE_LINE_ID(+)
+          and pav.VENDOR_ID(+) = reh.attribute1
+          and cdct.source_type_code = 'OE'
+          AND ooh.header_id=cdct.source_header_id(+)
+       and dsc.cfm_lns_id = scp.cfm_lns_id(+)
+       and dsh.shipment_line_id = dsc.shipment_line_id(+)
+         
+       --出库单
+       AND reh.line_inv_id = dsh.line_inv_id(+)
+       --通知单 
+       AND ool.line_id = reh.so_line_id
+         
+       and ool.inventory_item_id = msi.inventory_item_id
+       AND ool.ship_from_org_id = msi.organization_id
+       and ooh.cancelled_flag = 'N'
+       and hca.party_id = hp.party_id
+       and (p_cust_account_id is null or
+          hca.cust_account_id = p_cust_account_id)
+       AND hca.cust_account_id = ooh.sold_to_org_id
+       AND ooh.org_id = dct.org_id(+)
+       AND ooh.header_id = dct.source_header_id(+)
+       AND dct.source_type_code(+) = 'OE'
+       AND ooh.org_id = hou.organization_id
+       and ooh.header_id = ool.header_id
+       AND ooh.org_id = p_org_id
+         
+         Union all
+         
+         Select hou.name operating_units, --业务实体
+                hp.party_name, --客户名称
+                null SHIPPING_TYPE_CODE,
+                null VENDOR_NAME,
+                null real_freight_fee,
+                TRUNC(gd.GL_DATE) executedDate,
+                cux_dis_credit_check_utl.get_credit_value(p_check_type => 'SO',
+                                                          p_org_id     => ooh.org_id,
+                                                          p_header_id  => ooh.header_id,
+                                                          p_check_item => 'SO_SXQX') standard_limit_day,
+                --cux_common_utl.get_lookup_meaning('CUX_DIS_AREA', ool.attribute8) 
+                null district, --区域
+                to_char(ctl2.SALES_ORDER) order_number, --订单号
+                cux_flex_utl.get_flex_value_desc('YUANYAO_COA_COSTCENTRE',
+                                                 ooh.attribute3) costcentre, --部门
+                null contract_number,
+                to_char(ctl2.SALES_ORDER_DATE, 'yyyy-mm-dd') sign_date,
+                null item_code,
+                ctl2.description item_desc,
+                ctl2.UOM_CODE order_quantity_uom,
+                null req_number,
+                null line_number, --订单行
+                null estimate_in_out_date,
+                null req_qty,
+                null req_amount,
+                ct2.INVOICE_CURRENCY_CODE transactional_curr_code,
+                null line_id,
+                null header_id,
+                -1 SPLIT_FROM_LINE_ID,
+                null line_so_id,
+                nvl(ctl2.gross_unit_selling_price, ctl2.unit_selling_price) unit_selling_price,
+                nvl(ctl2.gross_unit_selling_price, ctl2.unit_selling_price) unit_selling_price_per_pqty,
+                hou.ORGANIZATION_ID,
+                null req_header_id,
+                hca.CUST_ACCOUNT_ID cust_account_id,
+                '退货通知单' req_type,
+                hca.account_number,
+                arpt_sql_func_util.get_salesrep_name_number(ct2.PRIMARY_SALESREP_ID,
+                                                            'NAME',
+                                                            hou.ORGANIZATION_ID) salesrep_name, --业务员
+                null SHIPMENT_NUMBER,
+                null SHIP_DATE,
+                null shipment_quantity,
+                null shipmentAmt,
+                null CONFIRM_NUM,
+                to_char(gd.GL_DATE, 'yyyy-mm-dd') Return_date,
+                nvl(ctl2.GROSS_EXTENDED_AMOUNT, ctl2.EXTENDED_AMOUNT) invoice_amt,
+                nvl(ctl2.quantity_credited, ctl2.quantity_invoiced) invoice_qty,
+                
+                nvl(ctl2.GROSS_EXTENDED_AMOUNT, ctl2.EXTENDED_AMOUNT) executedAmt
+         
+           from RA_CUST_TRX_LINE_GL_DIST_ALL gd,
+                hr_all_organization_units    hou,
+                oe_order_headers_all         ooh,
+                ra_customer_trx_all          ct2,
+                ra_customer_trx_lines_all    ctl2,
+                HZ_CUST_ACCOUNTS             hca,
+                hz_parties                   hp
+          where ctl2.CUSTOMER_TRX_LINE_ID = gd.CUSTOMER_TRX_LINE_ID(+)
+            and ctl2.SALES_ORDER = ooh.ORDER_NUMBER(+)
+            and ct2.ORG_ID = hou.ORGANIZATION_ID
+            and ct2.CUSTOMER_TRX_ID = ctl2.CUSTOMER_TRX_ID
+            and ct2.CUST_TRX_TYPE_ID in
+                (select ratype.CUST_TRX_TYPE_ID
+                   from ra_cust_trx_types_all ratype
+                  where ratype.NAME like '红字发票-%')
+            and (p_cust_account_id is null or
+                hca.cust_account_id = p_cust_account_id)
+            and ct2.bill_TO_CUSTOMER_ID = hca.CUST_ACCOUNT_ID
+            and hca.PARTY_ID = hp.PARTY_ID
+            and ct2.TRX_DATE >= to_date('2016-03-01', 'yyyy-mm-dd')
+            and ct2.org_id = p_org_id
+            and ctl2.Line_type = 'LINE'
+            
+            Union all --期初发票导入
+            
+            Select hou.name operating_units, --业务实体
+                hp.party_name, --客户名称
+                null SHIPPING_TYPE_CODE,
+                null VENDOR_NAME,
+                null real_freight_fee,
+                TRUNC(gd.GL_DATE) executedDate,
+                null standard_limit_day,
+                --cux_common_utl.get_lookup_meaning('CUX_DIS_AREA', ool.attribute8) 
+                null district, --区域
+                null order_number, --订单号
+                null costcentre, --部门
+                null contract_number,
+                null sign_date,
+                null item_code,
+                ctl2.description item_desc,
+                null order_quantity_uom,
+                null req_number,
+                null line_number, --订单行
+                null estimate_in_out_date,
+                null req_qty,
+                null req_amount,
+                ct2.INVOICE_CURRENCY_CODE transactional_curr_code,
+                null line_id,
+                null header_id,
+                -1 SPLIT_FROM_LINE_ID,
+                null line_so_id,
+                null unit_selling_price,
+                null unit_selling_price_per_pqty,
+                hou.ORGANIZATION_ID,
+                null req_header_id,
+                hca.CUST_ACCOUNT_ID cust_account_id,
+                '期初' req_type,
+                hca.account_number,
+                arpt_sql_func_util.get_salesrep_name_number(ct2.PRIMARY_SALESREP_ID,
+                                                            'NAME',
+                                                            hou.ORGANIZATION_ID) salesrep_name, --业务员
+                null SHIPMENT_NUMBER,
+                null SHIP_DATE,
+                null shipment_quantity,
+                null shipmentAmt,
+                null CONFIRM_NUM,
+                to_char(gd.GL_DATE, 'yyyy-mm-dd') Return_date,
+                nvl(ctl2.GROSS_EXTENDED_AMOUNT, ctl2.EXTENDED_AMOUNT) invoice_amt,
+                null invoice_qty,
+                
+                nvl(ctl2.GROSS_EXTENDED_AMOUNT, ctl2.EXTENDED_AMOUNT) executedAmt
+         
+           from RA_CUST_TRX_LINE_GL_DIST_ALL gd,
+                hr_all_organization_units    hou,
+                --oe_order_headers_all         ooh,
+                ra_customer_trx_all          ct2,
+                ra_customer_trx_lines_all    ctl2,
+                HZ_CUST_ACCOUNTS             hca,
+                hz_parties                   hp
+          where ctl2.CUSTOMER_TRX_LINE_ID = gd.CUSTOMER_TRX_LINE_ID(+)
+            and ct2.ORG_ID = hou.ORGANIZATION_ID
+            and ct2.CUSTOMER_TRX_ID = ctl2.CUSTOMER_TRX_ID
+            and ct2.BATCH_SOURCE_ID in
+                (select bs.BATCH_SOURCE_ID
+                   from ra_batch_sources_all bs
+                  where bs.NAME like '%期初初始%')
+            and (p_cust_account_id is null or
+                hca.cust_account_id = p_cust_account_id)
+            and ct2.bill_TO_CUSTOMER_ID = hca.CUST_ACCOUNT_ID
+            and hca.PARTY_ID = hp.PARTY_ID
+            and ct2.org_id = p_org_id
+            and ctl2.Line_type = 'LINE'
+            
+            ) req_invoices
+ order by req_invoices.cust_account_id, req_invoices.executedDate;
+              
+  cursor c_receipt(p_cur_org_id number) is --------------------查询所有收款单据
+select To_Char(Nvl(CRH_FIRST_POSTED.GL_DATE, CR.RECEIPT_DATE), 'yyyy-mm-dd') RECEIPT_DATE,
+       CR.PAY_FROM_CUSTOMER,
+       hou.NAME operating_units,
+       CR.RECEIPT_NUMBER,
+       cr.CURRENCY_CODE --币种
+      ,
+       -ps.AMOUNT_DUE_ORIGINAL - Nvl(app.amount_applied, 0) recvamt,
+       CUST.PARTY_ID --客户id
+      ,
+       party.PARTY_NAME
+       ,cust.cust_account_id
+       ,Nvl(CRH_FIRST_POSTED.GL_DATE, CR.RECEIPT_DATE) RECEIPT_DATE_
+  from (select APP_.CASH_RECEIPT_ID, sum(app_.amount_applied) amount_applied
+          from AR_RECEIVABLE_APPLICATIONS_all APP_
+         where APP_.DISPLAY = 'Y'
+         and not exists(
+         select 1 exist_flag from cux_dis_req_headers_all req_ 
+         where  req_.so_header_id=app_.ATTRIBUTE1 and last_ship_flag='Y'
+         and req_.req_type IN ('SO_DSP', 'SO_OUT')
+                    AND req_.req_status IN
+                        ('SUBMIT', 'APPROVED', 'FINAPPROVED'))
+           AND APP_.APPLIED_PAYMENT_SCHEDULE_ID in (-1, -8)
+         group by APP_.CASH_RECEIPT_ID) app,
+       
+       ar_cash_receipts_all        cr,
+       HZ_CUST_ACCOUNTS            CUST,
+       HZ_PARTIES                  PARTY,
+       ar_payment_schedules_all    ps,
+       AR_CASH_RECEIPT_HISTORY_ALL CRH_FIRST_POSTED,
+       hr_all_organization_units   hou
+ where CR.status in ('APP', 'UNAPP')
+   and cr.CASH_RECEIPT_ID = app.CASH_RECEIPT_ID(+)
+   AND CRH_FIRST_POSTED.CASH_RECEIPT_ID(+) = CR.CASH_RECEIPT_ID
+   AND CRH_FIRST_POSTED.ORG_ID(+) = CR.ORG_ID
+   AND CRH_FIRST_POSTED.FIRST_POSTED_RECORD_FLAG(+) = 'Y'
+      
+   and (p_cust_account_id is null or
+       CUST.cust_account_id = p_cust_account_id)
+   and CR.PAY_FROM_CUSTOMER = CUST.CUST_ACCOUNT_ID(+)
+   AND CUST.PARTY_ID = PARTY.PARTY_ID(+)
+   and CR.org_id = p_cur_org_id
+   and cr.CASH_RECEIPT_ID = ps.CASH_RECEIPT_ID
+   AND cr.org_id = hou.organization_id
+--and Nvl(CRH_FIRST_POSTED.GL_DATE,CR.RECEIPT_DATE)<=to_date('2016-05-01','yyyy-mm-dd')
+--and (p_Start_Date is null or Nvl(CRH_FIRST_POSTED.GL_DATE,CR.RECEIPT_DATE)>=p_Start_Date)
+--and (p_End_Date is null or Nvl(CRH_FIRST_POSTED.GL_DATE,CR.RECEIPT_DATE)<p_End_Date)
+--AND (PARTY.PARTY_ID = p_customer_id OR p_customer_id IS NULL)
+ order by CR.PAY_FROM_CUSTOMER,
+          Nvl(CRH_FIRST_POSTED.GL_DATE, CR.RECEIPT_DATE);
+
+
+    l_receipt c_receipt%rowtype;
+    l_req_invoices c_req_invoices%rowtype;
+    l_receipt_remainAmt number;
+    l_req_invoices_remainAmt number;
+    l_apply_amt number;
+    l_index     number;
+    l_firstTime number:=0;
+  BEGIN
+    --cux_conc_utl.out_msg('start...');
+    -- start activity to create savepoint, check compatibility
+    -- and initialize message list, include debug message hint to enter api
+    x_return_status := cux_api.start_activity(p_pkg_name      => g_pkg_name,
+                                              p_api_name      => l_api_name,
+                                              p_api_type      => l_api_type,
+                                              p_init_msg_list => p_init_msg_list);
+    IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+      RAISE fnd_api.g_exc_error;
+    END IF;
+    -- API body
+
+    --get Character set
+    BEGIN
+      SELECT v.tag
+        INTO l_client_charset
+        FROM fnd_lookup_values_vl v
+       WHERE v.lookup_type = 'FND_ISO_CHARACTER_SET_MAP'
+         AND v.lookup_code = fnd_profile.value('FND_NATIVE_CLIENT_ENCODING')
+         AND v.enabled_flag = 'Y'
+         AND trunc(SYSDATE) BETWEEN nvl(v.start_date_active, trunc(SYSDATE - 1)) AND
+             nvl(v.end_date_active, trunc(SYSDATE + 1));
+    EXCEPTION
+      WHEN no_data_found THEN
+        l_client_charset := 'UTF-8';
+    END;
+
+  begin  --报表头
+  -- todo
+  OPEN c_operating_unit;
+  FETCH c_operating_unit
+    INTO l_operating_unit;
+  CLOSE c_operating_unit;
+
+  OPEN c_cust;
+  FETCH c_cust
+    INTO l_party_name;
+  CLOSE c_cust;
+  l_district := cux_common_utl.get_lookup_meaning('CUX_DIS_AREA',
+                                                  p_district);
+  --print report header
+  cux_conc_utl.out_msg(REPLACE(g_print_header0,
+                               'G_CHARSET',
+                               l_client_charset));
+  cux_conc_utl.out_msg(g_print_header1);
+  cux_conc_utl.out_msg(g_print_header2);
+
+  l_print_string := g_print_header2_2;
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT01',
+                            nvl(l_operating_unit, l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT02',
+                            nvl(l_party_name, l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT03',
+                            nvl(l_district, l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT04',
+                            nvl(l_order_number, l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT05',
+                            nvl(p_contract_number, l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT06',
+                            nvl(to_char(p_date_from, g_date_format),
+                                l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT07',
+                            nvl(to_char(p_date_to, g_date_format),
+                                l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT08',
+                            nvl(p_display_zero_flag, l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT09',
+                            nvl(to_char(SYSDATE, g_date_format), l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT10',
+                            nvl(to_char(p_cash_date_f, g_date_format),
+                                l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT11',
+                            nvl(to_char(p_cash_date_t, g_date_format),
+                                l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT12',
+                            nvl(to_char(p_ar_date_f, g_date_format),
+                                l_cell_null));
+  l_print_string := REPLACE(l_print_string,
+                            'TEXT13',
+                            nvl(to_char(p_ar_date_t, g_date_format),
+                                l_cell_null));
+
+  cux_conc_utl.out_msg(l_print_string);
+--cux_conc_utl.out_msg('p_date_from'||p_date_from);
+  cux_conc_utl.out_msg(g_print_header3);
+end;
+
+    open c_req_invoices; --打开发货游标
+    open c_receipt(p_org_id);--打开收款游标
+
+    --发货、收款剩余金额初始化为0
+    l_receipt_remainAmt:=0;
+    l_req_invoices_remainAmt:=0;
+    l_index:=0; ---控制行数，不要出现死循环
+    
+    LOOP
+    l_index:=l_index+1;
+    if(l_index>150000) then--做调试的
+      cux_conc_utl.out_msg('当前查询数据超过15万行...');
+      exit;
+      end if;
+
+      if(l_req_invoices_remainAmt=0) then --当前发货剩余金额为0时，跳到下一行
+            fetch c_req_invoices into l_req_invoices;
+            if(c_req_invoices%notfound=false) then
+              l_req_invoices_remainAmt:=l_req_invoices.executedAmt;
+              else
+                l_req_invoices_remainAmt:=0;
+                end if;
+        end if;
+      
+      --cux_conc_utl.out_msg('当前收款金额为0时，跳到下一行...');
+      if(l_receipt_remainAmt=0) then --当前收款金额为0时，跳到下一行
+          fetch c_receipt into l_receipt;
+          if(c_receipt%notfound=false) then
+            l_receipt_remainAmt:=l_receipt.recvamt;
+            else
+              l_receipt_remainAmt:=0;
+          end if;
+        end if;
+
+        --发货和收款都循环到最后一条则退出
+        exit when (c_req_invoices%notfound=true and c_receipt%notfound=true);
+      
+      --1111111111如果当前发货和收款都有数据，且客户信息一致，则进行匹配
+      if(c_receipt%notfound=false and c_req_invoices%notfound=false 
+         and l_req_invoices.cust_account_id=l_receipt.cust_account_id) then   
+      
+      if(l_req_invoices_remainAmt=0) then
+         continue;
+      end if;
+      
+        if(l_req_invoices_remainAmt=l_req_invoices.executedamt) then
+          l_firsttime:=1;
+          else
+            l_firsttime:=0;
+        end if;
+        
+        if(l_req_invoices_remainAmt>l_receipt_remainAmt) then
+          l_apply_amt:=l_receipt_remainAmt;
+          l_receipt_remainAmt:=0;
+          l_req_invoices_remainAmt:=l_req_invoices_remainAmt-l_apply_amt;
+        else
+          l_apply_amt:=l_req_invoices_remainAmt;
+          l_req_invoices_remainAmt:=0;
+          l_receipt_remainAmt:=l_receipt_remainAmt-l_apply_amt;
+          end if;
+
+         --如果收款有过滤时间，则只显示在期间内的匹配结果
+        if(l_receipt.receipt_date_<=p_cash_date_f or l_receipt.receipt_date_>=p_cash_date_t) then
+            continue;
+        end if;
+        --如果应收有时间过滤，则只显示期间内的应收匹配结果
+        if(l_req_invoices.executedDate<=p_ar_date_f or l_req_invoices.executedDate>=p_ar_date_t) then
+            continue;
+        end if;
+        
+        cux_conc_utl.out_msg(g_print_body1);
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.operating_units));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.party_name));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.standard_limit_day));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.district));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.order_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.salesrep_name)); --业务员
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.costcentre)); --部门
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.contract_number));
+        --cux_conc_utl.out_msg('打印一个'||l_req_invoices.sign_date);
+        print_html_report_line(g_print_body2,'TEXT01',to_char(l_req_invoices.sign_date));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.item_code));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.item_desc));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.order_quantity_uom));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.unit_selling_price));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.req_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.line_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.estimate_in_out_date));
+        
+        if(l_firstTime=1) then
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.req_qty));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices.req_amount,2)));
+        else
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+          end if;
+          
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.shipment_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.ship_date));
+        if(l_firstTime=1) then
+           print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.shipment_quantity));
+           print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices.shipmentAmt,2)));
+           else
+             print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+           print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+        end if;
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.CONFIRM_NUM));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.return_DATE));
+        
+        if(l_firstTime=1) then
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.INVOICE_QTY));
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.INVOICE_QTY));
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices.invoice_amt,2)));
+          print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.executedDate,'yyyy-mm-dd'));
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices.executedAmt,2)));
+          else
+            print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+          print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.executedDate,'yyyy-mm-dd'));          
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+           end if;
+           
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_receipt.receipt_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_receipt.receipt_date));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_receipt.recvamt,2)));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_apply_amt,2)));
+        
+        --收款金额---如果有抵消，显示抵消，如果没有抵消，显示剩余收款金额
+        if(l_apply_amt<>0) then
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_apply_amt,2)));
+        else
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_receipt_remainAmt,2)));
+          end if;
+        
+        --应收款项，显示应收剩余数
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices_remainAmt,2)));
+        
+        --应收余额
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+        
+        --账期
+        l_acc_period:=nvl(l_receipt.receipt_date_,sysdate)-l_req_invoices.executedDate;
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_acc_period)));
+        
+        
+        l_cpjj_std_price:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJJ'); --产品基价(标准）
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjj_std_price,2)));
+        
+        l_cpjj_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJJ'); --产品基价(实际)
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjj_act_price,2)));
+        
+        l_cl_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CL'); --纯利
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cl_act_price,2)));
+        
+        l_bzsh_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZSH'); --标准损耗
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_bzsh_act_price,2)));
+        
+        l_bzzq_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZZQ'); --标准账期
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_bzzq_act_price,2)));
+                                                 
+             
+        l_cpjc_std_price:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJC'); --产品价差
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjc_std_price,2)));
+                                                 
+        l_cpjc_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJC'); --产品价差_实际 
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjc_act_price,2)));                                         
+
+        l_other_price:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'QT'); --其他加价
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_other_price,2)));
+        
+        l_ysfs:=cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_SHIPPING_TYPES'
+                                        ,p_lookup_code => l_req_invoices.shipping_type_code); --运输方式
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_ysfs));                                       
+        
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(null));--运输方式
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.VENDOR_NAME));--承运商
+        
+        l_bz_yf:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZYJ'); --标准运价
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_bz_yf,2)));                                         
+                                                 
+        l_yg_yf:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZYJ'); --预估运价
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_yg_yf,2)));                                         
+                                                 
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.real_freight_fee));--实际运费
+        
+        continue;
+      end if;
+      
+      --222222222222如果是对不上收款的发票或发货，先打印发货或发票      
+      if(c_req_invoices%notfound=false 
+        and (c_receipt%notfound=true or l_req_invoices.cust_account_id<l_receipt.cust_account_id)) then 
+        
+        if(l_req_invoices_remainAmt=0) then
+         continue;
+        end if;
+      
+      --如果应收有时间过滤，则只显示期间内的应收匹配结果
+        if(l_req_invoices.executedDate<=p_ar_date_f or l_req_invoices.executedDate>=p_ar_date_t) then
+            l_req_invoices_remainAmt:=0;
+            continue;
+        end if;
+        
+        cux_conc_utl.out_msg(g_print_body1);
+        --l_req_invoices_remainAmt:=0; 
+        l_apply_amt:=0;
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.operating_units));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.party_name));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.standard_limit_day));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.district));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.order_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.salesrep_name)); --业务员
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.costcentre)); --部门
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.contract_number));
+        print_html_report_line(g_print_body2, 'TEXT01',to_char(l_req_invoices.sign_date));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.item_code));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.item_desc));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.order_quantity_uom));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.unit_selling_price));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.req_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.line_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.estimate_in_out_date));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.req_qty));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices.req_amount,2)));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.shipment_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.ship_date));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.shipment_quantity));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices.shipmentAmt,2)));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.CONFIRM_NUM));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.return_DATE));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.INVOICE_QTY));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.INVOICE_QTY));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices_remainAmt,2)));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_req_invoices.executedDate,'yyyy-mm-dd'));
+        
+        --如果这个发货匹配过一部分收款则隐藏已执行
+        if(l_req_invoices_remainAmt=l_req_invoices.executedamt) then 
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices.executedamt,2)));
+        else
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+        end if;
+        
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+
+        --收款金额---如果有抵消，显示抵消，如果没有抵消，显示剩余收款金额
+        --if(l_apply_amt<>0) then
+        --  print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_apply_amt,2)));
+        --else
+        --  print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_receipt_remainAmt,2)));
+        --  end if;
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+        
+        --应收款项，显示应收剩余数
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices_remainAmt,2)));
+        
+        --应收余额
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_req_invoices_remainAmt,2)));
+        l_req_invoices_remainAmt:=0;
+        l_acc_period:=l_current_date-l_req_invoices.executedDate;
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_acc_period)));
+        
+        l_cpjj_std_price:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJJ'); --产品基价(标准）
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjj_std_price,2)));
+        
+        l_cpjj_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJJ'); --产品基价(实际)
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjj_act_price,2)));
+        
+        l_cl_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CL'); --纯利
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cl_act_price,2)));
+        
+        l_bzsh_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZSH'); --标准损耗
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_bzsh_act_price,2)));
+        
+        l_bzzq_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZZQ'); --标准账期
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_bzzq_act_price,2)));
+             
+        l_cpjc_std_price:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJC'); --产品价差
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjc_std_price,2)));
+                                                 
+        l_cpjc_act_price:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'CPJC'); --产品价差_实际 
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_cpjc_act_price,2)));                                         
+
+        l_other_price:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'QT'); --其他加价
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_other_price,2)));                                          
+        
+        l_ysfs:=cux_common_utl.get_lookup_meaning(p_lookup_type => 'CUX_DIS_SHIPPING_TYPES'
+                                        ,p_lookup_code => l_req_invoices.shipping_type_code); --运输方式
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_ysfs));
+        
+        
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.VENDOR_NAME));--承运商
+        
+        l_bz_yf:=get_standard_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZYJ'); --标准运价
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_bz_yf,2)));                                         
+                                                 
+        l_yg_yf:=get_actual_price(p_header_id       => l_req_invoices.oe_header_id,
+                                                 p_line_id         => nvl(l_req_invoices.SPLIT_FROM_LINE_ID,l_req_invoices.LINE_ID),
+                                                 p_price_type_code => 'BZYJ'); --预估运价
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_yg_yf,2)));                                         
+                                                 
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(l_req_invoices.real_freight_fee));--实际运费
+        
+        continue;
+      end if;
+      
+      --3333333333333333333333333333如果是对不上发货的收款，则先打印收款
+      if(c_receipt%notfound=false 
+        and (c_req_invoices%notfound=true or l_req_invoices.cust_account_id>l_receipt.cust_account_id)) then
+        
+        if(l_receipt.receipt_date_<=p_cash_date_f or l_receipt.receipt_date_>=p_cash_date_t) then
+            continue;
+        end if;
+        
+        cux_conc_utl.out_msg(g_print_body1);
+        --l_receipt_remainAmt:=0;
+        l_apply_amt:=0;
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_receipt.operating_units));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_receipt.party_name));
+        --print_html_report_line(g_print_body3, 'TEXT01', to_char(l_receipt.standard_limit_day));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01',to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(''));
+        
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_receipt.receipt_number));
+        print_html_report_line(g_print_body2, 'TEXT01', to_char(l_receipt.receipt_date));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_receipt.recvamt,2)));
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(''));
+
+        --收款金额---如果有抵消，显示抵消，如果没有抵消，显示剩余收款金额
+        --if(l_apply_amt<>0) then
+        --  print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_apply_amt,2)));
+        --else
+          print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_receipt_remainAmt,2)));
+        --end if;
+        
+        --应收款项，显示应收剩余数
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+        
+        --应收余额
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(-round(l_receipt_remainAmt,2)));
+        l_receipt_remainAmt:=0;
+        
+        print_html_report_line(g_print_body3, 'TEXT01', to_char(null));
+        --l_acc_period:=l_req_invoices.executedDate-nvl(l_receipt.receipt_date_,sysdate);
+        --print_html_report_line(g_print_body3, 'TEXT01', to_char(round(l_acc_period)));
+
+        continue;
+      end if;
+
+--cux_conc
+--_utl.out_msg('啥都没扯到');
+    END LOOP;
+    close c_req_invoices;
+    close c_receipt;
+    --print report footer
+    cux_conc_utl.out_msg(g_print_footer);
+
+    -- API end body
+    -- end activity, include debug message hint to exit api
+    cux_api.end_activity(p_pkg_name  => g_pkg_name,
+                         p_api_name  => l_api_name,
+                         p_commit    => p_commit,
+                         x_msg_count => x_msg_count,
+                         x_msg_data  => x_msg_data);
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_error,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_unexp,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN OTHERS THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_others,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+  END process_report;
+
+  PROCEDURE process_request(p_init_msg_list        IN VARCHAR2 DEFAULT fnd_api.g_false,
+                            p_commit               IN VARCHAR2 DEFAULT fnd_api.g_false,
+                            x_return_status        OUT NOCOPY VARCHAR2,
+                            x_msg_count            OUT NOCOPY NUMBER,
+                            x_msg_data             OUT NOCOPY VARCHAR2,
+                            p_org_id               IN NUMBER,
+                            p_cust_account_id      IN NUMBER,
+                            p_district             IN VARCHAR2,
+                            p_oe_header_id         IN NUMBER,
+                            p_contract_number      IN VARCHAR2,
+                            p_date_from            IN DATE,
+                            p_date_to              IN DATE,
+                            p_cash_date_f          IN DATE,
+                            p_cash_date_t          IN DATE,
+                            p_ar_date_f            IN DATE,
+                            p_ar_date_t            IN DATE,
+                            p_display_zero_flag    IN VARCHAR2,
+                            p_include_invaild_flag IN VARCHAR2 DEFAULT 'Y') IS
+    l_api_name CONSTANT VARCHAR2(22) := 'PROCESS_REQUEST';
+    l_api_type CONSTANT VARCHAR2(30) := '_sp1';
+
+  BEGIN
+    -- start activity to create savepoint, check compatibility
+    -- and initialize message list, include debug message hint to enter api
+    x_return_status := cux_api.start_activity(p_pkg_name      => g_pkg_name,
+                                              p_api_name      => l_api_name,
+                                              p_api_type      => l_api_type,
+                                              p_init_msg_list => p_init_msg_list);
+    IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+      RAISE fnd_api.g_exc_error;
+    END IF;
+
+    process_report(p_init_msg_list     => fnd_api.g_true,
+                   p_commit            => fnd_api.g_false,
+                   x_return_status     => x_return_status,
+                   x_msg_count         => x_msg_count,
+                   x_msg_data          => x_msg_data,
+                   p_org_id            => p_org_id,
+                   p_cust_account_id   => p_cust_account_id,
+                   p_district          => p_district,
+                   p_oe_header_id      => p_oe_header_id,
+                   p_contract_number   => p_contract_number,
+                   p_date_from         => p_date_from,
+                   p_date_to           => p_date_to,
+                   p_cash_date_f       => p_cash_date_f,
+                   p_cash_date_t       => p_cash_date_t,
+                   p_ar_date_f         => p_ar_date_f,
+                   p_ar_date_t         => p_ar_date_t,
+                   p_display_zero_flag => nvl(p_display_zero_flag, 'Y'));
+    IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+      RAISE fnd_api.g_exc_error;
+    END IF;
+    -- API end body
+    -- end activity, include debug message hint to exit api
+    cux_api.end_activity(p_pkg_name  => g_pkg_name,
+                         p_api_name  => l_api_name,
+                         p_commit    => p_commit,
+                         x_msg_count => x_msg_count,
+                         x_msg_data  => x_msg_data);
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_error,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_unexp,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN OTHERS THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_others,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+  END process_request;
+
+  PROCEDURE main(errbuf                 OUT VARCHAR2,
+                 retcode                OUT VARCHAR2,
+                 p_org_id               IN NUMBER,
+                 p_cust_account_id      IN NUMBER,
+                 p_district             IN VARCHAR2,
+                 p_oe_header_id         IN NUMBER,
+                 p_contract_number      IN VARCHAR2,
+                 p_date_from            IN VARCHAR2,
+                 p_date_to              IN VARCHAR2,
+                 p_cash_date_f          IN VARCHAR2,
+                 p_cash_date_t          IN VARCHAR2,
+                 p_ar_date_f            IN VARCHAR2,
+                 p_ar_date_t            IN VARCHAR2,
+                 p_display_zero_flag    IN VARCHAR2,
+                 p_include_invaild_flag IN VARCHAR2 DEFAULT 'Y') IS
+    l_return_status VARCHAR2(30);
+    l_msg_count     NUMBER;
+    l_msg_data      VARCHAR2(2000);
+    l_date_from     DATE;
+    l_date_to       DATE;
+    l_cash_date_f   DATE;
+    l_cash_date_t   DATE;
+    l_ar_date_f     DATE;
+    l_ar_date_t     DATE;
+  BEGIN
+    retcode := '0';
+    -- concurrent header log
+    cux_conc_utl.log_header;
+    -- conc body
+    mo_global.set_policy_context('S', p_org_id);
+    -- convert parameter data type, such as varchar2 to date
+    l_date_from   := trunc(fnd_conc_date.string_to_date(p_date_from));
+    l_date_to     := trunc(fnd_conc_date.string_to_date(p_date_to)) + 0.99999;
+    l_cash_date_f := trunc(fnd_conc_date.string_to_date(p_cash_date_f));
+    l_cash_date_t := trunc(fnd_conc_date.string_to_date(p_cash_date_t)) + 0.99999;
+    l_ar_date_f   := trunc(fnd_conc_date.string_to_date(p_ar_date_f));
+    l_ar_date_t   := trunc(fnd_conc_date.string_to_date(p_ar_date_t)) + 0.99999;
+
+
+    -- call process request api
+    process_request(p_init_msg_list        => fnd_api.g_true,
+                    p_commit               => fnd_api.g_true,
+                    x_return_status        => l_return_status,
+                    x_msg_count            => l_msg_count,
+                    x_msg_data             => l_msg_data,
+                    p_org_id               => p_org_id,
+                    p_cust_account_id      => p_cust_account_id,
+                    p_district             => p_district,
+                    p_oe_header_id         => p_oe_header_id,
+                    p_contract_number      => p_contract_number,
+                    p_date_from            => l_date_from,
+                    p_date_to              => l_date_to,
+                    p_cash_date_f          => l_cash_date_f,
+                    p_cash_date_t          => l_cash_date_t,
+                    p_ar_date_f            => l_ar_date_f,
+                    p_ar_date_t            => l_ar_date_t,
+                    p_display_zero_flag    => p_display_zero_flag,
+                    p_include_invaild_flag => p_include_invaild_flag);
+
+    IF l_return_status = fnd_api.g_ret_sts_error THEN
+      RAISE fnd_api.g_exc_error;
+    ELSIF l_return_status = fnd_api.g_ret_sts_unexp_error THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    END IF;
+
+    -- conc end body
+    -- concurrent footer log
+    cux_conc_utl.log_footer;
+
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      IF fnd_global.conc_request_id > 0 THEN
+        cux_conc_utl.log_message_list;
+      END IF;
+      retcode := '1';
+      fnd_msg_pub.count_and_get(p_encoded => fnd_api.g_false,
+                                p_count   => l_msg_count,
+                                p_data    => l_msg_data);
+      IF l_msg_count > 1 THEN
+        l_msg_data := fnd_msg_pub.get_detail(p_msg_index => fnd_msg_pub.g_first,
+                                             p_encoded   => fnd_api.g_false);
+      END IF;
+      errbuf := l_msg_data;
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      IF fnd_global.conc_request_id > 0 THEN
+        cux_conc_utl.log_message_list;
+      END IF;
+      retcode := '2';
+      fnd_msg_pub.count_and_get(p_encoded => fnd_api.g_false,
+                                p_count   => l_msg_count,
+                                p_data    => l_msg_data);
+      IF l_msg_count > 1 THEN
+        l_msg_data := fnd_msg_pub.get_detail(p_msg_index => fnd_msg_pub.g_first,
+                                             p_encoded   => fnd_api.g_false);
+      END IF;
+      errbuf := l_msg_data;
+    WHEN OTHERS THEN
+      fnd_msg_pub.add_exc_msg(p_pkg_name       => g_pkg_name,
+                              p_procedure_name => 'MAIN',
+                              p_error_text     => substrb(dbms_utility.format_error_backtrace || '-' ||
+                                                          SQLERRM,
+                                                          1,
+                                                          240));
+      IF fnd_global.conc_request_id > 0 THEN
+        cux_conc_utl.log_message_list;
+      END IF;
+      retcode := '2';
+      errbuf  := SQLERRM;
+  END main;
+
+END cux_dis_receivable_jili_new;

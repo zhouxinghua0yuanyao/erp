@@ -1,0 +1,20 @@
+select * from hz_parties where party_name='德清县红亮饲料有限公司' --10345
+select * from hz_cust_accounts where party_id=10345 --3332
+
+select * from hz_cust_acct_sites_all where cust_account_id=3332
+select * from hz_cust_site_uses_all where cust_acct_site_id=4621 --salesrep_id 100000065
+
+select * from  jtf_rs_resource_extns where source_name like '%许忠贵%'
+
+SELECT * FROM  jtf_rs_resource_extns where resource_id=100000074
+select * from jtf_rs_salesreps where salesrep_id=100000065
+
+
+select * from HZ_PArTY_SITES where party_id=10345
+select * from HZ_PARTY_SITE_USES where party_site_id in (select party_site_id from HZ_PArTY_SITES where party_id=10345)
+select * from HZ_LOCATIONS
+
+SELECT * FROM jtf_rs_salesreps
+
+select * from ar.hz_cust_site_uses_all
+

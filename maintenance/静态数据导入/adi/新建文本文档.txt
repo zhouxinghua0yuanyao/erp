@@ -1,0 +1,27 @@
+R12对客户进行了较大修改，因此客户接口表导入也有点小复杂
+ 下面说一下接口导入中的问题
+1、接口导入主要用到以下接口表，主要是前三张表
+    RA_CUSTOMERS_INTERFACE_ALL
+     --客户接口表，导入客户，帐户，地点等信息
+    RA_CUSTOMER_PROFILES_INT_ALL
+     --客户配置文件接口表，导入客户及地点上的配置文件信息
+    RA_CONTACT_PHONES_INT_ALL
+     --客户联系人接口表，导入客户联系人及联系方式
+    RA_CUSTOMER_BANKS_INT_ALL
+     RA_CUST_PAY_METHOD_INT_ALL
+
+ 2、在录入收单方时，要向PROFILES接口中插入两条纪录
+     客户PROFILE中没有orig_system_address_ref
+      地点PROFILE要添入orig_system_address_ref
+
+ 3、如果客户存在两个以上联系人
+     则需要向PHONES_INT接口表中插入多条纪录
+     其中注意，orig_system_customer_ref与orig_system_address_ref的赋值
+
+4、客户要分两次导入，先导“收单方”再导“收货方”
+
+5、国家为‘US‘，要注意他的地址格式
+     AR超级用户->设置->系统->国家(地区)
+
+6、成功导入客户后，如果发现后台数据库可以找数据，而前台查询不到客户时
+     可以执行“DQM 分段程序”

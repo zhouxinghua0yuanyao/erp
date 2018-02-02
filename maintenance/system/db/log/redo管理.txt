@@ -1,0 +1,32 @@
+查看日志
+select * from v$logfile
+select * from v$log
+
+
+alter database add logfile group 3 ('/ebs01/prod/db/data/log03a.dbf','/ebs01/prod/db/data/log03b.dbf') size 1024m;
+alter database add logfile group 4 ('/ebs01/prod/db/data/log04a.dbf','/ebs01/prod/db/data/log04b.dbf') size 1024m;
+alter database add logfile group 5 ('/ebs01/prod/db/data/log05a.dbf','/ebs01/prod/db/data/log05b.dbf') size 1024m;
+alter database add logfile group 6 ('/ebs01/prod/db/data/log06a.dbf','/ebs01/prod/db/data/log06b.dbf') size 1024m;
+alter database add logfile group 7 ('/ebs01/prod/db/data/log07a.dbf','/ebs01/prod/db/data/log07b.dbf') size 1024m;
+alter database add logfile group 8 ('/ebs01/prod/db/data/log08a.dbf','/ebs01/prod/db/data/log08b.dbf') size 1024m;
+alter database add logfile group 9 ('/ebs01/prod/db/data/log09a.dbf','/ebs01/prod/db/data/log09b.dbf') size 1024m;
+
+
+
+
+1.添加日志组
+alter database add logfile group 1 ('/u02/oradata/bolan/redo01.log') size 100m;
+2.添加日志组成员
+alter database add logfile member '/u02/oradata/bolan/redo01.log' to group 1;
+3.删除日志组
+alter database drop logfile group 1;
+4.删除日志组成员
+alter database drop logfile member '/u02/oradata/bolan/redo01.log';
+1.添加镜像日志
+alter database add standby logfile group 1 ('/u02/oradata/bolan/redo01.log') size 100m;
+2.添加镜像日志组成员
+alter database add standby logfile member '/u02/oradata/bolan/redo01.log' to group 1;
+3.删除镜像日志
+alter database drop standby logfile group 1;
+4.添加镜像日志组成员
+alter database drop standby logfile member '/u02/oradata/bolan/redo01.log';

@@ -1,0 +1,72 @@
+delete from AP_INVOICES_ALL 
+ where invoice_id=75103; 
+
+ delete from AP_INVOICE_LINES_ALL 
+ where invoice_id=75103; 
+
+ delete from AP_INVOICE_DISTRIBUTIONS_ALL 
+ where invoice_id=75103; 
+
+ delete from ZX_LINES 
+ where trx_id=75103 
+ and application_id=200; 
+
+ delete from ZX_LINES_SUMMARY 
+ where trx_id=75103 
+ and application_id=200; 
+
+ delete from ZX_REC_NREC_DIST 
+ where trx_id=75103 
+ and application_id=200; 
+
+
+ delete from ZX_LINES_DET_FACTORS 
+ where trx_id=75103 
+ and application_id=200; 
+
+ delete from AP_PAYMENT_SCHEDULES_ALL 
+ where invoice_id=75103; 
+
+ delete from AP_ALLOCATION_RULES 
+ where invoice_id=75103; 
+
+
+ delete from AP_ALLOCATION_RULE_LINES 
+ where invoice_id=75103; 
+
+
+ delete from AP_INVOICE_PAYMENTS_ALL 
+ where invoice_id=75103; 
+
+
+ delete from AP_CHECKS_ALL 
+ where check_id=65156; 
+
+ delete from AP_PAYMENT_HISTORY_ALL 
+ where check_id=65156; 
+
+ delete from AP_PAYMENT_HIST_DISTS 
+ where PAYMENT_HISTORY_ID in (55977,55978); 
+
+ delete from XLA_EVENTS 
+ where event_id in (947650,947651,947652,947653) 
+ and application_id=200; 
+
+ delete from XLA_AE_HEADERS 
+ where event_id in (947650,947651,947652,947653) 
+ and application_id=200; 
+
+
+ delete from XLA_AE_LINES 
+ where AE_HEADER_ID in (5202456,5202502,5202519,5202523) 
+ and application_id=200; 
+
+
+ delete from XLA_DISTRIBUTION_LINKS 
+ where event_id in (947650,947651,947652,947653) 
+ and application_id=200; 
+
+
+ delete from XLA_TRANSACTION_ENTITIES 
+ where entity_id in (846945,846946) 
+ and application_id=200; 

@@ -1,0 +1,167 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<!-- +======================================================================+ -->
+<!-- |    Copyright (c) 2005, 2014 Oracle and/or its affiliates.           | -->
+<!-- |                         All rights reserved.                         | -->
+<!-- |                           Version 12.0.0                             | -->
+<!-- +======================================================================+ -->
+<!-- $Header: GMEOSP.xml 120.0.12020000.2 2014/11/14 08:31:45 shalchen noship $ -->
+<!-- dbdrv: exec java oracle/apps/xdo/oa/util XDOLoader.class java &phase=dat checkfile:~PROD:patch/115/publisher/defs:GMEOSP.xml UPLOAD -DB_USERNAME &un_apps -DB_PASSWORD &pw_apps -JDBC_CONNECTION &jdbc_db_addr -LOB_TYPE DATA_TEMPLATE -APPS_SHORT_NAME ~PROD -LOB_CODE GMEOSP -LANGUAGE 00 -XDO_FILE_TYPE XML-DATA-TEMPLATE -FILE_NAME &fullpath:~PROD:patch/115/publisher/defs:GMEOSP.xml -->
+<!-- GSCC_Category="Xdo Data Definition" -->
+
+<dataTemplate name="GMEOSP" version="1.0">
+   <parameters>
+      <parameter name="P_ORGANIZATION_ID"   dataType="number"/>
+	  <parameter name="P_BATCH_FROM"   dataType="character"/>
+	  <parameter name="P_BATCH_TO"     dataType="character"/>
+	  <parameter name="P_PRODUCT_FROM" dataType="character"/>
+	  <parameter name="P_PRODUCT_TO"   dataType="character"/>
+	  <parameter name="P_BATCH_STATUS" dataType="character"/>
+	  <parameter name="P_OPEN_PO_FLAG" dataType="character"/>
+   </parameters> 
+   <dataQuery>
+      <sqlStatement name="Q_BATCH_INFO">
+         <![CDATA[
+            SELECT gbh.batch_id batch_id,
+                   gbh.batch_no batch_no,
+                   gl.meaning status,
+                   gbh.plan_start_date sched_start_date,
+                   gbh.plan_cmplt_date sched_cmplt_date,
+                   msib.concatenated_segments product,
+                   gmd.dtl_um uom,
+                   gmd.plan_qty scheduled_qty,
+                   gmd.actual_qty qty_completed       
+              FROM gme_batch_header gbh,
+                   gme_material_details gmd,
+                   wip_entities we,
+                   mtl_system_items_kfv msib,
+                   gem_lookups gl
+             WHERE (:p_batch_from IS NULL OR
+                    (:p_batch_from IS NOT NULL AND 
+                    gbh.batch_no >= :p_batch_from))
+               AND (:p_batch_to IS NULL OR
+                   (:p_batch_to IS NOT NULL AND 
+                    gbh.batch_no <= :p_batch_to))
+               AND gbh.organization_id = :p_organization_id     
+               AND gbh.batch_id = gmd.batch_id
+               AND (:p_product_from IS NULL OR
+                    (:p_product_from IS NOT NULL AND 
+                     msib.concatenated_segments >= :p_product_from))
+               AND (:p_product_to IS NULL OR
+                   (:p_product_to IS NOT NULL AND 
+                    msib.concatenated_segments <= :p_product_to))
+               AND  msib.organization_id = :p_organization_id     
+               AND (:p_batch_status IS NULL OR
+                   (:p_batch_status IS NOT NULL AND
+                    gbh.batch_status = :p_batch_status))
+               AND gbh.batch_id = we.wip_entity_id
+               AND we.primary_item_id = gmd.inventory_item_id
+               AND msib.inventory_item_id = gmd.inventory_item_id
+               AND msib.organization_id = gbh.organization_id
+               AND gmd.line_type = 1
+               AND gl.lookup_type = 'GME_BATCH_STATUS'
+               AND gbh.batch_status = gl.lookup_code
+               AND (NVL(:p_open_po_flag,'N') = 'N' OR
+                    (:p_open_po_flag = 'Y' AND
+                     EXISTS (   SELECT 'PO/REQ Linked'
+                                  FROM po_releases_all pr,
+                                       po_headers_all ph,
+                                       po_distributions_all pd,
+                                       po_line_locations_all pll
+                                 WHERE pd.po_line_id IS NOT NULL
+                                   AND pd.line_location_id IS NOT NULL
+                                   AND pd.wip_entity_id = gbh.batch_id
+                                   AND pd.destination_organization_id = gbh.organization_id
+                                   AND ph.po_header_id = pd.po_header_id
+                                   AND pll.line_location_id = pd.line_location_id
+                                   AND pr.po_release_id (+) = pd.po_release_id
+                                   AND (pll.cancel_flag IS NULL OR
+                                        pll.cancel_flag = 'N')
+                                   AND (pll.quantity_received < (pll.quantity-pll.quantity_cancelled))
+                                   AND nvl(pll.closed_code,'OPEN') <> 'FINALLY CLOSED'
+                                UNION ALL
+                                SELECT 'PO/REQ Linked'
+                                  FROM po_requisition_lines_all prl
+                                 WHERE prl.wip_entity_id = gbh.batch_id
+                                   AND prl.destination_organization_id = gbh.organization_id
+                                   AND nvl(prl.cancel_flag, 'N') = 'N'
+                                   AND prl.line_location_id IS NULL
+                                UNION ALL
+                                SELECT 'PO/REQ Linked'
+                                  FROM po_requisitions_interface_all pri
+                                 WHERE pri.wip_entity_id = gbh.batch_id
+                                   AND pri.destination_organization_id = gbh.organization_id)))
+             ORDER BY gbh.batch_id
+			]]>
+      </sqlStatement>   
+      <sqlStatement name="Q_PO_INFO">
+         <![CDATA[
+            SELECT gbs.batchstep_no step_no,
+                   gbr.resources resources,
+                   ph.segment1 po_number,
+                   pr.release_num po_release,
+                   pb.full_name buyer,
+                   pv.vendor_name  vendor,
+                   pla.line_num po_line,
+                   msib.segment1 osp_item,
+                   pla.unit_meas_lookup_code po_uom,
+                   pll.shipment_num po_shipment,
+                   pll.quantity qty_ordered,
+                   pll.quantity_received qty_delivered,
+                   pll.need_by_date due_date
+              FROM gme_batch_steps gbs,
+                   gme_batch_step_resources gbr,
+                   po_headers_all ph,        
+                   po_releases_all pr,
+                   po_lines_all pla,
+                   po_distributions_all pd,
+                   po_line_locations_all pll,
+                   po_buyers_val_v pb,
+                   po_vendors pv,
+                   mtl_system_items_b msib        
+             WHERE pd.wip_entity_id = :batch_id
+               AND pd.wip_entity_id = gbs.batch_id     
+               AND pd.wip_operation_seq_num       = gbs.batchstep_id
+               AND pd.destination_organization_id = gbr.organization_id        
+               AND pd.wip_resource_seq_num        = gbr.batchstep_resource_id
+               AND gbs.batchstep_id = gbr.batchstep_id
+               AND gbs.batch_id     = gbr.batch_id
+               AND ph.po_header_id  = pd.po_header_id
+               AND pr.po_release_id (+) = pd.po_release_id        
+               AND pll.line_location_id = pd.line_location_id
+               AND pla.po_line_id       = pd.po_line_id
+               AND ph.agent_id          = pb.employee_id
+               AND ph.vendor_id         = pv.vendor_id (+)
+               AND pla.item_id          = msib.inventory_item_id (+)
+               AND gbr.organization_id  = msib.organization_id
+		 ]]>
+      </sqlStatement>	 	  
+   </dataQuery>
+
+   <dataStructure>
+	  <group name="G_1" source="Q_BATCH_INFO">
+		<element name="batch_no" dataType="varchar2" value="batch_no"/>
+		<element name="product" dataType="varchar2" value="product"/>
+		<element name="status" dataType="varchar2" value="status"/>
+		<element name="uom" dataType="varchar2" value="uom"/>
+		<element name="scheduled_qty" dataType="number" value="scheduled_qty"/>
+		<element name="qty_completed" dataType="number" value="qty_completed"/>		
+        <element name="sched_start_date" dataType="date" value="sched_start_date"/>	
+        <element name="sched_cmplt_date" dataType="date" value="sched_cmplt_date"/>		
+	    <group name="G_2" source="Q_PO_INFO">
+			<element name="step_no" dataType="number" value="step_no"/>
+			<element name="resources" dataType="varchar2" value="resources"/>
+			<element name="po_number" dataType="varchar2" value="po_number"/>
+			<element name="po_release" dataType="number" value="po_release"/>
+			<element name="buyer" dataType="varchar2" value="buyer"/>
+			<element name="vendor" dataType="varchar2" value="vendor"/>
+			<element name="po_line" dataType="number" value="po_line"/>
+			<element name="osp_item" dataType="varchar2" value="osp_item"/>
+			<element name="po_uom" dataType="varchar2" value="po_uom"/>
+			<element name="po_shipment" dataType="number" value="po_shipment"/>
+			<element name="qty_ordered" dataType="number" value="qty_ordered"/>
+			<element name="qty_delivered" dataType="number" value="qty_delivered"/>
+			<element name="due_date" dataType="date" value="due_date"/>
+	    </group>			
+	  </group>
+   </dataStructure>
+</dataTemplate>

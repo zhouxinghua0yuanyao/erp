@@ -1,0 +1,734 @@
+
+
+
+
+ 
+
+
+
+Dear customer: 
+
+ Thanks for your update. 
+ Based on your request for deleting this invoice, please try to do as following: 
+
+ 1. Please backup all the data in the test instance. 
+ 2. Please run below script in the test instance. 
+
+ delete from AP_INVOICES_ALL 
+ where invoice_id=42421; 
+
+ delete from AP_INVOICE_LINES_ALL 
+ where invoice_id=42421; 
+
+ delete from AP_INVOICE_DISTRIBUTIONS_ALL 
+ where invoice_id=42421; 
+
+ delete from ZX_LINES 
+ where trx_id=42421 
+ and application_id=200; 
+
+ delete from ZX_LINES_SUMMARY 
+ where trx_id=42421 
+ and application_id=200; 
+
+ delete from ZX_REC_NREC_DIST 
+ where trx_id=42421 
+ and application_id=200; 
+
+
+ delete from ZX_LINES_DET_FACTORS 
+ where trx_id=42421 
+ and application_id=200; 
+
+ delete from AP_PAYMENT_SCHEDULES_ALL 
+ where invoice_id=42421; 
+
+ delete from AP_ALLOCATION_RULES 
+ where invoice_id=42421; 
+
+
+ delete from AP_ALLOCATION_RULE_LINES 
+ where invoice_id=42421; 
+
+
+ delete from AP_INVOICE_PAYMENTS_ALL 
+ where invoice_id=42421; 
+
+
+ delete from AP_CHECKS_ALL 
+ where check_id=34203; 
+
+ delete from AP_PAYMENT_HISTORY_ALL 
+ where check_id=34203; 
+
+ delete from AP_PAYMENT_HIST_DISTS 
+ where PAYMENT_HISTORY_ID in (46032,46035); 
+
+ delete from XLA_EVENTS 
+ where event_id in (553878,553879,553880,553881,553882,553914,553883,553913) 
+ and application_id=200; 
+
+ delete from XLA_AE_HEADERS 
+ where event_id in (553878,553879,553880,553881,553882,553914,553883,553913) 
+ and application_id=200; 
+
+
+ delete from XLA_AE_LINES 
+ where AE_HEADER_ID in (3774671,3774672,3774673,3774674,3774675,3774676,3774677,3774678) 
+ and application_id=200; 
+
+
+ delete from XLA_DISTRIBUTION_LINKS 
+ where event_id in (553878,553879,553880,553881,553882,553914,553883,553913) 
+ and application_id=200; 
+
+
+ delete from XLA_TRANSACTION_ENTITIES 
+ where entity_id in (487166,487167) 
+ and application_id=200; 
+
+ commit; 
+
+
+
+ Thanks, 
+
+ Ling. 
+ 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-6 下午2:11  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Upload to TDS successful for the file ZHOUXINGHUA-Invoice_Data-2016-09-07_09-51-42.zip. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+
+
+  Oracle 技术支持 - 2016-9-6 下午2:10  [ODM Action Plan] 
+
+
+
+
+
+ 
+
+
+
+Dear customer: 
+
+ Please use below Note to get the Aplist for datafix 
+
+Note. 732163.1 - R12.0.6+ : Oracle Payables Invoice Data Data Collection Test 
+
+
+ Thanks, 
+
+ Ling. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-6 下午1:44  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Upload to TDS successful for the file distributionlines-3.jpg. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-6 下午1:44  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Upload to TDS successful for the file distributionlines-2.jpg. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-6 下午1:44  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Upload to TDS successful for the file distributionlines-1.jpg. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+
+
+  Oracle 技术支持 - 2016-9-6 下午1:33  [ODM Action Plan] 
+
+
+
+
+
+ 
+
+
+
+Dear customer: 
+
+ For fixing this issue, I need more information on this issue. 
+ First please let me know your expectation on this issue? 
+
+ And provide below information on the problem-ed invoice. 
+
+ 1. Please upload Aplist on -invoice based on below Note 
+
+ 732163.1, R12.0.6+ : Oracle Payables Invoice Data Data Collection Test 
+
+
+ 2. Please uplaod GDF file result following the below note 1360390.1 , R12: Master GDF Diagnostic to Validate Data Related to Invoices, Payments, Accounting and Suppliers 
+
+
+ From Note. 1360390.1 - R12: Diagnostic Script to Validate Data Related to Invoices, Payments, and Suppliers , download ap_gdf_detect_pkg.zip file and run ap_gdf_detect_pkg.sql first to create ap_gdf_detect_pkg and then run single_trx.sql with the problem invoice id. 
+
+
+ Thanks, 
+
+ Ling. 
+ 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+
+
+  Oracle 技术支持 - 2016-9-6 下午1:31  [ODM Issue Verification] 
+
+
+
+
+
+ 
+
+
+
+Verified the issue in the screen shots as noted below: 
+
+ SCREEN SHOTS 
+ ----------------------- 
+ Filename = OverviewOfInvoice.jpg 
+ See the following issue/symptom: 
+
+
+ Customer updates 
+ ----------------------- 
+ Hi, I created an AP invoice and created payment for this invoice. then I created account entries, Error message pops out. 
+ Error number: 
+ 95277 
+ So I found OU code of Balance segments of AP invoice distributetion lines are not consistent ,so the payment is 
+
+ ERROR 
+ ----------------------- 
+
+ 95277 
+ 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+
+
+  Oracle 技术支持 - 2016-9-6 下午1:31  [ODM Issue Clarification] 
+
+
+
+
+
+ 
+
+
+
+On : 12.2.4 The OU code of Balance segments of AP invoice distributetion lines are not consistent 
+
+
+
+ STEPS 
+ ----------------------- 
+ The issue can be reproduced at will with the following steps: 
+ 1.Login to Payables Responsibility 
+ 2. Create invoice 
+ 3. Validate 
+
+ BUSINESS IMPACT 
+ ----------------------- 
+ The issue has the following business impact: 
+ Due to this issue, users cannot validate normally 
+ 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+
+
+  Oracle 技术支持 - 2016-9-6 下午1:28  [Notes] 
+
+
+
+
+
+ 
+
+
+
+My name is ling.jin and I will be assisting you with this Service Request (SR). If you have any comments or concerns about the support you receive, please contact my manager seonggil.jeong at seonggil.jeong@oracle.com 
+
+ The following document can enhance your experience with Global Customer Services: 
+Doc ID: 166650.1 : Working Effectively With Support 
+
+ You may search the community for issues similar to yours at the following URL: 
+ https://community.oracle.com/community/support/oracle_e-business_suite/ 
+
+ Use the information below to get the latest Oracle EBS information, or follow us on EBS Twitter or EBS Blog. 
+Doc ID: 432.1 – Get Proactive! Find all of the latest tools and offerings to help you streamline and simplify your daily operations. 
+ http://twitter.com/#!/Oracle_EBS 
+ http://blogs.oracle.com/EBS/ 
+
+ If you need to call in, here is a link to the Customer Global support numbers: 
+ http://www.oracle.com/us/support/contact/index.html 
+ 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-6 下午1:09  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Thanks. We want to close ap period asap. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+
+
+  Oracle 技术支持 - 2016-9-6 下午12:51  [Notes] 
+
+
+
+
+
+ 
+
+
+
+Hi XingHua, 
+
+ Your issue was transferred to me. My name is Xinghua and I will be helping you with your issue. 
+ If you should have any comments or concerns regarding the service you receive, and wish to speak to a manager, then please follow the escalation process described in Note 166650.1 : Working Effectively With Support. 
+ You can contact my manager at Jackie.han@oracle.com 
+
+ Thank you for your patience, 
+ Xinghua 
+ Global Customer Services 
+ 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+
+
+  Oracle 技术支持 - 2016-9-5 下午11:44  [Notes] 
+
+
+
+
+
+ 
+
+
+
+Hi Zhou, 
+
+ We received and will review your updates. 
+
+ Kind regards, 
+ 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-5 下午9:52  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Upload to TDS successful for the file 创建会计科目_050916应付模块.rtf. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-5 下午9:51  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Upload to TDS successful for the file error.png. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-5 下午9:51  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+Upload to TDS successful for the file distributionLinesOfInvoice.jpg. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-5 下午9:48  [Update from Customer] 
+
+
+
+
+
+
+
+ 
+
+
+
+plz assign this sr tp China time zone. A couple of days ago, I met this problem. But that AP invoice doesn't have payment. So Oracle tech provided script to delete invoice. Tis time I want to delete ap invoice and payment. 
+
+ 
+
+
+      
+
+
+
+  
+
+   
+
+
+
+
+
+ 
+
+ISYSTEM@SHYUANYAO.COM  - 2016-9-5 下午9:44  [Customer Problem Description] 
+
+
+
+
+
+
+
+ 
+
+
+
+Customer Problem Description 
+ --------------------------------------------------- 
+
+ Problem Summary 
+ --------------------------------------------------- 
+ The OU code of Balance segments of AP invoice distributetion lines are not consistent 
+
+ Problem Description 
+ --------------------------------------------------- 
+ Hi, I created an AP invoice and created payment for this invoice. then I created account entries, Error message pops out. 
+ Error number: 
+ 95277 
+ So I found OU code of Balance segments of AP invoice distributetion lines are not consistent ,so the payment is. 
+
+ Error Codes 
+ --------------------------------------------------- 
+
+ 

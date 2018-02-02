@@ -1,0 +1,49 @@
+# +======================================================================+ 
+# |    Copyright (c) 2005, 2015 Oracle and/or its affiliates.           | 
+# |                         All rights reserved.                         | 
+# |                           Version 12.0.0                             | 
+# +======================================================================+ 
+# $Header: gmebhrar.ldt 120.0.12020000.2 2015/04/30 05:10:02 qzeng noship $
+
+# dbdrv: exec fnd bin FNDLOAD bin &phase=dat checkfile:~PROD:~PATH:~FILE &ui_apps 0 Y UPLOAD @AME:patch/115/import/amescvar.lct @~PROD:~PATH/~FILE
+LANGUAGE = "US"
+LDRCONFIG = "amescvar.lct 120.5.12020000.1"
+
+#Source Database seed122
+
+#RELEASE_NAME 12.2.2
+
+# -- Begin Entity Definitions -- 
+
+DEFINE AME_CALLING_APPS
+  KEY   APPLICATION_SHORT_NAME          VARCHAR2(50)
+  KEY   TRANSACTION_TYPE_ID             VARCHAR2(50)
+  TRANS APPLICATION_NAME                VARCHAR2(720)
+  BASE  BASE_APPLICATION_NAME           VARCHAR2(240)
+  BASE  LINE_ITEM_ID_QUERY              VARCHAR2(4000)
+  BASE  LAST_UPDATE_DATE                VARCHAR2(19)
+  CTX   OWNER                           VARCHAR2(100)
+
+  DEFINE AME_APP_CONFIG_VARS
+    KEY   VARIABLE_NAME                   VARCHAR2(50)
+    KEY   APPLICATION_SHORT_NAME          VARCHAR2(50)
+    KEY   TRANSACTION_TYPE_ID             VARCHAR2(50)
+    TRANS USER_CONFIG_VAR_NAME            VARCHAR2(150)
+    BASE  VARIABLE_VALUE                  VARCHAR2(200)
+    TRANS DESCRIPTION                     VARCHAR2(300)
+    BASE  LAST_UPDATE_DATE                VARCHAR2(19)
+    CTX   OWNER                           VARCHAR2(100)
+  END AME_APP_CONFIG_VARS
+END AME_CALLING_APPS
+
+# -- End Entity Definitions -- 
+
+
+BEGIN AME_CALLING_APPS "GME" "oracle.apps.gme.batch.holdrelease"
+  APPLICATION_NAME = "GME ERES Batch Hold Release"
+  BASE_APPLICATION_NAME = "GME ERES Batch Hold Release"
+  LAST_UPDATE_DATE = "2015/04/20 12:53:32"
+  OWNER = "ORACLE12.2.0"
+
+END AME_CALLING_APPS
+

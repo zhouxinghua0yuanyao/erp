@@ -1,0 +1,47 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<!-- +======================================================================+ -->
+<!-- |    Copyright (c) 2005, 2015 Oracle and/or its affiliates.           | -->
+<!-- |                         All rights reserved.                         | -->
+<!-- |                           Version 12.0.0                             | -->
+<!-- +======================================================================+ -->
+
+<!-- $Header: gmebhdrs.wfx 120.0.12020000.1 2015/04/30 04:16:55 qzeng noship $ -->
+<!-- dbdrv: exec java oracle/apps/fnd/wf WFXLoad.class java &phase=daa+39 \ -->
+<!-- dbdrv: checkfile:~PROD:~PATH:~FILE \ -->
+<!-- dbdrv: -u &un_apps &pw_apps &jdbc_db_addr &jdbc_protocol US \ -->
+<!-- dbdrv: &fullpath_~PROD_~PATH_~FILE -->
+<!-- Source Database seed122 -->
+
+<oracle.apps.wf.event.all.sync>
+<WF_TABLE_DATA>
+  <WF_EVENT_SUBSCRIPTIONS>
+    <VERSION>1.0</VERSION>
+    <GUID>#NEW</GUID>
+    <SYSTEM_GUID>#LOCAL</SYSTEM_GUID>
+    <SOURCE_TYPE>LOCAL</SOURCE_TYPE>
+    <SOURCE_AGENT_GUID/>
+    <EVENT_FILTER_GUID>oracle.apps.gme.batch.holdrelease</EVENT_FILTER_GUID>
+    <PHASE>0</PHASE>
+    <STATUS>ENABLED</STATUS>
+    <RULE_DATA>KEY</RULE_DATA>
+    <OUT_AGENT_GUID/>
+    <TO_AGENT_GUID/>
+    <PRIORITY>50</PRIORITY>
+    <RULE_FUNCTION>EDR_PSIG_RULE.PSIG_RULE</RULE_FUNCTION>
+    <JAVA_RULE_FUNC/>
+    <STANDARD_TYPE/>
+    <STANDARD_CODE/>
+    <ON_ERROR_CODE>ABORT</ON_ERROR_CODE>
+    <ACTION_CODE>CUSTOM_RG</ACTION_CODE>
+    <WF_PROCESS_TYPE>EDRPSIGF</WF_PROCESS_TYPE>
+    <WF_PROCESS_NAME>PSIG_ESIGN_PAGE_FLOW</WF_PROCESS_NAME>
+    <PARAMETERS>EDR_XML_MAP_CODE=oracle.apps.gme.cbr.btch.hold</PARAMETERS>
+    <OWNER_NAME>OPM Process Execution</OWNER_NAME>
+    <OWNER_TAG>GME</OWNER_TAG>
+    <CUSTOMIZATION_LEVEL>L</CUSTOMIZATION_LEVEL>
+    <LICENSED_FLAG>Y</LICENSED_FLAG>
+    <DESCRIPTION>This event raised when batch hold is released</DESCRIPTION>
+    <EXPRESSION/>
+  </WF_EVENT_SUBSCRIPTIONS>
+</WF_TABLE_DATA>
+</oracle.apps.wf.event.all.sync>

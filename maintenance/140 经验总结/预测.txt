@@ -1,0 +1,2 @@
+if you want MRP, data collection is not required. 
+and you should use the responsibility "Material Planning" for MRP.

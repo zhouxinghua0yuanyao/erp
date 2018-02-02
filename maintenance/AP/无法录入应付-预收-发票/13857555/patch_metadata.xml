@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<patch_metadata>
+<patch_number>13857555</patch_number>
+<product>iby</product>
+<abstract><![CDATA[RCA: ISSUES WITH DUPLICATE PAYEE DELETION GDF: 10140168]]></abstract>
+<description><![CDATA[Script to Remove Duplicate Payees and their references.]]></description>
+<entity_abbreviation>iby</entity_abbreviation>
+<release>R12</release>
+<based_on><![CDATA[C]]></based_on>
+<aru_update_date>MAY-22-2015 17:22:22</aru_update_date>
+ <manual_steps>
+  <steps_available>
+   <step product="ad" location="patch/115/manualsteps" filename="ad_apply_patch.xml" 
+    version="13857555:R12.IBY.C"   category="Apply The Patch">Apply patch 
+   </step> 
+  </steps_available>
+ </manual_steps>
+<introducing>
+</introducing>
+<requires>
+</requires>
+</patch_metadata>

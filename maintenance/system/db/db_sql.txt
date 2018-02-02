@@ -1,0 +1,16 @@
+select * from gl_je_headers
+SELECT blocks, empty_blocks, num_rows FROM dba_tables WHERE table_name =upper('gl_je_headers'); 
+SELECT TABLE_NAME, 
+         (BLOCKS * 8192 / 1024 / 1024) - 
+         (NUM_ROWS * AVG_ROW_LEN / 1024 / 1024) "Data lower than HWM in MB" 
+    FROM dba_TABLES 
+   WHERE table_name = 'GL_JE_HEADERS';
+
+--exec dbms_stats.gather_table_stats('GL','GL_JE_HEADERS',CASCADE=>TRUE); 
+analyze table "GL"."GL_JE_HEADERS" compute statistics; 
+
+alter table "GL"."GL_JE_HEADERS" enable row movement; --打开行移动
+alter table "GL"."GL_JE_HEADERS" shrink space cascade; --压缩表及相关数据段并下调HWM
+alter table "GL"."GL_JE_HEADERS" shrink space compact; --只压缩不下调HWM
+alter table "GL"."GL_JE_HEADERS" shrink space ; --下调HWM
+alter table "GL"."GL_JE_HEADERS" disable row movement; --关闭行移动1

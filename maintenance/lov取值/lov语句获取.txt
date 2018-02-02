@@ -1,0 +1,2 @@
+select sql_text from  v$sqltext t where t.ADDRESS
+in (select prev_sql_addr from v$session a where sid=2399)

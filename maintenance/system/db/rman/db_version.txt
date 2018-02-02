@@ -1,0 +1,95 @@
+DBID=316607836
+
+
+RMAN configuration parameters for database with db_unique_name PROD are:
+CONFIGURE RETENTION POLICY TO REDUNDANCY 15;
+CONFIGURE BACKUP OPTIMIZATION ON;
+CONFIGURE DEFAULT DEVICE TYPE TO DISK;
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 5 BACKUP TYPE TO COMPRESSED BACKUPSET;
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE CHANNEL DEVICE TYPE DISK MAXOPENFILES 50 MAXPIECESIZE 32 G;
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE; # default
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/ebs01/prod/db/11.2.0/dbs/snapcf_PROD.f'; # default
+
+vir
+ADJREOPTS='-Xms128M -Xmx512M'
+ADJVAPRG=/ebs01/prod/db/11.2.0/appsutil/jre/bin/java
+ADPERLPRG=/ebs01/prod/db/11.2.0/perl/bin/perl
+BASH=/usr/bin/bash
+BASHOPTS=cmdhist:expand_aliases:extquote:force_fignore:hostcomplete:interactive_comments:login_shell:progcomp:promptvars:sourcepath:xpg_echo
+BASH_ALIASES=()
+BASH_ARGC=()
+BASH_ARGV=()
+BASH_CMDS=()
+BASH_LINENO=()
+BASH_SOURCE=()
+BASH_VERSINFO=([0]="4" [1]="1" [2]="17" [3]="1" [4]="release" [5]="sparc-sun-solaris2.11")
+BASH_VERSION='4.1.17(1)-release'
+COLUMNS=81
+CONTEXT_FILE=/ebs01/prod/db/11.2.0/appsutil/PROD_dbsrv.xml
+CONTEXT_NAME=PROD_dbsrv
+DIRSTACK=()
+EUID=102
+GROUPS=()
+HISTFILE=/export/home/oraprod/.bash_history
+HISTFILESIZE=500
+HISTSIZE=500
+HOME=/export/home/oraprod
+HOSTNAME=dbsrv
+HOSTTYPE=sparc
+HZ=
+IFS=$' \t\n'
+LANG=en_US.UTF-8
+LC_ALL=
+LC_COLLATE=
+LC_CTYPE=
+LC_MESSAGES=
+LC_MONETARY=
+LC_NUMERIC=
+LC_TIME=
+LD_LIBRARY_PATH=/ebs01/prod/db/11.2.0/lib:/usr/dt/lib:/usr/openwin/lib:/ebs01/prod/db/11.2.0/ctx/lib:/ebs01/prod/db/11.2.0/lib32
+LIBPATH=/ebs01/prod/db/11.2.0/lib:/usr/dt/lib:/usr/openwin/lib:/ebs01/prod/db/11.2.0/ctx/lib:/ebs01/prod/db/11.2.0/lib32
+LINES=39
+LINK_CNTRL=
+LOGNAME=oraprod
+MACHTYPE=sparc-sun-solaris2.11
+MAIL=/var/mail/oraprod
+MAILCHECK=60
+NLS_DATE_FORMAT=DD-MON-RR
+NLS_LANG=American_America.UTF8
+NLS_NUMERIC_CHARACTERS=.,
+NLS_SORT=binary
+OPTERR=1
+OPTIND=1
+ORACLE_HOME=/ebs01/prod/db/11.2.0
+ORACLE_SID=PROD
+ORA_NLS10=/ebs01/prod/db/11.2.0/nls/data/9idata
+ORA_TZFILE=
+OSTYPE=solaris2.11
+PAGER='/usr/bin/less -ins'
+PATH=/ebs01/prod/db/11.2.0/perl/bin:/ebs01/prod/db/11.2.0/bin:/usr/ccs/bin:/usr/sbin:/ebs01/prod/db/11.2.0/appsutil/jre/bin:/usr/bin:/usr/sbin:.
+PERL5LIB=/ebs01/prod/db/11.2.0/perl/lib/5.10.0:/ebs01/prod/db/11.2.0/perl/lib/site_perl/5.10.0:/ebs01/prod/db/11.2.0/appsutil/perl
+PERLBIN=/ebs01/prod/db/11.2.0/perl/bin
+PIPESTATUS=([0]="0")
+PPID=16130
+PS1='\u@\h:\w\$ '
+PS2='> '
+PS4='+ '
+PWD=/export/home/oraprod
+SHELL=/usr/bin/bash
+SHELLOPTS=braceexpand:emacs:hashall:histexpand:history:interactive-comments:monitor
+SHLIB_PATH=/ebs01/prod/db/11.2.0/lib:/usr/lib:/ebs01/prod/db/11.2.0/ctx/lib
+SHLVL=1
+TERM=vt100
+TNS_ADMIN=/ebs01/prod/db/11.2.0/network/admin/PROD_dbsrv
+TZ=localtime
+UID=102
+_=/
+customfile=/ebs01/prod/db/11.2.0/customPROD_dbsrv.env

@@ -1,0 +1,172 @@
+begin aru bug_16674834 
+
+  compatible release 12.0.0 
+
+  compatible platform GENERIC 
+
+  compatible requires_translation yes 
+
+  characterset us7ascii 
+
+  extension recordpatch 16674834 US 
+
+  extension patch_type software base 
+
+  extension fixes 16799875 ap C 
+  extension fixes 17600307 ap C 
+  extension fixes 16183315 ap C 
+  extension fixes 16164378 ap C 
+  extension fixes 15831147 ap C 
+  extension fixes 16674834 ap C 
+  extension fixes 17446677 ap C 
+  extension fixes 16636525 ap C 
+
+  extension includes 16674834 ap C 
+  extension includes 15831147 ap C 
+  extension includes 16164378 ap C 
+  extension includes 16183315 ap C 
+  extension includes 16636525 ap C 
+  extension includes 16799875 ap C 
+  extension includes 17446677 ap C 
+  extension includes 17600307 ap C 
+
+  compatible feature checkfile 
+
+  extension trackable_entity ap product Oracle Payables 
+  extension based on ap C
+
+  begin bug ap 15831147
+    begin actions
+    end actions
+  end bug ap 15831147
+
+  begin bug ap 16164378
+    begin actions
+    end actions
+  end bug ap 16164378
+
+  begin bug ap 16183315
+    begin actions
+    end actions
+  end bug ap 16183315
+
+  begin bug ap 16636525
+    begin actions
+    end actions
+  end bug ap 16636525
+
+  begin bug ap 16799875
+    begin actions
+    end actions
+  end bug ap 16799875
+
+  begin bug ap 17446677
+    begin actions
+    end actions
+  end bug ap 17446677
+
+  begin bug ap 17600307
+    begin actions
+    end actions
+  end bug ap 17600307
+
+  begin bug ap 16674834
+    begin actions
+
+      #=================================#
+      # Actions for Copying Patch Files #
+      #=================================#
+
+      copy      ap       patch/115/import/US       APXLAAAD.ldt 120.0.12020000.17
+      copy      ap       patch/115/import/US       APXLASET.ldt 120.87.12020000.4
+      copy      ap       patch/115/sql             apacpayb.pls 120.47.12020000.7
+      copy      ap       patch/115/sql             apacpays.pls 120.17.12020000.2
+      copy      ap       patch/115/sql             apacrndb.pls 120.66.12020000.9
+      copy      ap       patch/115/sql             apeventb.pls 120.123.12020000.4
+      copy      ap       patch/115/sql             apimportaad.sql 120.3.12020000.1
+      copy      ap       patch/115/sql             appaydib.pls 120.121.12020000.16
+      copy      ap       patch/115/sql             appaydis.pls 120.27.12020000.2
+      copy      ap       patch/115/sql             appostimportaad.sql 120.4.12020000.1
+      copy      ap       patch/115/sql             appredib.pls 120.66.12020000.7
+      copy      ap       patch/115/sql             appredis.pls 120.25.12020000.2
+      copy      ap       patch/115/xdf             ap_extract_invoice_dtls_bc_v.xdf 120.12.12020000.3
+      copy      ap       patch/115/xdf             ap_invoice_extract_details_v.xdf 120.23.12020000.2
+      copy      ap       patch/115/xdf             ap_payment_extract_details_v.xdf 120.30.12020000.3
+
+      #=======================================#
+      # Actions for Applying Database Objects #
+      #=======================================#
+
+      #
+      # Phase PLS - Create Package Specifications
+      #
+
+      # file-version-parsed ap patch/115/sql apacpays.pls 120.17.12020000.2
+      sql ap patch/115/sql apacpays.pls none none none package &phase=pls checkfile(120.6.12010000.13=120.17.12020000.2):ap:patch/115/sql:apacpays.pls
+
+      # file-version-parsed ap patch/115/sql appaydis.pls 120.27.12020000.2
+      sql ap patch/115/sql appaydis.pls none none none package &phase=pls checkfile(120.16.12010000.10=120.27.12020000.2):ap:patch/115/sql:appaydis.pls
+
+      # file-version-parsed ap patch/115/sql appredis.pls 120.25.12020000.2
+      sql ap patch/115/sql appredis.pls none none none package &phase=pls checkfile(120.11.12010000.12=120.25.12020000.2):ap:patch/115/sql:appredis.pls
+
+      #
+      # Phase VW - Create Views
+      #
+
+      # file-version-parsed ap patch/115/xdf ap_extract_invoice_dtls_bc_v.xdf 120.12.12020000.3
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=vw checkfile(120.8.12010000.13=120.12.12020000.3):ap:patch/115/xdf:ap_extract_invoice_dtls_bc_v.xdf:vw_view &un_apps &pw_apps &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr view &fullpath_ap_patch/115/xdf_ap_extract_invoice_dtls_bc_v.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed ap patch/115/xdf ap_invoice_extract_details_v.xdf 120.23.12020000.2
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=vw checkfile(120.12.12010000.11=120.23.12020000.2):ap:patch/115/xdf:ap_invoice_extract_details_v.xdf:vw_view &un_apps &pw_apps &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr view &fullpath_ap_patch/115/xdf_ap_invoice_extract_details_v.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      # file-version-parsed ap patch/115/xdf ap_payment_extract_details_v.xdf 120.30.12020000.3
+      exec java oracle/apps/fnd/odf2 FndXdfCmp.class java &phase=vw checkfile(120.9.12010000.20=120.32):ap:patch/115/xdf:ap_payment_extract_details_v.xdf:vw_view &un_apps &pw_apps &un_apps &pw_apps &jdbc_protocol &jdbc_db_addr view &fullpath_ap_patch/115/xdf_ap_payment_extract_details_v.xdf &fullpath_fnd_patch/115/xdf_xsl
+
+      #
+      # Phase PLB - Create Package Bodies
+      #
+
+      # file-version-parsed ap patch/115/sql apacpayb.pls 120.47.12020000.7
+      sql ap patch/115/sql apacpayb.pls none none none package &phase=plb checkfile(120.12.12010000.41=120.47.12020000.7):ap:patch/115/sql:apacpayb.pls
+
+      # file-version-parsed ap patch/115/sql apacrndb.pls 120.66.12020000.9
+      sql ap patch/115/sql apacrndb.pls none none none package &phase=plb checkfile(120.22.12010000.54=120.66.12020000.9):ap:patch/115/sql:apacrndb.pls
+
+      # file-version-parsed ap patch/115/sql apeventb.pls 120.123.12020000.4
+      sql ap patch/115/sql apeventb.pls none none none package &phase=plb checkfile(120.54.12010000.71=120.123.12020000.4):ap:patch/115/sql:apeventb.pls
+
+      # file-version-parsed ap patch/115/sql appaydib.pls 120.121.12020000.16
+      sql ap patch/115/sql appaydib.pls none none none package &phase=plb checkfile(120.28.12010000.110=120.121.12020000.16)(120.21.12000000.114=120.28.12010000.98)(120.21.12000000.101=120.28.12010000.85):ap:patch/115/sql:appaydib.pls
+
+      # file-version-parsed ap patch/115/sql appredib.pls 120.66.12020000.7
+      sql ap patch/115/sql appredib.pls none none none package &phase=plb checkfile(120.20.12010000.48=120.66.12020000.7)(120.18.12000000.49=120.20.12010000.42):ap:patch/115/sql:appredib.pls
+
+      #
+      # Phase DAT - non-AOL Seed Data
+      #
+
+      # file-version-parsed ap patch/115/sql apimportaad.sql 120.3.12020000.1
+      sql ap patch/115/sql apimportaad.sql none none none sqlplus &phase=dat checkfile:nocheck
+
+      # file-version-parsed ap patch/115/import/US APXLAAAD.ldt 120.0.12020000.17
+      exec fnd bin FNDLOAD bin &phase=dat+1 checkfile:ap:patch/115/import/US:APXLAAAD.ldt &ui_apps 0 Y UPLOAD @XLA:patch/115/import/xlaaadrule.lct @SQLAP:patch/115/import/US/APXLAAAD.ldt
+
+      # file-version-parsed ap patch/115/import/US APXLASET.ldt 120.87.12020000.4
+      exec fnd bin FNDLOAD bin &phase=dat+1 checkfile:ap:patch/115/import/US:APXLASET.ldt &ui_apps 0 Y UPLOAD @XLA:patch/115/import/xlaemseed.lct @SQLAP:patch/115/import/US/APXLASET.ldt
+
+      #
+      # Phase UPG - non-AOL Transaction Data
+      #
+
+      # file-version-parsed ap patch/115/sql appostimportaad.sql 120.4.12020000.1
+      sql ap patch/115/sql appostimportaad.sql none none none sqlplus &phase=upg+70 checkfile:nocheck
+
+      #========================================#
+      # Actions for Generating Dependent Files #
+      #========================================#
+
+    end actions
+  end bug ap 16674834
+
+end aru bug_16674834

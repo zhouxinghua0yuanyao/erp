@@ -1,0 +1,57 @@
+begin aru bug_21419380 
+
+  compatible release 12.0.0 
+
+  compatible platform GENERIC 
+
+  characterset us7ascii 
+
+  extension recordpatch 21419380 US 
+
+  extension patch_type software base 
+
+  extension fixes 21419380 po D 
+
+  extension includes 21419380 po D 
+
+  compatible feature checkfile 
+
+  extension trackable_entity po product Oracle Purchasing 
+  extension based on po D
+
+  begin bug po 21419380
+    begin actions
+
+      #=================================#
+      # Actions for Copying Patch Files #
+      #=================================#
+
+      copy      po       sql                       poresrel.sql 120.3.12020000.4
+      copy      po       sql                       poresreq.sql 120.3.12020000.3
+      copy      po       sql                       poxrespo.sql 120.3.12020000.7
+
+      #=======================================#
+      # Actions for Applying Database Objects #
+      #=======================================#
+
+      #
+      # Phase NOEXEC - These files are intentionally not executed.
+      #
+
+      # file-version-parsed po sql poresrel.sql 120.3.12020000.4
+      # noexec po sql poresrel.sql
+
+      # file-version-parsed po sql poresreq.sql 120.3.12020000.3
+      # noexec po sql poresreq.sql
+
+      # file-version-parsed po sql poxrespo.sql 120.3.12020000.7
+      # noexec po sql poxrespo.sql
+
+      #========================================#
+      # Actions for Generating Dependent Files #
+      #========================================#
+
+    end actions
+  end bug po 21419380
+
+end aru bug_21419380

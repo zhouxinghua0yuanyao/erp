@@ -1,0 +1,27 @@
+req Z2017120800250
+so  52017112803
+po  SBM-S57788
+inv B0052017121200001
+out S2017121100528
+batch SBM-S57788-20171208-003
+qty .5
+
+--直发
+select rowid,a.req_number,a.req_status from cux_dis_req_headers_all a where req_number='Z2017120800250' -- CANCELED
+
+--出库头
+select rowid,a.SHIPMENT_NUMBER,a.STATUS_CODE from cux_dis_txn_shp_all a where a.SHIPMENT_NUMBER='S2017121100528' --CANCELLED
+--出库明细
+select rowid,a.STATUS_CODE,a.SHIPMENT_QUANTITY from cux_dis_txn_shp_lns_all a 
+where a.SHIPMENT_ID in (select a.SHIPMENT_ID from cux_dis_txn_shp_all a where a.SHIPMENT_NUMBER='S2017121100528')
+--开票申请
+select rowid,cfm.* from cux_dis_ship_cfm_all cfm   where cfm.CONFIRM_NUM='B0052017121200001' --CANCELLED
+
+开票 B0052017121200001
+直发 Z2017120800254
+out  S2017121100526
+销售 52017102318
+
+采购 SBM-S56958  8.1   SBM-S56958-20171208-004
+
+采购 SBM-S57788  22.4  SBM-S57788-20171208-001

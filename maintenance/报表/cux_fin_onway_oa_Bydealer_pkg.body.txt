@@ -1,0 +1,1148 @@
+CREATE OR REPLACE PACKAGE BODY cux_fin_onway_oa_Bydealer_pkg IS
+
+    /*==================================================
+    Copyright (C) YUANYAO Shit Corp.
+               AllRights Reserved
+    ==================================================*/
+    /*==================================================
+    Program Name:
+        cux_fin_prepay_onway_oa_pkg
+    Description:
+        Just shit:
+
+    History:
+        1.00  2016-07-24  zhou  Creation
+    ==================================================*/
+
+    -- Global variable
+    g_pkg_name CONSTANT VARCHAR2(30) := 'cux_fin_prepay_onway_oa_pkg';
+    -- Debug Enabled
+    --l_debug       VARCHAR2(1) := NVL(FND_PROFILE.VALUE('AFLOG_ENABLED'),'N');
+
+    PROCEDURE process_age_data(p_init_msg_list IN VARCHAR2 DEFAULT fnd_api.g_false,
+                         p_commit        IN VARCHAR2 DEFAULT fnd_api.g_false,
+                         x_return_status OUT NOCOPY VARCHAR2,
+                         x_msg_count     OUT NOCOPY NUMBER,
+                         x_msg_data      OUT NOCOPY VARCHAR2,
+                         p_org_id        IN NUMBER,
+                         p_vendor_id     IN NUMBER,
+                         p_not_pay_flag  IN VARCHAR2 DEFAULT NULL) IS
+    l_api_name CONSTANT VARCHAR2(22) := 'process_data';
+    l_temp_record CUX_FIN_PAYABLES_AGE_TEMP %ROWTYPE;
+    l_api_type CONSTANT VARCHAR2(30) := '_sp1';
+    l_total_qty    NUMBER;
+    l_amount_age1  NUMBER;
+    l_amount_age2  NUMBER;
+    l_amount_age3  NUMBER;
+    l_amount_age4  NUMBER;
+    l_amount_age5  NUMBER;
+    l_amount_age6  NUMBER;
+    l_amount_age7  NUMBER;
+    l_rate         NUMBER;
+    l_deliver_qty  NUMBER;
+    l_invoiced_qty NUMBER;
+    l_last_amount  NUMBER;
+    l_tax_amount   NUMBER;
+    l_amount       NUMBER;
+    l_day          NUMBER;
+    l_invoice_num  VARCHAR2(2000);
+    l_line_number  VARCHAR2(2000);
+    l_first_flag   BOOLEAN;
+
+    CURSOR cur_po_data IS
+    --匹配到货通知单/直发申请单
+      SELECT pv.vendor_name, --供应商
+             pv.segment1 vendor_number, --供应商编号
+             cux_flex_utl.get_flex_value_desc('CUX_PO_SUPPLIER_TYPE', pv.attribute1) vendor_type, --供应商类型
+             cux_fin_payables_age_rpt_pkg.get_vendor_business_type(pv.vendor_id) business_type, --业务分类
+             poh.segment1 po_number, --PO编号
+             poh.po_header_id,
+             pol.po_line_id,
+             pol.unit_price * (1 + cux_fin_payables_age_rpt_pkg.get_po_line_rata(pol.po_line_id)) unit_price,
+             poh.currency_code, --币种
+             cdri.header_id req_header_id,
+             cdri.line_inv_id,
+             cdrh.req_type,
+             decode(cdrh.req_type, 'PO_RTN', cdri.req_qty * -1, cdri.req_qty) req_qty,
+             trunc(cdrh.estimate_in_out_date) estimate_in_out_date,
+             cux_dis_req_common_utl.get_inv_exec_status(cdri.line_inv_id) exec_status
+        FROM po_headers_all           poh,
+             po_lines_all             pol,
+             po_vendors               pv,
+             cux_dis_req_headers_all  cdrh,
+             cux_dis_req_line_inv_all cdri
+       WHERE 1 = 1
+         AND poh.po_header_id = pol.po_header_id
+         AND poh.vendor_id = pv.vendor_id
+         AND cdrh.header_id = cdri.header_id
+         AND pol.po_line_id = cdri.po_line_id
+         AND pol.po_header_id = cdri.po_header_id
+         AND pol.org_id = cdri.org_id
+         AND cdrh.req_type IN ('SO_DSP', 'PO_RCV', 'PO_RTN')
+         AND cdrh.req_status IN ('SUBMIT', 'APPROVED', 'FINAPPROVED')
+         AND poh.org_id = p_org_id
+         AND poh.vendor_id = nvl(p_vendor_id, poh.vendor_id);
+    --期初的AP发票
+    CURSOR c_ap_invoice IS
+      SELECT hp.party_name vendor_name, --供应商
+             pv.segment1 vendor_number, --供应商编号
+             cux_flex_utl.get_flex_value_desc('CUX_PO_SUPPLIER_TYPE', pv.attribute1) vendor_type, --供应商类型
+             cux_fin_payables_age_rpt_pkg.get_vendor_business_type(pv.vendor_id) business_type, --业务分类
+             ai.invoice_num,
+             ail.line_number,
+             ail.accounting_date gl_date,
+             ai.invoice_currency_code,
+             nvl(SUM(ail.amount), 0) +
+             (SELECT nvl(SUM(app.amount), 0)
+                FROM ap_allocation_rule_lines app
+               WHERE 1 = 1
+                 AND app.invoice_id = ail.invoice_id
+                 AND app.to_invoice_line_number = ail.line_number) line_amount, --行金额
+             nvl(SUM(ai.invoice_amount), 0) invoice_amount, --发票额
+             nvl(SUM(ai.amount_paid), 0) amount_paid, --已付
+             ail.invoice_id
+        FROM ap.ap_invoice_lines_all ail, ap_invoices_all ai, po_vendors pv, hz_parties hp
+       WHERE 1 = 1
+         AND ai.party_id = hp.party_id
+         AND ai.vendor_id = pv.vendor_id(+)
+         AND ail.invoice_id = ai.invoice_id
+         AND nvl(ap_invoices_pkg.get_approval_status(ai.invoice_id,
+                                                     ai.invoice_amount,
+                                                     ai.payment_status_flag,
+                                                     ai.invoice_type_lookup_code),
+                 'NEVER APPROVED') <> 'NEVER APPROVED'
+         AND nvl(ai.invoice_type_lookup_code, 'STANDARD') <> 'PREPAYMENT'
+         AND ail.line_type_lookup_code = 'ITEM'
+         AND ail.inventory_item_id IS NULL --库存项目为空的为期初
+         AND ai.org_id = p_org_id
+         AND ai.vendor_id = nvl(p_vendor_id, ai.vendor_id)
+       GROUP BY ail.invoice_id,
+                ai.invoice_num,
+                pv.segment1,
+                pv.attribute1,
+                pv.vendor_id,
+                ail.line_number,
+                ail.accounting_date,
+                ai.invoice_currency_code,
+                hp.party_name
+      HAVING nvl(SUM(ai.invoice_amount), 0) <> 0;
+    --循环临时表
+    CURSOR cur_temp IS
+      SELECT cfpa.rowid row_id, cfpa.* FROM CUX_FIN_PAYABLES_AGE_TEMP cfpa;
+
+  BEGIN
+    -- start activity to create savepoint, check compatibility
+    -- and initialize message list, include debug message hint to enter api
+    /*x_return_status := cux_api.start_activity(p_pkg_name      => g_pkg_name,
+                                              p_api_name      => l_api_name,
+                                              p_api_type      => l_api_type,
+                                              p_init_msg_list => p_init_msg_list);
+    IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+      RAISE fnd_api.g_exc_unexpected_error;
+    ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+      RAISE fnd_api.g_exc_error;
+    END IF;*/
+
+    -->>1.0 数据源 循环符合要求的所有到货通知单
+    FOR l_po_record IN cur_po_data LOOP
+
+      l_temp_record               := NULL;
+      l_temp_record.vendor_name   := l_po_record.vendor_name;
+      l_temp_record.vendor_number := l_po_record.vendor_number;
+      l_temp_record.vendor_type   := l_po_record.vendor_type;
+      l_temp_record.business_type := l_po_record.business_type;
+      l_temp_record.po_number     := l_po_record.po_number;
+      l_temp_record.currency_code := l_po_record.currency_code;
+      l_temp_record.po_header_id  := l_po_record.po_header_id;
+      l_temp_record.po_line_id    := l_po_record.po_line_id;
+      l_temp_record.unit_price    := l_po_record.unit_price;
+
+      --如果正在执行，取入库数量，入库日期；
+      --申请数量-入库数量，预计出入库日期
+      --如果是已执行，取入库数量，入库日期
+      IF l_po_record.exec_status IN ('EXECUTING', 'EXECUTED') THEN
+
+        --取已入库数量
+        --循环所有的接收
+        l_deliver_qty := 0;
+        FOR l_receive IN (SELECT rt.shipment_header_id,
+                                 rt.shipment_line_id,
+                                 rsh.receipt_num,
+                                 rsl.line_num,
+                                 rt.transaction_id,
+                                 rt.transaction_type,
+                                 decode(rt.transaction_type,
+                                        'RECEIVE',
+                                        rt.quantity,
+                                        rt.quantity * -1) quantity,
+                                 trunc(rt.transaction_date) transaction_date
+                            FROM rcv_transactions     rt,
+                                 rcv_shipment_headers rsh,
+                                 rcv_shipment_lines   rsl
+                           WHERE rt.shipment_header_id = rsh.shipment_header_id
+                             AND rt.shipment_line_id = rsl.shipment_line_id
+                             AND nvl(rt.attribute1, '-99') = l_po_record.req_type
+                             AND nvl(rt.attribute3, '-99') = to_char(l_po_record.line_inv_id)
+                             AND rt.po_header_id = l_po_record.po_header_id
+                             AND rt.po_line_id = l_po_record.po_line_id
+                             AND rt.transaction_type IN ('RECEIVE', 'RETURN TO RECEIVING')
+                             AND rt.source_document_code = 'PO') LOOP
+          --循环所有的入库
+          l_first_flag := FALSE;        
+          IF l_receive.transaction_type = 'RECEIVE' THEN
+            l_first_flag := TRUE;
+            FOR l_deliver IN (SELECT nvl(SUM(decode(rt.transaction_type,
+                                                    'DELIVER',
+                                                    rt.quantity,
+                                                    rt.quantity * -1)),
+                                         0) quantity,
+                                     MIN(trunc(rt.transaction_date)) transaction_date
+                                FROM rcv_transactions rt
+                               WHERE rt.shipment_header_id = l_receive.shipment_header_id
+                                 AND rt.shipment_line_id = l_receive.shipment_line_id
+                                 AND nvl(rt.attribute1, '-99') = l_po_record.req_type
+                                 AND nvl(rt.attribute3, '-99') = to_char(l_po_record.line_inv_id)
+                                 AND rt.po_header_id = l_po_record.po_header_id
+                                 AND rt.po_line_id = l_po_record.po_line_id
+                                 AND rt.transaction_type = 'DELIVER'
+                                 AND rt.source_document_code = 'PO' HAVING nvl(SUM(decode(rt.transaction_type,
+                                                    'DELIVER',
+                                                    rt.quantity,
+                                                    rt.quantity * -1)),
+                                         0) <> 0) LOOP
+
+              l_temp_record.rcv_shipment_num   := l_receive.receipt_num; --接收
+              l_temp_record.rcv_line_num       := l_receive.line_num; --接收行
+              l_temp_record.from_date          := l_deliver.transaction_date;
+              l_temp_record.from_date_desc     := '入库日期';
+              l_temp_record.qty                := l_deliver.quantity;
+              l_temp_record.rcv_transaction_id := l_receive.transaction_id;
+              INSERT INTO cux.CUX_FIN_PAYABLES_AGE_TEMP VALUES l_temp_record;--return ;
+              l_deliver_qty := l_deliver_qty + l_deliver.quantity;
+              l_first_flag  := FALSE;
+            END LOOP;
+          END IF;
+
+          IF l_first_flag OR l_receive.transaction_type = 'RETURN TO RECEIVING' THEN
+            l_temp_record.rcv_shipment_num   := l_receive.receipt_num; --接收
+            l_temp_record.rcv_line_num       := l_receive.line_num; --接收行
+            l_temp_record.from_date          := l_receive.transaction_date;
+            l_temp_record.from_date_desc     := '入库日期';
+            l_temp_record.qty                := l_receive.quantity;
+            l_temp_record.rcv_transaction_id := l_receive.transaction_id;
+            INSERT INTO CUX_FIN_PAYABLES_AGE_TEMP VALUES l_temp_record;
+            l_deliver_qty := l_deliver_qty + l_receive.quantity;
+          END IF;
+        END LOOP;
+        --取未入库数量
+        IF ((l_po_record.exec_status = 'EXECUTING' AND l_deliver_qty < l_po_record.req_qty) OR
+           l_deliver_qty = 0) THEN
+          l_temp_record.rcv_shipment_num   := NULL; --接收
+          l_temp_record.rcv_line_num       := NULL; --接收行
+          l_temp_record.from_date          := l_po_record.estimate_in_out_date;
+          l_temp_record.from_date_desc     := '预计出入库日期';
+          l_temp_record.qty                := l_po_record.req_qty - l_deliver_qty;
+          l_temp_record.rcv_transaction_id := NULL;
+          INSERT INTO CUX_FIN_PAYABLES_AGE_TEMP VALUES l_temp_record;
+        END IF;
+      ELSE
+        --如果是未执行，取申请数量，预计出入库日期
+        l_temp_record.rcv_shipment_num   := NULL; --接收
+        l_temp_record.rcv_line_num       := NULL; --接收行
+        l_temp_record.from_date          := l_po_record.estimate_in_out_date;
+        l_temp_record.from_date_desc     := '预计出入库日期';
+        l_temp_record.qty                := l_po_record.req_qty;
+        l_temp_record.rcv_transaction_id := NULL;
+        INSERT INTO CUX_FIN_PAYABLES_AGE_TEMP VALUES l_temp_record;
+
+      END IF;
+    END LOOP; --end po_line PO行循环结束
+
+    -->>2.0 期初的AP发票
+    FOR l_ap_invoice IN c_ap_invoice LOOP
+      --对于起始日属性=发票日期，应付余额=应付发票行金额*（1+发票行税率）-应付发票已付金额*
+      --应付发票行金额（1+发票行税率）/应付发票原始合计金额
+      l_last_amount := l_ap_invoice.line_amount -
+                       (l_ap_invoice.amount_paid * l_ap_invoice.line_amount /
+                       l_ap_invoice.invoice_amount);
+
+      l_temp_record                     := NULL;
+      l_temp_record.vendor_name         := l_ap_invoice.vendor_name;
+      l_temp_record.vendor_number       := l_ap_invoice.vendor_number;
+      l_temp_record.vendor_type         := l_ap_invoice.vendor_type;
+      l_temp_record.business_type       := l_ap_invoice.business_type;
+      l_temp_record.po_number           := NULL;
+      l_temp_record.currency_code       := l_ap_invoice.invoice_currency_code;
+      l_temp_record.po_header_id        := NULL;
+      l_temp_record.po_line_id          := NULL;
+      l_temp_record.unit_price          := NULL;
+      l_temp_record.rcv_shipment_num    := NULL;
+      l_temp_record.rcv_line_num        := NULL;
+      l_temp_record.from_date           := l_ap_invoice.gl_date;
+      l_temp_record.from_date_desc      := '发票日期';
+      l_temp_record.qty                 := NULL;
+      l_temp_record.rcv_transaction_id  := NULL;
+      l_temp_record.amount              := l_last_amount;
+      l_temp_record.invoice_num         := l_ap_invoice.invoice_num;
+      l_temp_record.invoice_line_number := l_ap_invoice.line_number;
+      INSERT INTO CUX_FIN_PAYABLES_AGE_TEMP VALUES l_temp_record;
+    END LOOP;
+
+    -->>3.0 计算已匹配的应付余额和账龄
+    --对于起始日属性=入库日期的：根据订单行及接收行号追匹配的应付发票行，并找到该应付发票行所在的应付发票。
+    --应付余额={（入库数量-匹配数量）*订单行单价*（1+订单行税率）+匹配数量*发票匹配单价*（1+发票行税率）
+    ---应付发票已付金额*应付发票匹配行金额（1+发票行税率）/应付发票原始合计金额 }*该入库行金额/该接收行关联的所有入库行金额之和
+    FOR l_temp IN cur_temp LOOP
+
+      l_amount_age1 := NULL;
+      l_amount_age2 := NULL;
+      l_amount_age3 := NULL;
+      l_amount_age4 := NULL;
+      l_amount_age5 := NULL;
+      l_amount_age6 := NULL;
+      l_amount_age7 := NULL;
+
+      --该入库行金额/该接收行关联的所有入库行金额之和
+      SELECT nvl(SUM(t.qty), 0)
+        INTO l_total_qty
+        FROM CUX_FIN_PAYABLES_AGE_TEMP t
+       WHERE t.rcv_transaction_id = l_temp.rcv_transaction_id
+         AND t.po_line_id = l_temp.po_line_id
+         AND t.po_header_id = l_temp.po_header_id;
+
+      IF l_total_qty = 0 THEN
+        l_rate := 0;
+      ELSE
+        l_rate := l_temp.qty / l_total_qty;
+      END IF;
+      --匹配金额，匹配数量
+      l_invoiced_qty := 0;
+      l_last_amount  := 0;
+      l_invoice_num  := NULL;
+      l_first_flag   := TRUE;
+      l_line_number  := NULL;
+      FOR l_invoice IN (SELECT nvl(SUM(ail.amount), 0) line_amount,
+                               nvl(SUM(ail.quantity_invoiced), 0) quantity_invoiced,
+                               ail.invoice_id,
+                               nvl(SUM(ai.invoice_amount), 0) /*+ nvl(SUM(ai.total_tax_amount), 0)*/ invoice_amount, --发票额
+                               nvl(SUM(ai.amount_paid), 0) amount_paid, --已付
+                               ai.invoice_num,
+                               listagg(ail.line_number, ',') within GROUP(ORDER BY ail.line_number) line_number
+                          FROM ap.ap_invoice_lines_all ail, ap_invoices_all ai
+                         WHERE ail.invoice_id = ai.invoice_id
+                           AND nvl(ap_invoices_pkg.get_approval_status(ai.invoice_id,
+                                                                       ai.invoice_amount,
+                                                                       ai.payment_status_flag,
+                                                                       ai.invoice_type_lookup_code),
+                                   'NEVER APPROVED') <> 'NEVER APPROVED'
+                           AND ai.invoice_type_lookup_code = 'STANDARD'
+                           AND ail.line_type_lookup_code = 'ITEM'
+                           AND ail.rcv_transaction_id = l_temp.rcv_transaction_id
+                           AND ail.po_line_id = l_temp.po_line_id
+                           AND ail.po_header_id = l_temp.po_header_id
+                         GROUP BY ail.invoice_id, ai.invoice_num
+                        HAVING nvl(SUM(ai.invoice_amount), 0) <> 0) LOOP
+        --行税额
+        SELECT nvl(SUM(app.amount), 0)
+          INTO l_tax_amount
+          FROM ap_allocation_rule_lines app, ap_invoice_lines_all ail
+         WHERE 1 = 1
+           AND app.invoice_id = ail.invoice_id
+           AND app.to_invoice_line_number = ail.line_number
+           AND ail.line_type_lookup_code = 'ITEM'
+           AND ail.rcv_transaction_id = l_temp.rcv_transaction_id
+           AND ail.po_line_id = l_temp.po_line_id
+           AND ail.po_header_id = l_temp.po_header_id
+           AND ail.invoice_id = l_invoice.invoice_id;
+
+        --应付金额：
+        IF l_invoice.invoice_amount = 0 THEN
+          l_amount := 0;
+        ELSE
+          IF nvl(p_not_pay_flag, 'N') = 'N' THEN
+            l_amount := (l_invoice.line_amount + l_tax_amount) -
+                        ((l_invoice.amount_paid * (l_invoice.line_amount + l_tax_amount) /
+                        l_invoice.invoice_amount) * l_rate);
+          ELSE
+            l_amount := (l_invoice.line_amount + l_tax_amount);
+          END IF;
+        END IF;
+        l_last_amount  := l_last_amount + l_amount;
+        l_invoiced_qty := l_invoiced_qty + l_invoice.quantity_invoiced;
+        IF l_first_flag THEN
+          l_invoice_num := l_invoice.invoice_num;
+          l_line_number := l_invoice.line_number;
+          l_first_flag  := FALSE;
+        ELSE
+          l_invoice_num := l_invoice_num || ',' || l_invoice.invoice_num;
+          l_line_number := l_line_number || ',' || l_invoice.line_number;
+        END IF;
+      END LOOP;
+
+      l_last_amount := l_last_amount + nvl((l_temp.qty - l_invoiced_qty) * l_temp.unit_price, 0) +
+                       nvl(l_temp.amount, 0);
+      l_day         := trunc(SYSDATE) - trunc(l_temp.from_date) + 1;
+
+      IF l_day >= 1 AND l_day <= 15 THEN
+        l_amount_age1 := l_last_amount;
+      ELSIF l_day >= 16 AND l_day <= 30 THEN
+        l_amount_age2 := l_last_amount;
+      ELSIF l_day >= 31 AND l_day <= 60 THEN
+        l_amount_age3 := l_last_amount;
+      ELSIF l_day >= 61 AND l_day <= 90 THEN
+        l_amount_age4 := l_last_amount;
+      ELSIF l_day >= 91 AND l_day <= 180 THEN
+        l_amount_age5 := l_last_amount;
+      ELSIF l_day >= 181 AND l_day <= 360 THEN
+        l_amount_age6 := l_last_amount;
+      ELSIF l_day >= 361 THEN
+        l_amount_age7 := l_last_amount;
+      END IF;
+
+      /*IF l_last_amount = 0 THEN
+        DELETE FROM cux.CUX_FIN_PAYABLES_AGE_TEMP t WHERE t.rowid = l_temp.row_id;
+      ELSE*/
+        UPDATE cux.CUX_FIN_PAYABLES_AGE_TEMP t
+           SET t.amount              = l_last_amount,
+               t.from_date           = trunc(t.from_date),
+               t.amount_age1         = l_amount_age1,
+               t.amount_age2         = l_amount_age2,
+               t.amount_age3         = l_amount_age3,
+               t.amount_age4         = l_amount_age4,
+               t.amount_age5         = l_amount_age5,
+               t.amount_age6         = l_amount_age6,
+               t.amount_age7         = l_amount_age7,
+               t.invoice_num         = nvl(t.invoice_num, l_invoice_num),
+               t.invoice_line_number = nvl(t.invoice_line_number, l_line_number)
+         WHERE t.rowid = l_temp.row_id;
+      --END IF;
+
+    END LOOP; --end 余额获取结束.
+
+  DELETE FROM cux.CUX_FIN_PAYABLES_AGE_TEMP t WHERE round(t.amount,2) = 0;
+    -- API end body
+    -- end activity, include debug message hint to exit api
+    /*cux_api.end_activity(p_pkg_name  => g_pkg_name,
+                         p_api_name  => l_api_name,
+                         p_commit    => p_commit,
+                         x_msg_count => x_msg_count,
+                         x_msg_data  => x_msg_data);
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_error,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_unexp,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);
+    WHEN OTHERS THEN
+      x_return_status := cux_api.handle_exceptions(p_pkg_name  => g_pkg_name,
+                                                   p_api_name  => l_api_name,
+                                                   p_api_type  => l_api_type,
+                                                   p_exc_name  => cux_api.g_exc_name_others,
+                                                   x_msg_count => x_msg_count,
+                                                   x_msg_data  => x_msg_data);*/
+  END process_age_data;
+    
+
+    -------------------------------------------
+    --Added by Shayska.AI@20160316
+    --判断是否释放
+    -------------------------------------------
+    FUNCTION judgement_release(p_po_header_id IN NUMBER) RETURN VARCHAR2 IS
+        l_count NUMBER;
+    BEGIN
+        SELECT COUNT(*)
+        INTO   l_count
+        FROM   cux_dis_req_headers_all h
+              ,cux_dis_req_line_po_all l
+        WHERE  l.po_header_id = p_po_header_id -- to_number(ai.attribute2)
+        AND    h.header_id = l.header_id
+        AND    h.req_status IN ('SUBMIT'
+                               ,'APPROVED'
+                               ,'FINAPPROVED')
+        AND    h.last_arrival_flag = 'Y';
+
+        IF l_count = 0 THEN
+            RETURN 'N';
+        ELSE
+            RETURN 'Y';
+        END IF;
+    END judgement_release;
+
+    /*====================================================
+    *  FUNCTION / PROCEDURE
+    *       process_data
+    *   DESCRIPTION:
+    *      数据收集
+    *   ARGUMENT:
+    *   RETURN:
+    *       N/A
+    *   HISTORY:
+    *     1.00  2016.03.02  HY.  Creation
+    =======================================================*/
+    PROCEDURE process_data(p_init_msg_list  IN VARCHAR2 DEFAULT fnd_api.g_false
+                          ,p_commit         IN VARCHAR2 DEFAULT fnd_api.g_false
+                          ,x_return_status  OUT NOCOPY VARCHAR2
+                          ,x_msg_count      OUT NOCOPY NUMBER
+                          ,x_msg_data       OUT NOCOPY VARCHAR2
+                          ,p_org_id         IN NUMBER
+                          ,p_vendor_id      IN NUMBER
+                          ,p_order_date_f   IN DATE
+                          ,p_order_date_t   IN DATE
+                          --,p_invoice_date_f IN DATE
+                          --,p_invoice_date_t IN DATE
+                          ) IS
+        l_api_name CONSTANT VARCHAR2(22) := 'process_data';
+        l_api_type CONSTANT VARCHAR2(30) := '_sp1';
+        --l_ljdh_amount         NUMBER;
+        --l_ljdh_qty            NUMBER;
+        --l_ljbz_amount         NUMBER;
+        --l_ljhk_amount         NUMBER;
+        --l_judgement_release   VARCHAR2(1); --Added by Shayska.AI@20160316
+        --l_temp_record         cux.cux_fin_prepay_onway_temp%ROWTYPE;
+
+        
+
+    BEGIN
+        -- start activity to create savepoint, check compatibility
+        -- and initialize message list, include debug message hint to enter api
+        x_return_status := cux_api.start_activity(p_pkg_name => g_pkg_name
+                                                 ,p_api_name => l_api_name
+                                                 ,p_api_type => l_api_type
+                                                 ,p_init_msg_list => p_init_msg_list);
+        IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+            RAISE fnd_api.g_exc_unexpected_error;
+        ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+            RAISE fnd_api.g_exc_error;
+        END IF;
+        -->>1.0 统计此供应商所有到货金额和数量，已到货
+        cux_fin_payables_age_rpt_pkg.process_data(p_init_msg_list => fnd_api.g_false
+                                                 ,p_commit => fnd_api.g_false
+                                                 ,x_return_status => x_return_status
+                                                 ,x_msg_count => x_msg_count
+                                                 ,x_msg_data => x_msg_data
+                                                 ,p_org_id => p_org_id
+                                                 ,p_vendor_id => p_vendor_id
+                                                 ,p_not_pay_flag => 'Y');
+        IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+            RAISE fnd_api.g_exc_unexpected_error;
+        ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+            RAISE fnd_api.g_exc_error;
+        END IF;
+        
+        -- API end body
+        -- end activity, include debug message hint to exit api
+        cux_api.end_activity(p_pkg_name => g_pkg_name
+                            ,p_api_name => l_api_name
+                            ,p_commit => p_commit
+                            ,x_msg_count => x_msg_count
+                            ,x_msg_data => x_msg_data);
+    EXCEPTION
+        WHEN fnd_api.g_exc_error THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_error
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+        WHEN fnd_api.g_exc_unexpected_error THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_unexp
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+        WHEN OTHERS THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_others
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+    END process_data;
+
+    PROCEDURE process_report(p_init_msg_list  IN VARCHAR2 DEFAULT fnd_api.g_false
+                            ,p_commit         IN VARCHAR2 DEFAULT fnd_api.g_false
+                            ,x_return_status  OUT NOCOPY VARCHAR2
+                            ,x_msg_count      OUT NOCOPY NUMBER
+                            ,x_msg_data       OUT NOCOPY VARCHAR2
+                            ,p_org_id         IN NUMBER
+                            ,p_vendor_id      IN NUMBER
+                            ,p_order_date_f   IN DATE
+                            ,p_order_date_t   IN DATE
+                            --,p_invoice_date_f IN DATE
+                            --,p_invoice_date_t IN DATE
+                            ) IS
+        l_api_name CONSTANT VARCHAR2(22) := 'process_report';
+        l_api_type CONSTANT VARCHAR2(30) := '_sp1';
+        l_print_string VARCHAR2(32767);
+        l_cell_null CONSTANT VARCHAR2(10) := chr(38) || 'nbsp;';
+        l_client_charset VARCHAR2(150);
+        l_operating_unit VARCHAR2(240);
+        l_party_name     VARCHAR2(360);
+
+        CURSOR c_operating_unit IS
+            SELECT hou.name
+            FROM   hr_operating_units hou
+            WHERE  hou.organization_id = p_org_id;
+
+        CURSOR c_vendor_name IS
+            SELECT pv.vendor_name
+            FROM   po_vendors pv
+            WHERE  pv.vendor_id = p_vendor_id;
+            
+        cursor mainData is
+        Select oa_order.*,
+               age_temp.*,
+               --oa_order.yfbzj + oa_order.yfkje - Nvl(age_temp.amount,0) ztzj
+               oa_order.yfkje - Nvl(age_temp.amount,0) ztzj
+          from (select 
+                       ou.name orgName,
+                       a.skdw,
+                       b.ddh,
+                       --b.hth,
+                       b.wl,
+                       To_Char(poh.CREATION_DATE,'yyyy-mm-dd') CREATION_DATE,
+                       Sum(nvl(decode(b.bcfklx, '1', b.bcfkje, 0), 0)) yfbzj,
+                       Sum(nvl(decode(b.bcfklx, '0', b.bcfkje, 0), 0)) yfkje
+                  From formtable_main_10@oadb     a,
+                       formtable_main_10_dt1@oadb b,
+                       workflow_requestbase@oadb  c,
+                       workflow_nodebase@oadb wn,
+                       po_headers_all poh,CUX_OU_ORGANIZATION_V ou
+                 where a.id = b.mainid and b.ddh=poh.segment1
+                 AND    poh.vendor_id = nvl(p_vendor_id,poh.vendor_id)
+            AND poh.creation_date BETWEEN nvl(p_order_date_f ,poh.creation_date)
+            AND nvl(p_order_date_t,poh.creation_date)
+            and poh.ORG_ID=Nvl(p_org_id,poh.ORG_ID) and poh.ORG_ID=ou.organization_id
+            and a.requestid = c.requestid and c.currentnodeid =wn.id and wn.isend=1
+                 group by ou.name,a.skdw, b.ddh, b.wl,poh.CREATION_DATE) oa_order,--, b.hth
+               (Select po_number, sum(qty) qty, sum(amount) amount
+                  from CUX_FIN_PAYABLES_AGE_TEMP t
+                 group by t.po_number) age_temp
+         Where oa_order.ddh = age_temp.po_number(+);
+
+    BEGIN
+        -- start activity to create savepoint, check compatibility
+        -- and initialize message list, include debug message hint to enter api
+        x_return_status := cux_api.start_activity(p_pkg_name => g_pkg_name
+                                                 ,p_api_name => l_api_name
+                                                 ,p_api_type => l_api_type
+                                                 ,p_init_msg_list => p_init_msg_list);
+        IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+            RAISE fnd_api.g_exc_unexpected_error;
+        ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+            RAISE fnd_api.g_exc_error;
+        END IF;
+        -- API body
+
+        --get Character set
+        BEGIN
+            SELECT v.tag
+            INTO   l_client_charset
+            FROM   fnd_lookup_values_vl v
+            WHERE  v.lookup_type = 'FND_ISO_CHARACTER_SET_MAP'
+            AND    v.lookup_code = fnd_profile.value('FND_NATIVE_CLIENT_ENCODING')
+            AND    v.enabled_flag = 'Y'
+            AND    trunc(SYSDATE) BETWEEN nvl(v.start_date_active
+                                             ,trunc(SYSDATE - 1)) AND nvl(v.end_date_active
+                                                                         ,trunc(SYSDATE + 1));
+        EXCEPTION
+            WHEN no_data_found THEN
+                l_client_charset := 'UTF-8';
+        END;
+
+        cux_conc_utl.out_msg(REPLACE(g_print_header0
+                                    ,'G_CHARSET'
+                                    ,l_client_charset));
+        cux_conc_utl.out_msg(g_print_header1);
+        cux_conc_utl.out_msg(g_print_header2);
+
+-- todo
+        OPEN c_operating_unit;
+        FETCH c_operating_unit
+            INTO l_operating_unit;
+        CLOSE c_operating_unit;
+
+        OPEN c_vendor_name;
+        FETCH c_vendor_name
+            INTO l_party_name;
+        CLOSE c_vendor_name;
+        
+        l_print_string := g_print_header2_2;
+        l_print_string := REPLACE(l_print_string
+                                 ,'TEXT01'
+                                 ,nvl(l_operating_unit
+                                     ,l_cell_null));
+        l_print_string := REPLACE(l_print_string
+                                 ,'TEXT02'
+                                 ,nvl(to_char(l_party_name)
+                                     ,l_cell_null));
+        l_print_string := REPLACE(l_print_string
+                                 ,'TEXT03'
+                                 ,nvl(to_char(SYSDATE
+                                             ,'YYYY-MM-DD')
+                                     ,l_cell_null));
+        l_print_string := REPLACE(l_print_string
+                                 ,'TEXT04'
+                                 ,nvl(to_char(p_order_date_f
+                                             ,'YYYY-MM-DD')
+                                     ,l_cell_null));
+        l_print_string := REPLACE(l_print_string
+                                 ,'TEXT05'
+                                 ,nvl(to_char(p_order_date_t
+                                             ,'YYYY-MM-DD')
+                                     ,l_cell_null));
+        /*l_print_string := REPLACE(l_print_string
+                                 ,'TEXT06'
+                                 ,nvl(to_char(p_invoice_date_f
+                                             ,'YYYY-MM-DD')
+                                     ,l_cell_null));
+        l_print_string := REPLACE(l_print_string
+                                 ,'TEXT07'
+                                 ,nvl(to_char(p_invoice_date_t
+                                             ,'YYYY-MM-DD')
+                                     ,l_cell_null));*/
+        cux_conc_utl.out_msg(l_print_string);
+
+        cux_conc_utl.out_msg(g_print_header3);
+        -- 打开动态游标
+        
+        FOR l_rec IN mainData LOOP
+
+            --print report body
+            l_print_string := g_print_body;
+
+            l_print_string := REPLACE(l_print_string----核算主体
+                                     ,'核算主体'
+                                     ,nvl(to_char(l_rec.orgName)
+                                         ,l_cell_null));
+            l_print_string := REPLACE(l_print_string----收款单位
+                                     ,'收款单位'
+                                     ,nvl(to_char(l_rec.skdw)
+                                         ,l_cell_null));
+                                         
+             --l_print_string := REPLACE(l_print_string----合同号
+             --                        ,'合同号'
+             --                        ,nvl(to_char(l_rec.hth)
+             --                            ,l_cell_null));
+            l_print_string := REPLACE(l_print_string --订单号
+                                     ,'订单号'
+                                     ,nvl(to_char(l_rec.ddh)
+                                         ,l_cell_null));
+            l_print_string := REPLACE(l_print_string --订单日期
+                                     ,'订单日期'
+                                     ,nvl(to_char(l_rec.CREATION_DATE)
+                                         ,l_cell_null));
+             l_print_string := REPLACE(l_print_string----物料
+                                     ,'物料大类说明'
+                                     ,nvl(to_char(l_rec.wl)
+                                         ,l_cell_null));                         
+             
+            l_print_string := REPLACE(l_print_string
+                                     ,'预付保证金'
+                                     ,nvl(to_char(l_rec.yfbzj)
+                                         ,l_cell_null));
+            l_print_string := REPLACE(l_print_string
+                                     ,'预付货款'
+                                     ,nvl(to_char(l_rec.yfkje)
+                                         ,l_cell_null));
+            l_print_string := REPLACE(l_print_string
+                                     ,'发货货款'
+                                     ,nvl(to_char(l_rec.amount)
+                                         ,l_cell_null));
+
+            l_print_string := REPLACE(l_print_string
+                                     ,'在途资金'
+                                     ,nvl(to_char(l_rec.ztzj)
+                                         ,l_cell_null));
+            cux_conc_utl.out_msg(l_print_string);
+        END LOOP;
+
+        --print report footer
+        cux_conc_utl.out_msg(g_print_footer);
+
+        -- API end body
+        -- end activity, include debug message hint to exit api
+        cux_api.end_activity(p_pkg_name => g_pkg_name
+                            ,p_api_name => l_api_name
+                            ,p_commit => p_commit
+                            ,x_msg_count => x_msg_count
+                            ,x_msg_data => x_msg_data);
+    EXCEPTION
+        WHEN fnd_api.g_exc_error THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_error
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+        WHEN fnd_api.g_exc_unexpected_error THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_unexp
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+        WHEN OTHERS THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_others
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+    END process_report;
+
+    /*====================================================
+    *  FUNCTION / PROCEDURE
+    *       process_request
+    *   DESCRIPTION:
+    *      主程序
+    *   ARGUMENT:
+    *
+    *   RETURN:
+    *       N/A
+    *   HISTORY:
+    *     1.00  2016.03.02  HY.  Creation
+    =======================================================*/
+    PROCEDURE process_request(p_init_msg_list  IN VARCHAR2 DEFAULT fnd_api.g_false
+                             ,p_commit         IN VARCHAR2 DEFAULT fnd_api.g_false
+                             ,x_return_status  OUT NOCOPY VARCHAR2
+                             ,x_msg_count      OUT NOCOPY NUMBER
+                             ,x_msg_data       OUT NOCOPY VARCHAR2
+                             ,p_org_id         IN NUMBER
+                             ,p_vendor_id      IN NUMBER
+                             ,p_order_date_f   IN DATE
+                             ,p_order_date_t   IN DATE
+                             --,p_invoice_date_f IN DATE
+                             --,p_invoice_date_t IN DATE
+                             ) IS
+
+        l_api_name CONSTANT VARCHAR2(30) := 'process_request';
+        l_api_type CONSTANT VARCHAR2(30) := '_sp1';
+
+    BEGIN
+
+        -- start activity to create savepoint, check compatibility
+        -- and initialize message list, include debug message hint to enter api
+        x_return_status := cux_api.start_activity(p_pkg_name => g_pkg_name
+                                                 ,p_api_name => l_api_name
+                                                 ,p_api_type => l_api_type
+                                                 ,p_init_msg_list => p_init_msg_list);
+        IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+            RAISE fnd_api.g_exc_unexpected_error;
+        ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+            RAISE fnd_api.g_exc_error;
+        END IF;
+
+        process_data(p_init_msg_list => fnd_api.g_false
+                    ,p_commit => fnd_api.g_false
+                    ,x_return_status => x_return_status
+                    ,x_msg_count => x_msg_count
+                    ,x_msg_data => x_msg_data
+                    ,p_org_id => p_org_id
+                    ,p_vendor_id => p_vendor_id
+                    ,p_order_date_f => p_order_date_f
+                    ,p_order_date_t => p_order_date_t
+                    --,p_invoice_date_f => p_invoice_date_f
+                    --,p_invoice_date_t => p_invoice_date_t
+                    );
+        IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+            RAISE fnd_api.g_exc_unexpected_error;
+        ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+            RAISE fnd_api.g_exc_error;
+        END IF;
+
+        process_report(p_init_msg_list => fnd_api.g_false
+                      ,p_commit => fnd_api.g_false
+                      ,x_return_status => x_return_status
+                      ,x_msg_count => x_msg_count
+                      ,x_msg_data => x_msg_data
+                      ,p_org_id => p_org_id
+                      ,p_vendor_id => p_vendor_id
+                      ,p_order_date_f => p_order_date_f
+                      ,p_order_date_t => p_order_date_t
+                      --,p_invoice_date_f => p_invoice_date_f
+                      --,p_invoice_date_t => p_invoice_date_t
+                      );
+        IF (x_return_status = fnd_api.g_ret_sts_unexp_error) THEN
+            RAISE fnd_api.g_exc_unexpected_error;
+        ELSIF (x_return_status = fnd_api.g_ret_sts_error) THEN
+            RAISE fnd_api.g_exc_error;
+        END IF;
+        -- API end body
+        -- end activity, include debug message hint to exit api
+        cux_api.end_activity(p_pkg_name => g_pkg_name
+                            ,p_api_name => l_api_name
+                            ,p_commit => p_commit
+                            ,x_msg_count => x_msg_count
+                            ,x_msg_data => x_msg_data);
+
+    EXCEPTION
+        WHEN fnd_api.g_exc_error THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_error
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+        WHEN fnd_api.g_exc_unexpected_error THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_unexp
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+        WHEN OTHERS THEN
+            x_return_status := cux_api.handle_exceptions(p_pkg_name => g_pkg_name
+                                                        ,p_api_name => l_api_name
+                                                        ,p_api_type => l_api_type
+                                                        ,p_exc_name => cux_api.g_exc_name_others
+                                                        ,x_msg_count => x_msg_count
+                                                        ,x_msg_data => x_msg_data);
+    END process_request;
+
+    PROCEDURE main(errbuf           OUT VARCHAR2
+                  ,retcode          OUT VARCHAR2
+                  ,p_org_id         IN NUMBER
+                  ,p_vendor_id      IN NUMBER
+                  ,p_order_date_f   IN VARCHAR2
+                  ,p_order_date_t   IN VARCHAR2
+                  --,p_invoice_date_f IN VARCHAR2
+                  --,p_invoice_date_t IN VARCHAR2
+                  ) IS
+        l_return_status  VARCHAR2(30);
+        l_msg_count      NUMBER;
+        l_msg_data       VARCHAR2(2000);
+        l_order_date_f   DATE;
+        l_order_date_t   DATE;
+        l_invoice_date_f DATE;
+        l_invoice_date_t DATE;
+
+        --l_date_to       DATE;
+    BEGIN
+        retcode := '0';
+        -- concurrent header log
+        cux_conc_utl.log_header;
+        -- conc body
+        mo_global.set_policy_context('S'
+                                    ,p_org_id);
+        -- convert parameter data type, such as varchar2 to date
+        l_order_date_f   := trunc(fnd_conc_date.string_to_date(p_order_date_f));
+        l_order_date_t   := trunc(fnd_conc_date.string_to_date(p_order_date_t)) + 0.99999;
+        --l_invoice_date_f := trunc(fnd_conc_date.string_to_date(p_invoice_date_f));
+        --l_invoice_date_t := trunc(fnd_conc_date.string_to_date(p_invoice_date_t)) + 0.99999;
+        --l_date_to := trunc(SYSDATE) + 0.99999;
+
+        -- call process request api
+        process_request(p_init_msg_list => fnd_api.g_true
+                       ,p_commit => fnd_api.g_true
+                       ,x_return_status => l_return_status
+                       ,x_msg_count => l_msg_count
+                       ,x_msg_data => l_msg_data
+                       ,p_org_id => p_org_id
+                       ,p_vendor_id => p_vendor_id
+                       ,p_order_date_f => l_order_date_f
+                       ,p_order_date_t => l_order_date_t
+                       --,p_invoice_date_f => l_invoice_date_f
+                       --,p_invoice_date_t => l_invoice_date_t
+                       );
+
+        IF l_return_status = fnd_api.g_ret_sts_error THEN
+            RAISE fnd_api.g_exc_error;
+        ELSIF l_return_status = fnd_api.g_ret_sts_unexp_error THEN
+            RAISE fnd_api.g_exc_unexpected_error;
+        END IF;
+
+        -- conc end body
+        -- concurrent footer log
+        cux_conc_utl.log_footer;
+
+    EXCEPTION
+        WHEN fnd_api.g_exc_error THEN
+            IF fnd_global.conc_request_id > 0 THEN
+                cux_conc_utl.log_message_list;
+            END IF;
+            retcode := '1';
+            fnd_msg_pub.count_and_get(p_encoded => fnd_api.g_false
+                                     ,p_count => l_msg_count
+                                     ,p_data => l_msg_data);
+            IF l_msg_count > 1 THEN
+                l_msg_data := fnd_msg_pub.get_detail(p_msg_index => fnd_msg_pub.g_first
+                                                    ,p_encoded => fnd_api.g_false);
+            END IF;
+            errbuf := l_msg_data;
+        WHEN fnd_api.g_exc_unexpected_error THEN
+            IF fnd_global.conc_request_id > 0 THEN
+                cux_conc_utl.log_message_list;
+            END IF;
+            retcode := '2';
+            fnd_msg_pub.count_and_get(p_encoded => fnd_api.g_false
+                                     ,p_count => l_msg_count
+                                     ,p_data => l_msg_data);
+            IF l_msg_count > 1 THEN
+                l_msg_data := fnd_msg_pub.get_detail(p_msg_index => fnd_msg_pub.g_first
+                                                    ,p_encoded => fnd_api.g_false);
+            END IF;
+            errbuf := l_msg_data;
+        WHEN OTHERS THEN
+            fnd_msg_pub.add_exc_msg(p_pkg_name => g_pkg_name
+                                   ,p_procedure_name => 'MAIN'
+                                   ,p_error_text => substrb(dbms_utility.format_error_backtrace || '-' || SQLERRM
+                                                           ,1
+                                                           ,240));
+            IF fnd_global.conc_request_id > 0 THEN
+                cux_conc_utl.log_message_list;
+            END IF;
+            retcode := '2';
+            errbuf  := SQLERRM;
+    END main;
+
+    --付款
+    function kaiKai_onway(p_vendor_name in varchar2,p_OU_code in varchar2)RETURN NUMBER IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+      x_vendor_id number;
+      x_org_id     number;
+      x_ed         number; 
+      x_fukuan     number;
+      x_amount     number;
+      x_ztzj       number;
+      --------------------
+      x_return_status  VARCHAR2(30);
+        x_msg_count      NUMBER;
+        x_msg_data       VARCHAR2(2000);
+
+      begin
+        
+     if(p_OU_code='005' or p_OU_code='006' or p_OU_code='011' or p_OU_code is null) then
+      return 0;
+      end if;
+      
+              SELECT pv.VENDOR_ID --根据传递的供应商中文名，转换为Oracle的对应vendor_id
+          into x_vendor_id
+          FROM po_vendors pv
+         WHERE pv.vendor_name = p_vendor_name;
+         --return x_vendor_id;
+         SELECT hou.Organization_id into x_org_id--根据代码获取OU的id
+            FROM   hr_operating_units hou
+            where substr(hou.short_code,2,length(p_OU_code))=p_OU_code;
+            
+       delete CUX_FIN_PAYABLES_AGE_TEMP;
+       commit;
+      process_age_data(p_init_msg_list => fnd_api.g_false
+                                                 ,p_commit => fnd_api.g_false
+                                                 ,x_return_status => x_return_status
+                                                 ,x_msg_count => x_msg_count
+                                                 ,x_msg_data => x_msg_data
+                                                 ,p_org_id => x_org_id
+                                                 ,p_vendor_id => x_vendor_id
+                                                 ,p_not_pay_flag => 'Y');
+
+   Select sum(oa_order.yfkje + oa_order.yfbzj - Nvl(age_temp.amount, 0))
+     into x_ztzj
+     from (select ou.name orgName,
+                  a.skdw,
+                  b.ddh,
+                  --b.hth,
+                  b.wl,
+                  To_Char(poh.CREATION_DATE, 'yyyy-mm-dd') CREATION_DATE,
+                  Sum(nvl(decode(b.bcfklx, '1', b.bcfkje, 0), 0)) yfbzj,
+                  Sum(nvl(decode(b.bcfklx, '0', b.bcfkje, 0), 0)) yfkje
+             From formtable_main_10@oadb     a,
+                  formtable_main_10_dt1@oadb b,
+                  workflow_requestbase@oadb  c,
+                  po_headers_all             poh,
+                  CUX_OU_ORGANIZATION_V      ou
+            where a.id = b.mainid
+              and b.ddh = poh.segment1
+              AND poh.vendor_id = nvl(x_vendor_id, poh.vendor_id)
+              /*AND poh.creation_date BETWEEN
+                  nvl(p_order_date_f, poh.creation_date) AND
+                  nvl(p_order_date_t, poh.creation_date)*/
+              and poh.ORG_ID = Nvl(x_org_id, poh.ORG_ID)
+              and poh.ORG_ID = ou.organization_id
+              and a.requestid = c.requestid
+              and c.status = '归档'
+            group by ou.name, a.skdw, b.ddh, b.wl, poh.CREATION_DATE) oa_order, --, b.hth
+          (Select po_number, sum(qty) qty, sum(amount) amount
+             from cux_fin_payables_age_temp t
+            group by t.po_number) age_temp
+    Where oa_order.ddh = age_temp.po_number(+);
+             
+ /*Select sum(fkje - nvl(amount, 0)) into x_ztzj
+   from (select b.ddh, Nvl(sum(b.bcfkje), 0) fkje --into x_fukuan
+           From formtable_main_10@oadb     a,
+                formtable_main_10_dt1@oadb b,
+                workflow_requestbase@oadb  c
+          where a.id = b.mainid
+            and a.requestid = c.requestid
+            and c.status = '归档' and a.skdw=p_vendor_name
+          group by b.ddh) fkd,
+        (select age_temp.po_number, sum(age_temp.amount) amount
+           from CUX_FIN_PAYABLES_AGE_TEMP age_temp
+          group by age_temp.po_number) age
+  where fkd.ddh = age.po_number;*/
+
+       delete CUX_FIN_PAYABLES_AGE_TEMP;
+       commit;
+       --return x_amount;
+       return x_ztzj;
+        exception
+          WHEN OTHERS THEN
+            --DBMS_OUTPUT.PUT_LINE(SQLCODE||'---'||SQLERRM);
+            rollback;
+            return 10;
+       end kaiKai_onway;
+       
+       
+--预付款额度
+    function kaiKai_YfkED(p_vendor_name in varchar2,p_OU_code in varchar2)RETURN number IS
+      x_vendor_id number;
+      x_org_id     number;
+      x_ed         number;            
+      begin
+        
+      if(p_OU_code='005' or p_OU_code='006' or p_OU_code is null) then --  or p_OU_code='011'
+      return 10000000000;
+      end if;
+      
+      SELECT pv.VENDOR_ID --根据传递的供应商中文名，转换为Oracle的对应vendor_id
+          into x_vendor_id
+          FROM po_vendors pv
+         WHERE pv.vendor_name = p_vendor_name;
+         --return x_vendor_id;
+         SELECT hou.Organization_id into x_org_id--根据代码获取OU的id
+            FROM   hr_operating_units hou
+            where substr(hou.short_code,2,length(p_OU_code))=p_OU_code;
+            
+            
+        select cdcsl.LOOKUP_VALUE into x_ed
+          from cux_dis_credit_set_lines   cdcsl,
+               cux_dis_credit_set_headers cdcsh,
+               hr_operating_units         hou,
+               ap_suppliers               ap
+         where cdcsl.HEADER_ID = cdcsh.HEADER_ID
+           and cdcsh.ORG_ID = hou.organization_id
+           and Lookup_code = 'PO_YFKED'
+           and ap.VENDOR_ID = cdcsh.VENDOR_OR_CUST_ID
+           and substr(hou.short_code, 2, length(p_OU_code)) = p_OU_code
+           and ap.VENDOR_NAME = p_vendor_name;
+        --return p_vendor_name; 
+        --return x_vendor_id;
+        return To_number(Nvl(x_ed,0));
+
+        exception
+          WHEN OTHERS THEN
+            ---return 300;
+            return 300000000;
+       end;
+       
+END cux_fin_onway_oa_Bydealer_pkg;

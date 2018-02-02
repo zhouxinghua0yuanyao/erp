@@ -1,0 +1,24 @@
+Is the period of the cancelled batch still open or already closed? 
+
+ If the inventory period is still open, please try script below on TEST instance firstly: 
+
+ Update gme_batch_header 
+ set batch_status = 2 -- wip batch 
+ where batch_id = &cancelled_batch_id; 
+
+select * from gme_batch_header where batch_no='1002196' and batch_id=86587
+
+Update gme_batch_header set batch_status = 2 -- wip batch 
+ where batch_id = 86587;
+
+ commit; 
+
+ Load batch to the Batch Details form. Go into (Menu) Inventory > Correct Material Transactions and delete the transactions that are there via red 'X' short key. Actual transaction quantity should be recalculated to zero. 
+
+ Update gme_batch_header 
+ set batch_status = -1 -- canceled batch 
+ where batch_id =&cancelled_batch_id; 
+
+ commit; 
+
+ Verify the issue and feedback result on Sr please. 

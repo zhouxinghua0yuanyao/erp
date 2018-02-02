@@ -1,0 +1,174 @@
+<html>
+<head>
+<title>Update 13857555 - RCA: ISSUES WITH DUPLICATE PAYEE DELETION GDF: 10140168</title>
+
+<style type='text/css'>
+.OraHeaderSub
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:14pt;
+        color:#3a5a87;
+        font-weight:bold
+}
+.OraHeaderSubSub
+{
+        font-family:Tahoma,Helvetica,Geneva,sans-serif;
+        font-size:8pt;
+        color:#3a5a87;
+        font-weight:bold;
+}
+.OraTableCellText
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:9pt;
+        background-color:#eaeff5;
+        color:#000000;
+}
+.OraTableRowHeader
+{
+        font-family:Arial, Helvetica, Geneva, sans-serif;
+        font-size:10pt;
+        font-weight:bold;
+        text-align:left;
+        background-color:#cfe0f1;
+        color:#3c3c3c;
+        text-indent:1
+}
+.OraErrorText
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:10pt;
+        font-weight:bold;
+        color:#cc0000
+}
+
+.OraBGColorDark
+{
+    background-color:#3a5a87
+}
+.PhaseHeader
+{
+        font-family:Tahoma, Helvetica, Geneva, sans-serif;
+        font-size:10pt;
+        text-align:left;
+        background-color:#cfe0f1;
+        color:#3c3c3c;
+        text-indent:1;
+}
+</style>
+
+</head>
+
+<body background=#ffffff>
+<table width=620>
+<tr><td>
+<table border=0 cellpadding=0 cellspacing=0 width=100%>
+<tr>
+<td valign=top width=100% height=14 class=OraBGColorDark>&nbsp;</td>
+</tr>
+</table>
+
+<table width=100% border="0" cellpadding=3>
+<tr>
+<th class=OraTableRowHeader colspan=2>
+Abstract
+</th>
+</tr>
+<tr>
+<td class=OraTableCellText colspan=2>
+RCA: ISSUES WITH DUPLICATE PAYEE DELETION GDF: 10140168
+</td>
+</tr>
+
+
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader nowrap>Update</td>
+<td class=OraTableCellText width="100%">13857555</td>
+</tr>
+<tr>
+<th class=OraTableRowHeader nowrap>Product</td>
+<td class=OraTableCellText width="100%">Oracle Payments</td>
+</tr>
+<tr>
+<th class=OraTableRowHeader nowrap>Release</td>
+<td class=OraTableCellText width="100%">R12</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader nowrap>Platform</td>
+<td class=OraTableCellText width="100%">Generic Platform</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader nowrap>Built</td>
+<td class=OraTableCellText width="100%">MAY-22-2015 17:22:22</td>
+</tr>
+
+<tr>
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+
+<tr>
+<th class=OraTableRowHeader colspan=2>
+Instructions
+</th>
+</tr>
+<tr>
+<td class=OraTableCellText colspan=2>
+<pre>
+<table border=0 cellpadding=3 class=nomargins width=100%>
+  <tbody>
+  <tr><td class=OraTableRowHeader>Instructions For Applying This Patch
+  </td></tr>
+  <tr><td class=OraTableCellText></td></tr><tr><td class=PhaseHeader><b>Apply The Patch</b><p>For 12.0.X / 12.1.X / pre-upgrade patches (using adpatch), you must shut down
+all Application tier services before performing the tasks in this section.
+For 12.2.X patches (using adop), you can perform the tasks in this section
+without shutting down the Application tier services.</td></tr><tr><td class=OraTableCellText><font class=OraHeaderSubSub>Apply patch</font>
+<font class=AruLegendBlue>[required]</font>
+<pre>Apply the patch with ADOP:
+  adop phase=apply patches=13857555</pre></td></tr></tbody></table>
+</pre>
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+<tr>
+<th class=OraTableRowHeader colspan=2>
+Description
+</th>
+</tr>
+<tr>
+<td class=OraTableCellText colspan=2>
+<pre>
+Script to Remove Duplicate Payees and their references.
+</pre>
+</td>
+</tr>
+
+<tr>
+<td colspan=2>
+&nbsp;
+</td>
+</tr>
+
+</table><table border=0 cellpadding=0 cellspacing=0 width=100%>
+<tr>
+<td valign=top width=100% height=14 class=OraBGColorDark>&nbsp;</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--|    Copyright (c) 2005, 2014 Oracle and/or its affiliates.           |-->
+<!--|                         All rights reserved.                        |-->
+<!--|                           Version 12.0.0                            |-->
+<!-- $Header: ad_apply_patch.xml 120.4.12020000.4 2014/03/29 05:11:12 vgannara ship $ -->
+<manual_step>
+<key>ad_apply_patch</key>
+<product>ad</product>
+<type>required</type>
+<title> Apply patch </title>
+<category>ad_apply_patch</category>
+<text>Apply the patch with ADOP:
+  adop phase=apply patches=%patch_number%</text>
+</manual_step>

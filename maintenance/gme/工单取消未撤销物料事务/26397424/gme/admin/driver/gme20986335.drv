@@ -1,0 +1,24 @@
+# $Header: gme20986335.drv 120.0.12020000.5 2015/04/30 17:19:36 jjgao noship $
+# # ============================================================
+# # Copyright (c) 1999,2015 Oracle Corporation .  All Rights Reserved.
+# # ============================================================
+# # ============================================================
+# # FILENAME
+# #     gme20986335.drv
+# # DESCRIPTION
+# #     Sub File driver for 20986335
+# #
+# # NOTES
+# #
+# # HISTORY
+# #  ============================================================
+if installation-type admin node nodedev forms formsdev web webdev
+       gme           xml/orc115      gme_cbr_batchhold.dtd
+endif
+if installation-type forms
+    gme  forms/<LANG> GMEBDOHD.fmx
+endif
+
+if installation-type formsdev
+    gme forms/<LANG> GMEBDOHD.fmb  fmb au forms/<LANG>
+endif

@@ -1,0 +1,22 @@
+#################################################################
+# $Header: gme16974953.drv 120.0.12020000.2 2013/06/18 09:31:18 jjgao noship $
+# # ============================================================
+# # Copyright (c) Oracle Corporation 1999 All Rights Reserved.
+# # ============================================================
+#
+# # ============================================================
+# # FILENAME
+# #     gme16974953.drv for bug 16974953
+if installation-type forms
+    gme     forms/<LANG>     GMEBAIED.fmx
+    gme     forms/<LANG>     GMEBDIED.fmx
+    gme     forms/<LANG>     GMEBTIED.fmx
+    gme     forms/<LANG>     GMERTIED.fmx
+endif
+
+if installation-type formsdev
+    gme     forms/<LANG>     GMEBAIED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEBDIED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMEBTIED.fmb   fmb au forms/<LANG>
+    gme     forms/<LANG>     GMERTIED.fmb   fmb au forms/<LANG>
+endif

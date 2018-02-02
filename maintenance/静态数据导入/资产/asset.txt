@@ -1,0 +1,3 @@
+create table zxh_BAD_ASSETS as 
+ select distinct bk.book_type_code, bk.asset_id from FA_BOOKS bk where book_type_code='FA_A001_CORP' and last_update_date>=to_date('2017/07/27','yyyy/mm/dd')
+ 

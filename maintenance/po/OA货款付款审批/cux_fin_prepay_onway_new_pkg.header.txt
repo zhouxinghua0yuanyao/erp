@@ -1,0 +1,131 @@
+﻿CREATE OR REPLACE PACKAGE cux_fin_prepay_onway_new_pkg IS
+  /*==================================================
+  Copyright (C) Yuanyao Shit
+             AllRights Reserved
+  ==================================================*/
+  /*==================================================
+  Program Name:
+      cux_fin_prepay_onway_oa_pkg
+  Description:
+      This program provide private API to perform:
+       FIN-032_预付在途资金报表（管理）
+  History:
+      1.00  2016-07-31  Zhou xinghua Creation
+  ==================================================*/
+
+  PROCEDURE main(errbuf           OUT VARCHAR2,
+                 retcode          OUT VARCHAR2,
+                 p_org_id         IN NUMBER,
+                 p_vendor_id      IN NUMBER,
+                 p_order_date_f   IN VARCHAR2,
+                 p_order_date_t   IN VARCHAR2
+                 --,
+                 --p_invoice_date_f IN VARCHAR2,
+                 --p_invoice_date_t IN VARCHAR2
+                 );
+
+function get_invoiceTotalAmt(p_transaction_id number) return number;
+function kaiKai_onway(p_vendor_name in varchar2,p_OU_code in varchar2)RETURN NUMBER;
+
+  --
+  FUNCTION get_po_total_qty(p_po_header_id IN NUMBER) RETURN NUMBER;
+  FUNCTION get_po_total_amount(p_po_header_id IN NUMBER) RETURN NUMBER;
+  g_print_header0 VARCHAR2(300) := '<html>' ||
+                                   '<meta http-equiv="Content-Language" content="zh-cn">' ||
+                                   '<meta http-equiv="Content-Type" content="text/html; charset=G_CHARSET">';
+  g_print_header1 CONSTANT VARCHAR2(5000) := '<title> CUX:OA预付在途资金报表 </title>' ||
+                                             '<style type="text/css">' ||
+                                             '<-- $header: porstyl2.css 115.9 2011/02/21 09:21:42 DFLEE ship ${  }' ||
+                                             '<!--' ||
+                                             '   body         {background-color: #ffffff;}' ||
+                                             '   .subheader1  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 13pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' ||
+                                             '   .subheader2  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' ||
+                                             '   .tableheader {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 background: #E0ECF8;' ||
+                                             '                 color: #336699;' ||
+                                             '                 text-align: center;}' ||
+                                             '   .tabledata   {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 mso-number-format: "\@"}' ||
+                                             '   .tabledata2  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 color: #000000;' ||
+                                             '                 mso-number-format: "\@"}' ||
+                                             '   .tablenumber {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 text-align: right}' ||
+                                             '   .tablenum002 {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 9pt;' ||
+                                             '                 background: #EFF5FB;' ||
+                                             '                 color: #000000;' ||
+                                             '                 text-align: right;' ||
+                                             '                 mso-number-format: "0\.0000";}' ||
+                                             '    .footer  {font-family: Arial, Helvetica, Geneva, sans-serif;' ||
+                                             '                 font-size: 10pt;' ||
+                                             '                 font-weight: bold;' ||
+                                             '                 color: #336699;}' || '-->' ||
+                                             '</style>';
+
+  g_print_header2 VARCHAR2(500) := '<body>' ||
+                                   '<TABLE border=0 cellpadding=0 cellspacing=0 width=1200>' ||
+                                   '<TR><th colspan=24 class=subheader1 align=center style="margin-top: 0">CUX:OA预付在途资金</th></TR>' ||
+                                   '</TABLE>';
+
+  g_print_header2_2 VARCHAR2(2000) := '<TABLE border=0 cellpadding=0 cellspacing=0 width=900>' ||
+                                      '<TR><td class="tabledata2">业务实体：</td> <td align = left class="tabledata2">TEXT01</td> ' ||
+                                      '<td class="tabledata2">供应商：</td><td align = "left" class="tabledata2">TEXT02</td>  ' ||
+                                      '<td class="tabledata2">制单日期：</td><td align = "left" class="tabledata2">TEXT03</td>  ' ||
+                                      '</TR> ' ||
+                                      '<TR><td class="tabledata2">订单日期从：</td> <td align = left class="tabledata2">TEXT04</td> ' ||
+                                      '<td class="tabledata2">订单日期至：</td><td align = "left" class="tabledata2">TEXT05</td>  ' ||
+                                      --'<td class="tabledata2">预付款日期从：</td><td align = "left" class="tabledata2">TEXT06</td>  ' ||
+                                      --'<td class="tabledata2">预付款日期至：</td><td align = "left" class="tabledata2">TEXT07</td>  ' ||
+                                      '</TR></TABLE>';
+
+  g_print_header3 CONSTANT VARCHAR2(5000) := '<TABLE width=900 border=1 cellpadding=3 cellspacing=1><tr>' ||
+                                             '<td class="tableheader" nowrap width="100">核算主体</td>' ||
+                                             '<td class="tableheader" nowrap width="100">业务类型</td>' ||
+                                             '<td class="tableheader" nowrap width="100">合同类型</td>' ||
+                                             '<td class="tableheader" nowrap width="100">订单日期</td>' ||
+                                             '<td class="tableheader" nowrap width="100">供应商</td>' ||
+                                             '<td class="tableheader" nowrap width="100">订单号</td>' ||
+                                             '<td class="tableheader" nowrap width="100">部门</td>' ||
+                                             '<td class="tableheader" nowrap width="100">业务员</td>' ||
+                                             '<td class="tableheader" nowrap width="100">币种</td>' ||
+                                             '<td class="tableheader" nowrap width="100">申请数量</td>' ||
+                                             '<td class="tableheader" nowrap width="100">入库数量</td>' ||
+                                             '<td class="tableheader" nowrap width="100">已执行数量</td>' ||
+                                             '<td class="tableheader" nowrap width="100">发票金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">已执行金额</td>' ||
+                                             '<td class="tableheader" nowrap width="100">已付款</td></tr>';
+
+  g_print_body VARCHAR2(32767) := '<tr><td class="tabledata">$核算主体$</td>' ||
+                                  '<td class="tabledata">$业务类型$</td>' ||
+                                  '<td class="tabledata">$合同类型$</td>' ||
+                                  '<td class="tabledata">$订单日期$</td>' ||
+                                  '<td class="tabledata">$供应商$</td>' ||
+                                  '<td class="tabledata">$订单号$</td>' ||
+                                  '<td class="tabledata">$部门$</td>' ||
+                                  '<td class="tabledata">$业务员$</td>' ||
+                                  '<td class="tabledata">$币种$</td>' ||
+                                  '<td class="tablenumber">$申请数量$</td>' ||
+                                  '<td class="tablenumber">$入库数量$</td>' ||
+                                  '<td class="tablenumber">$已执行数量$</td>' ||
+                                  '<td class="tablenumber">$发票金额$</td>' ||
+                                  '<td class="tablenumber">$已执行金额$</td>' ||
+                                  '<td class="tablenumber">$已付款$</td></tr>';
+
+  g_print_footer CONSTANT VARCHAR2(30) := '</TABLE></body></html>';
+END cux_fin_prepay_onway_new_pkg;

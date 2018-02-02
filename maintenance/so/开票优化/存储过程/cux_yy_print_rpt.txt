@@ -1,0 +1,481 @@
+CREATE OR REPLACE PACKAGE cux_yy_print_rpt AS
+  /*==================================================
+  Copyright (C) Hand Enterprise Solutions Co.,Ltd.
+             AllRights Reserved
+  ==================================================*/
+  /*==================================================
+  Program Name:
+      CUX_PRINT_REEIPT_UTL
+  Description:
+      This program provide concurrent main procedure to perform:
+      PRINT
+  History:
+      1.00  2014/11/6 20:14:32  chunshan.huang  Creation
+  ==================================================*/
+
+  -- Author  : HUANG CHUNSHAN
+  -- Created : 2014/10/21 11:41:42
+  -- Purpose : 及时打印签收单 
+
+  PROCEDURE main(errbuf      OUT VARCHAR2
+                ,retcode     OUT VARCHAR2
+                ,p_header_id IN NUMBER);
+
+END cux_yy_print_rpt;
+
+
+
+
+CREATE OR REPLACE PACKAGE BODY cux_yy_print_rpt AS
+
+  /*==================================================
+  Copyright (C) Hand Enterprise Solutions Co.,Ltd.
+             AllRights Reserved
+  ==================================================*/
+  /*==================================================
+  Program Name:
+      cux_yy_print_rpt
+  Description:
+      This program provide concurrent main procedure to perform:
+      PRINT
+  History:
+      1.00  2014/11/6 20:14:32  chunshan.huang   Creation
+  ==================================================*/
+
+  -- Global variable
+  g_pkg_name CONSTANT VARCHAR2(30) := 'cux_yy_print_rpt';
+  -- Debug Enabled
+  l_debug VARCHAR2(1) := nvl(fnd_profile.value('AFLOG_ENABLED'), 'N');
+
+  /*===========================================================================
+  --   PROCEDURE NAME:    output
+  --   PURPOSE: Standard CONC output
+  =============================================================================*/
+
+  FUNCTION f_upper_money(p_num IN NUMBER DEFAULT NULL) RETURN NVARCHAR2 IS
+    /*Ver:1.0 Created By xsb on 2003-8-18 For:  
+    将金额数字(单位元)转换为大写(采用从低至高算法)  
+    数字整数部分不得超过16位,可以是负数。  
+    Ver：1.1 Modified By xsb on 2003-8-20 For:个位数处理也放在For循环中。  
+    Ver：1.2 Modified By xsb on 2003-8-22 For:分后不带整字。  
+    Ver：1.3 Modified By xsb on 2003-8-28 For:完善测试用例。  
+    测试用例:  
+    SET HEAD OFF  
+    SET FEED OFF  
+    select '无参数时='||f_upper_money() from dual;  
+    select 'null='||f_upper_money(null) from dual;  
+    select '0='||f_upper_money(0) from dual;  
+    select '0.01='||f_upper_money(0.01) from dual;  
+    select '0.126='||f_upper_money(0.126) from dual;  
+    select '01.234='||f_upper_money(01.234) from dual;  
+    select '10='||f_upper_money(10) from dual;  
+    select '100.1='||f_upper_money(100.1) from dual;  
+    select '100.01='||f_upper_money(100.01) from dual;  
+    select '10000='||f_upper_money(10000) from dual;  
+    select '10012.12='||f_upper_money(10012.12) from dual;  
+    select '20000020.01='||f_upper_money(20000020.01) from dual;  
+    select '3040506708.901='||f_upper_money(3040506708.901) from dual;  
+    select '40005006078.001='||f_upper_money(40005006078.001) from dual;  
+    select '-123456789.98='||f_upper_money(-123456789.98) from dual;  
+    select '123456789123456789.89='||f_upper_money(123456789123456789.89) from dual;  
+    */
+    RESULT      NVARCHAR2(100); --返回字符串  
+    num_round   NVARCHAR2(100) := to_char(abs(round(p_num, 2))); --转换数字为小数点后2位的字符(正数)  
+    num_left    NVARCHAR2(100); --小数点左边的数字  
+    num_right   NVARCHAR2(2); --小数点右边的数字  
+    str1        NCHAR(10) := '零壹贰参肆伍陆柒捌玖'; --数字大写  
+    str2        NCHAR(16) := '元拾佰仟万拾佰仟亿拾佰仟万拾佰仟'; --数字位数(从低至高)  
+    num_pre     NUMBER(1) := 1; --前一位上的数字  
+    num_current NUMBER(1); --当前位上的数字  
+    num_count   NUMBER := 0; --当前数字位数  
+  
+  BEGIN
+    IF p_num IS NULL THEN
+      RETURN NULL;
+    END IF; --转换数字为null时返回null  
+  
+    SELECT to_char(nvl(substr(to_char(num_round),
+                              1,
+                              decode(instr(to_char(num_round), '.'),
+                                     0,
+                                     length(num_round),
+                                     instr(to_char(num_round), '.') - 1)),
+                       0))
+    INTO   num_left
+    FROM   dual; --取得小数点左边的数字  
+    SELECT substr(to_char(num_round),
+                  decode(instr(to_char(num_round), '.'),
+                         0,
+                         length(num_round) + 1,
+                         instr(to_char(num_round), '.') + 1),
+                  2)
+    INTO   num_right
+    FROM   dual; --取得小数点右边的数字  
+  
+    IF length(num_left) > 16 THEN
+      RETURN '**********';
+    END IF; --数字整数部分超过16位时  
+  
+    --采用从低至高的算法，先处理小数点右边的数字  
+    IF length(num_right) = 2 THEN
+      IF to_number(substr(num_right, 1, 1)) = 0 THEN
+        RESULT := '零' ||
+                  substr(str1, to_number(substr(num_right, 2, 1)) + 1, 1) || '分';
+      ELSE
+        RESULT := substr(str1, to_number(substr(num_right, 1, 1)) + 1, 1) || '角' ||
+                  substr(str1, to_number(substr(num_right, 2, 1)) + 1, 1) || '分';
+      END IF;
+    ELSIF length(num_right) = 1 THEN
+      RESULT := substr(str1, to_number(substr(num_right, 1, 1)) + 1, 1) || '角整';
+    ELSE
+      RESULT := '整';
+    END IF;
+    --再处理小数点左边的数字  
+    FOR i IN REVERSE 1 .. length(num_left) LOOP
+      --(从低至高)  
+      num_count   := num_count + 1; --当前数字位数  
+      num_current := to_number(substr(num_left, i, 1)); --当前位上的数字  
+      IF num_current > 0 THEN
+        --当前位上数字不为0按正常处理  
+        RESULT := substr(str1, num_current + 1, 1) ||
+                  substr(str2, num_count, 1) || RESULT;
+      ELSE
+        --当前位上数字为0时  
+        IF MOD(num_count - 1, 4) = 0 THEN
+          --当前位是元、万或亿时  
+          RESULT  := substr(str2, num_count, 1) || RESULT;
+          num_pre := 0; --元、万,亿前不准加零  
+        END IF;
+        IF num_pre > 0
+           OR length(num_left) = 1 THEN
+          --上一位数字不为0或只有个位时  
+          RESULT := substr(str1, num_current + 1, 1) || RESULT;
+        END IF;
+      END IF;
+      num_pre := num_current;
+    END LOOP;
+  
+    IF p_num < 0 THEN
+      --转换数字是负数时  
+      RESULT := '负' || RESULT;
+    END IF;
+  
+    RETURN RESULT;
+  
+  EXCEPTION
+    WHEN OTHERS THEN
+      raise_application_error(-20001, '数字转换大写出现错误！' || SQLERRM);
+  END;
+
+  PROCEDURE output(p_content IN VARCHAR2) IS
+  BEGIN
+    hand_conc_utl.out_msg(p_content);
+  END output;
+
+  /*===========================================================================
+  --   PROCEDURE NAME:    log
+  --   PURPOSE: Standard CONC log
+  =============================================================================*/
+  PROCEDURE log(p_content IN VARCHAR2) IS
+  BEGIN
+    hand_conc_utl.log_msg(p_content);
+  END log;
+
+  /*===========================================================================
+  --   PROCEDURE NAME:    set_error_msg
+  --   PURPOSE: 
+  =============================================================================*/
+  PROCEDURE set_error_msg(p_moulde_name IN VARCHAR2
+                         ,p_text        IN VARCHAR2) IS
+  BEGIN
+    fnd_msg_pub.add_exc_msg(p_pkg_name       => g_pkg_name,
+                            p_procedure_name => p_moulde_name,
+                            p_error_text     => p_text);
+  END set_error_msg;
+
+  --主程序
+  PROCEDURE main(errbuf      OUT VARCHAR2
+                ,retcode     OUT VARCHAR2
+                ,p_header_id IN NUMBER) IS
+    l_clob          CLOB;
+    l_clob_date1    CLOB;
+    l_clob_date2    CLOB;
+    l_clob_date3    CLOB;
+    l_print_name    VARCHAR2(200);
+    l_host          VARCHAR2(200);
+    l_sum_qty       NUMBER := 0;
+    l_sum_price     NUMBER := 0;
+    l_sum_disacount NUMBER := 0;
+    l_remark        VARCHAR2(240);
+  
+    --行
+    CURSOR cur_line IS
+      SELECT (SELECT msib.segment1
+              FROM   mtl_system_items_b msib
+              WHERE  oel.inventory_item_id = msib.inventory_item_id
+              AND    rownum = 1) item_code
+            ,(SELECT msib.description
+              FROM   mtl_system_items_b msib
+              WHERE  oel.inventory_item_id = msib.inventory_item_id
+              AND    rownum = 1) item_name
+            ,oel.order_quantity_uom
+            ,oel.ordered_quantity
+            ,oel.unit_selling_price
+            ,oel.attribute12 rematk
+            ,oel.header_id
+            ,oel.line_id
+            ,oel.ordered_quantity * oel.unit_selling_price amount
+      FROM   oe_order_lines_all oel
+      WHERE  oel.header_id = p_header_id and oel.flow_status_code<>'CANCELLED';
+  
+    --反利明细
+    CURSOR cur_discount(c_header_id NUMBER) IS
+      SELECT cdpd.creation_date
+            ,cdpd.type_meaning
+            ,cdpd.name_meaning
+            ,cdpd.discount_amount
+            ,cdpd.remark
+      FROM   cux_dis_price_discount_v cdpd
+      WHERE  cdpd.source_header_id = c_header_id;
+  
+    --客户
+    l_cust_name  VARCHAR2(100);
+    l_req_number VARCHAR2(100);
+    l_ship_date  VARCHAR2(12);
+  
+  BEGIN
+    l_host       := fnd_profile.value('TCF:HOST');
+    l_print_name := fnd_profile.value('CUX_PRINTER_NAME');
+    retcode      := '0';
+  
+    --客户
+    BEGIN
+      SELECT party.party_name
+            ,oeh.attribute6 remark
+      INTO   l_cust_name
+            ,l_remark
+      FROM   hz_parties           party
+            ,hz_cust_accounts     cust_acct
+            ,oe_order_headers_all oeh
+      WHERE  party.party_id = cust_acct.party_id
+      AND    cust_acct.cust_account_id = oeh.sold_to_org_id
+      AND    oeh.header_id = p_header_id;
+    EXCEPTION
+      WHEN OTHERS THEN
+        l_cust_name := NULL;
+    END;
+  
+    --发货单
+    BEGIN
+      SELECT t.req_number
+            ,to_char(t.estimate_in_out_date, 'YYYY-MM-DD')
+      INTO   l_req_number
+            ,l_ship_date
+      FROM   cux_dis_req_headers_all t
+      WHERE  t.so_header_id = p_header_id;
+    EXCEPTION
+      WHEN OTHERS THEN
+        l_req_number := NULL;
+        l_ship_date  := NULL;
+    END;
+  
+    l_clob_date1 := '
+        </br>
+        </br>
+        <h2 align="center" margin-top:20px>
+            江苏盐城源耀饲料有限公司 销售提货单
+        </h2>
+        <div align="center">
+            <table  width="90%">
+                <tr>
+                    <td colspan="2">
+                        <strong>客户名称: ' || l_cust_name || '</strong>
+                    </td>
+                    <td colspan="2">
+                        <strong>发货日期: ' || l_ship_date || '</strong>
+                    </td>
+                    <td colspan="3">
+                        <strong>发货单: ' || l_req_number || '</strong>
+                    </td>
+                </tr>
+      </table>
+      <table  border="1" bordercolor="#000000" cellspacing="0" cellpadding="2" style="border-collapse:collapse"  width="90%">
+         <tr>
+              <td><strong>物料编号</strong>   </td>
+              <td><strong>物料名称</strong>   </td>
+              <td><strong>主计量</strong>     </td>
+              <td><strong>数量</strong>       </td>
+              <td><strong>含税单价</strong>   </td>
+              <td><strong>价格合计</strong>   </td>
+              <td><strong>备注</strong>       </td>
+         </tr>';
+    FOR rec1 IN cur_line LOOP
+      l_sum_qty    := l_sum_qty + nvl(rec1.ordered_quantity, 0);
+      l_sum_price  := l_sum_price +
+                      nvl(rec1.ordered_quantity * rec1.unit_selling_price,
+                          0);
+      l_clob_date2 := l_clob_date2 || '
+           <tr>
+                    <td>
+                        ' || rec1.item_code || '
+                    </td>
+                    <td>
+                        ' || rec1.item_name || '
+                    </td>
+                    <td>
+                        ' || rec1.order_quantity_uom || '
+                    </td>
+                    <td align="center">
+                       ' ||
+                      to_char(rec1.ordered_quantity,'FM999999999990.00') || '
+                    </td>
+                    <td>
+                        ' ||
+                      to_char(rec1.unit_selling_price,'FM999999999990.00') || '
+                    </td>
+                    <td>
+                        ' ||
+                      to_char(rec1.ordered_quantity *
+                              rec1.unit_selling_price,'FM999999999990.00') || '
+                    </td>
+                    <td>
+                        ' || rec1.rematk || '
+                    </td>
+            </tr>';
+    END LOOP;
+  
+    l_clob_date3 := '
+        <tr>
+           <td colspan="7" align="center"><strong>返利明细表</strong></td>
+        </tr>
+        <tr>
+           <td><strong>客户名称</strong> </td>
+           <td><strong>日期</strong>     </td>
+           <td><strong>折扣类型</strong> </td>
+           <td><strong>折扣名称</strong> </td>
+           <td align="left"><strong>折扣金额</strong></td>
+           <td colspan = "2" ><strong>备注</strong></td>
+        </tr>';
+  
+    FOR rec2 IN cur_discount(p_header_id) LOOP
+      l_sum_disacount := l_sum_disacount + nvl(rec2.discount_amount, 0);
+    
+      l_clob_date3 := l_clob_date3 || '
+        <tr height="30px">
+           <td>
+             ' || l_cust_name || '
+           </td>
+           <td> ' ||
+                      to_char(rec2.creation_date, 'yyyy-mm-dd') || '
+           </td>
+           <td> ' || rec2.type_meaning || '
+           </td>
+           <td>' || rec2.name_meaning || '
+                    </td>
+           <td  align="left">
+                         ' || rec2.discount_amount || '
+           </td>
+            <td colspan = "2" >
+                         ' || rec2.remark || '
+           </td>
+        </tr>';
+    
+    END LOOP;
+    l_clob_date3 := l_clob_date3 || '</table>
+			<table border="0"  width="90%">
+				<tr height="30px">
+				  <td colspan = "2">整单合计(大写):' ||
+                    to_char(l_sum_price - l_sum_disacount,'FM999999999990.00') ||
+                    '</td>
+					<td colspan = "2">数量合计:' || to_char(l_sum_qty,'FM999999999990.00') ||
+                    '</td>
+					<td colspan = "3">含税合计:' ||
+                    to_char(l_sum_price - l_sum_disacount,'FM999999999990.00') ||
+                    '</td>
+				</tr>
+				<tr height="30px">
+				  <td colspan></td>
+					<td colspan>' ||
+                    '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' ||
+                    f_upper_money(l_sum_price - l_sum_disacount) ||
+                    '</td>
+					<td colspan = "1"></td>
+					<td colspan = "1"></td>
+					<td colspan = "1"></td>
+					<td colspan = "1"></td>
+          <td colspan = "1"></td>
+				</tr>
+				<tr height="30px">
+				    <td colspan = "7"><strong>
+                              第一联(白):存根 &nbsp;&nbsp;&nbsp;
+                              第二联(红):提货 &nbsp;&nbsp;&nbsp;
+                              第三联(蓝):客户 &nbsp;&nbsp;&nbsp;
+                              第四联(黄):出门 </strong></td>
+				</tr>
+				<tr height="30px">
+				   <td colspan = "4" align="left"><strong>注:本票据当日有效，逾期作废，请重新开票</strong></td>
+					 <td colspan = "3" align="left"><strong>联系电话：</strong></td>
+				</tr>
+				<tr height="30px">
+				    <td colspan = "7" align="left"><strong>备注：' ||
+                    l_remark || '</strong></td>
+				</tr>
+				
+            </table>
+        </div>';
+    l_clob       := l_clob || '<html><head><title>销售提货单</title>
+    <object id="jatoolsPrinter" classid="CLSID:B43D3361-D075-4BE2-87FE-057188254255"
+        codebase="' || l_host || '/printfile/jatoolsPrinter.cab#version=5,7,0,0
+        width="0" height="0">
+    </object>
+    <script type="text/javascript">
+        function doPrint(how) {
+            var myDoc = {
+              //  marginIgnored:true,
+                settings:{ 
+					      printer : ''' || l_print_name || ''',
+                leftMargin:2.08,
+                rightMargin:2.08,
+			      		paperWidth : 2400, 
+					      paperHeight : 1400, 
+					      orientation : 1 },
+                documents: document, 
+                copyrights: ''杰创软件拥有版权  www.jatools.com'' 
+            };
+            if (how == ''打印预览...'')
+                jatoolsPrinter.printPreview(myDoc); 
+            else if (how == ''print'')
+                jatoolsPrinter.print(myDoc, true); 
+            else
+				        jatoolsPrinter.print(myDoc, false);  
+        }
+    </script>
+    <META name=GENERATOR content="MSHTML 10.00.9200.17116">
+     <style type="text/css">
+       .a {width:230px;overflow:hidden;white-space:nowrap;font-family:"宋体";font-size:13pt;}
+        td{font-family:"宋体";font-size:13pt;}
+     </style>
+    </head>
+    <body onload = "doPrint(''...'')"> <div id=''page1''>';
+  
+    l_clob := l_clob || l_clob_date1 || l_clob_date2 || l_clob_date3 ||
+              '</div></body></html>';
+  
+    cux_conc_utl.out_msg(l_clob);
+  
+  EXCEPTION
+    WHEN fnd_api.g_exc_error THEN
+      cux_conc_utl.log_message_list;
+      retcode := '1';
+      errbuf  := SQLERRM;
+    WHEN fnd_api.g_exc_unexpected_error THEN
+      cux_conc_utl.log_message_list;
+      retcode := '2';
+      errbuf  := SQLERRM;
+    WHEN OTHERS THEN
+      cux_conc_utl.log_message_list;
+      retcode := '2';
+      errbuf  := SQLERRM;
+  END main;
+
+END cux_yy_print_rpt;

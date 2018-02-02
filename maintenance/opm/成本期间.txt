@@ -1,0 +1,32 @@
+APP-GMF-87931: Please open prior period before opening current period.
+
+Update GMF_PERIOD_STATUSES
+
+set delete_mark =1
+
+where period_id =&period_id
+
+ 
+
+commit
+
+ 
+
+2) Deletion of Calandar J
+
+Create table CM_CLDR_DTL_YEAR as
+
+Select * from CM_CLDR_DTL 
+
+where PERIOD_CODE='&PERIOD_CODE'  and CALENDAR_CODE='YEAR'
+
+ 
+
+ 
+
+Delete from CM_CLDR_DTL 
+
+where PERIOD_CODE='&PERIOD_CODE' and CALENDAR_CODE='YEAR'
+CST_CAL_N
+
+CREV_PREV_MTHD 的值无效

@@ -1,0 +1,6 @@
+DELETE FROM zx_lines_det_factors
+WHERE application_id = 660
+AND entity_code = 'OE_ORDER_HEADERS'
+AND event_class_code = 'SALES_TRANSACTION_TAX_QUOTE';
+
+COMMIT;
